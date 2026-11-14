@@ -820,6 +820,13 @@
       background: var(--ring-grad);
     }
     .ring.add { background: var(--yellow); }
+    .story-count {
+      position: absolute; right: -2px; bottom: -2px; z-index: 2;
+      min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box;
+      border-radius: 999px; background: var(--text); color: var(--bg);
+      font-size: 10px; font-weight: 700; line-height: 18px; text-align: center;
+      box-shadow: 0 0 0 2px var(--bg);
+    }
     .ring-inner {
       width: 100%; height: 100%; border-radius: 50%; background: var(--bg); padding: 2px; overflow: hidden;
       display: grid; place-items: center;
@@ -1812,8 +1819,23 @@
       position: absolute; top: calc(18px + var(--safe-top)); left: 12px; right: 12px;
       display: flex; align-items: center; gap: 10px; z-index: 8; pointer-events: auto; text-shadow: 0 1px 6px #000;
     }
-    #story-close { position: relative; z-index: 10; pointer-events: auto; }
-    .viewer-top h3 { font-size: 15px; font-weight: 600; flex: 1; }
+    #story-close, #story-more { position: relative; z-index: 10; pointer-events: auto; }
+    .viewer-top h3 { font-size: 15px; font-weight: 600; flex: 1; min-width: 0; }
+    #story-more { display: none; color: #fff; font-size: 20px; font-weight: 700; letter-spacing: 1px; }
+    #story-viewer.is-own #story-more { display: grid; }
+    #story-owner-actions {
+      display: none; position: absolute; left: 12px; right: 12px;
+      bottom: calc(16px + var(--safe-bot)); z-index: 8;
+      justify-content: center; pointer-events: auto;
+    }
+    #story-viewer.is-own #story-owner-actions { display: flex; }
+    #story-add-more {
+      height: 44px; padding: 0 16px; border-radius: 22px;
+      background: rgba(0,0,0,.5); color: #fff; font-weight: 600; font-size: 14px;
+      border: 1px solid rgba(255,255,255,.28);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    #story-more-sheet, #story-delete-sheet { z-index: 95; }
     .countdown {
       position: absolute; top: calc(62px + var(--safe-top)); right: 14px; z-index: 3;
       width: 42px; height: 42px; border-radius: 50%;
@@ -4338,9 +4360,13 @@
       <div class="viewer-top">
         <div class="av sm" id="story-av"></div>
         <h3 id="story-who"></h3>
+        <button type="button" class="icon-round" id="story-more" aria-label="More">⋯</button>
         <button type="button" class="icon-round" id="story-close" aria-label="Close">✕</button>
       </div>
       <div class="tap-zones"><div class="left" id="story-prev"></div><div class="right" id="story-next"></div></div>
+      <div id="story-owner-actions">
+        <button type="button" id="story-add-more">+ Add to story</button>
+      </div>
       <div id="story-reply">
         <div class="story-reacts" id="story-reacts">
           <button type="button" data-story-react="😂" aria-label="Reply with 😂">😂</button>
@@ -4357,6 +4383,22 @@
         </div>
       </div>
       <div class="viewer-capture-note" id="story-capture-note" hidden></div>
+    </div>
+    <div class="chat-sheet" id="story-more-sheet">
+      <div class="chat-sheet-card" role="dialog" aria-label="Story options">
+        <button type="button" class="sheet-action" id="story-more-delete" style="color:#FF3B30">Delete this story</button>
+        <button type="button" class="sheet-cancel" id="story-more-cancel">Cancel</button>
+      </div>
+    </div>
+    <div class="chat-sheet" id="story-delete-sheet">
+      <div class="chat-sheet-card" role="dialog" aria-label="Delete this story">
+        <h3>Delete this story?</h3>
+        <p class="privacy-note" style="padding:4px 12px 12px">It will be removed for everyone.</p>
+        <div class="qv-actions">
+          <button type="button" class="qv-cancel" id="story-delete-cancel">Cancel</button>
+          <button type="button" class="qv-send danger" id="story-delete-confirm">Delete</button>
+        </div>
+      </div>
     </div>
 
     <div id="snap-viewer">
@@ -6056,7 +6098,9 @@
       const unseen = byAuthor[aid].some(s => unseenStory(s.id));
       const name = aid === "me" ? "Your story" : p.name.split(" ")[0];
       const live = isLivePerson(aid);
-      row += '<button type="button" class="story-item" '+(live ? 'data-live="'+aid+'"' : 'data-story-author="'+aid+'"')+'><div class="ring-wrap"><div class="ring '+(live?"live ":"")+(unseen?"unseen":"")+'"><div class="ring-inner">'+avatarSVG(p.avatar, 56)+'</div></div>'+(live ? liveBadgeHtml(creatorMeta(aid).liveViewers) : "")+"</div><p>"+escapeHtml(name)+"</p></button>";
+      const count = byAuthor[aid].length;
+      const badge = (aid === "me" && count > 1) ? '<span class="story-count">'+count+"</span>" : "";
+      row += '<button type="button" class="story-item" '+(live ? 'data-live="'+aid+'"' : 'data-story-author="'+aid+'"')+'><div class="ring-wrap"><div class="ring '+(live?"live ":"")+(unseen?"unseen":"")+'"><div class="ring-inner">'+avatarSVG(p.avatar, 56)+'</div></div>'+badge+(live ? liveBadgeHtml(creatorMeta(aid).liveViewers) : "")+"</div><p>"+escapeHtml(name)+"</p></button>";
     });
     $("#stories-row").innerHTML = row;
     syncFeedsStories();
@@ -7883,6 +7927,10 @@
       });
       document.addEventListener("keydown", function (e) {
         if (e.key !== "Escape") return;
+        const storyDel = document.getElementById("story-delete-sheet");
+        if (storyDel && storyDel.classList.contains("open")) { e.preventDefault(); closeStoryDeleteSheet(true); return; }
+        const storyMore = document.getElementById("story-more-sheet");
+        if (storyMore && storyMore.classList.contains("open")) { e.preventDefault(); closeStoryMoreSheet(true); return; }
         const pin = document.getElementById("pin-pad") || document.getElementById("lock-pad") || document.querySelector(".pin-pad.open, #pin-sheet.open");
         if (pin && (pin.classList.contains("open") || pin.style.display === "flex")) return;
         const msg = document.getElementById("msg-context");
@@ -14176,24 +14224,84 @@
     state.storyStartedAt = Date.now();
     state.storyLeft = 5000;
     const canReply = !!(s.author && s.author !== "me" && personById[s.author] && !isBlocked(s.author));
+    const mine = s.author === "me";
     const viewer = $("#story-viewer");
-    if (viewer) viewer.classList.toggle("has-reply", canReply);
+    if (viewer) {
+      viewer.classList.toggle("has-reply", canReply);
+      viewer.classList.toggle("is-own", mine);
+    }
     const replyInp = $("#story-reply-input");
     if (replyInp) replyInp.value = "";
     clearTimeout(state.storyTimer);
     state.storyTimer = setTimeout(() => { state.storyIndex++; showStory(); }, 5000);
   }
+  function closeStorySheets() {
+    const more = document.getElementById("story-more-sheet");
+    const del = document.getElementById("story-delete-sheet");
+    if (more) more.classList.remove("open");
+    if (del) del.classList.remove("open");
+  }
   function closeStories() {
     clearTimeout(state.storyTimer);
     state.storyPaused = false;
+    try { closeStorySheets(); } catch (e) {}
     const sv = $("#story-viewer");
-    if (sv) { sv.classList.remove("open"); sv.classList.remove("has-reply"); }
+    if (sv) { sv.classList.remove("open"); sv.classList.remove("has-reply"); sv.classList.remove("is-own"); }
     const vidEl = $("#story-video");
     if (vidEl) { try { vidEl.pause(); vidEl.removeAttribute("src"); } catch (e) {} }
     fillCameraSourceEl($("#story-cam-source"), null);
     hideNav(false);
     try { refreshStatusRings(); } catch (e) {}
     if (state.page === 3) renderStoriesPage();
+  }
+  function openStoryMoreSheet() {
+    const s = currentStory();
+    if (!s || s.author !== "me") return;
+    try { pauseStory(); } catch (e) {}
+    const sheet = document.getElementById("story-more-sheet");
+    if (sheet) sheet.classList.add("open");
+  }
+  function closeStoryMoreSheet(resume) {
+    const sheet = document.getElementById("story-more-sheet");
+    if (sheet) sheet.classList.remove("open");
+    if (resume) try { resumeStory(); } catch (e) {}
+  }
+  function openStoryDeleteSheet() {
+    const s = currentStory();
+    if (!s || s.author !== "me") return;
+    try { pauseStory(); } catch (e) {}
+    closeStoryMoreSheet(false);
+    const sheet = document.getElementById("story-delete-sheet");
+    if (sheet) sheet.classList.add("open");
+  }
+  function closeStoryDeleteSheet(resume) {
+    const sheet = document.getElementById("story-delete-sheet");
+    if (sheet) sheet.classList.remove("open");
+    if (resume) try { resumeStory(); } catch (e) {}
+  }
+  function deleteCurrentStory() {
+    const s = currentStory();
+    if (!s || s.author !== "me") return;
+    store.userStories = (store.userStories || []).filter(function (x) { return x && x.id !== s.id; });
+    try { saveStore(); } catch (e) {}
+    closeStoryDeleteSheet(false);
+    closeStoryMoreSheet(false);
+    const q = storiesByAuthor("me");
+    toast("Story deleted");
+    if (!q.length) {
+      closeStories();
+      try { renderChatPage(); } catch (e) {}
+      try { if (state.page === 3) renderStoriesPage(); } catch (e) {}
+      return;
+    }
+    state.storyQueue = q;
+    if (state.storyIndex >= q.length) state.storyIndex = q.length - 1;
+    try { renderChatPage(); } catch (e) {}
+    showStory();
+  }
+  function addToOwnStory() {
+    closeStories();
+    goPage(PAGE.camera);
   }
   function renderStoriesPage() {
     const stories = seedStories();
@@ -15795,6 +15903,7 @@
     const story = { id, author: "me", src: image, at: Date.now(), caption: currentCaption() || "You" };
     if (videoUrl) story.video = videoUrl;
     if (fromCam) story.source = "camera";
+    if (!Array.isArray(store.userStories)) store.userStories = [];
     store.userStories.push(story);
     if (!store.userPosts) store.userPosts = [];
     const post = { id: "up-"+id, src: image || videoUrl, caption: currentCaption(), likes: 0, at: Date.now() };
@@ -16082,9 +16191,55 @@
   }
 
   /* ---------- events ---------- */
+  function resetTabToRoot(i) {
+    if (i === PAGE.chat) {
+      const thread = document.getElementById("thread");
+      if (thread && thread.classList.contains("open")) {
+        try { closeThreadSearch(); } catch (e) {}
+        try { requestCloseThread(); } catch (e) {}
+      }
+      if (state.chatSearchOpen) {
+        try { closeChatSearch(); } catch (e) {}
+      }
+      try { if (typeof isAddFriendsOpen === "function" && isAddFriendsOpen()) closeAddFriendsScreen(); } catch (e) {}
+      try { if (typeof lockedFolderIsOpen === "function" && lockedFolderIsOpen()) closeLockedFolder(); } catch (e) {}
+      try { if (typeof archivedIsOpen === "function" && archivedIsOpen()) closeArchived(); } catch (e) {}
+      state.chatTab = "chats";
+      try { if (typeof syncChatTabs === "function") syncChatTabs(); } catch (e) {}
+      try { renderChatPage(); } catch (e) {}
+      const scroll = document.getElementById("chat-scroll");
+      if (scroll) scroll.scrollTop = 0;
+      return;
+    }
+    if (i === PAGE.feeds) {
+      try { closeStories(); } catch (e) {}
+      try { if (typeof closeSpotlight === "function") closeSpotlight(); } catch (e) {}
+      const sc = document.querySelector("#page-feeds .scroll") || document.getElementById("page-feeds");
+      if (sc) sc.scrollTop = 0;
+      return;
+    }
+    if (i === PAGE.camera) {
+      try {
+        const prev = document.getElementById("snap-preview");
+        if (prev && prev.classList.contains("open") && typeof closePreview === "function") closePreview();
+      } catch (e) {}
+      return;
+    }
+    if (i === PAGE.community) {
+      ["screen-create", "screen-info", "screen-members"].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("open");
+      });
+      try { hideNav(false); } catch (e) {}
+    }
+  }
   $$("#nav [data-go]").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const i = Number(btn.dataset.go);
+      if (i === state.page) {
+        resetTabToRoot(i);
+        return;
+      }
       goPage(i);
     });
   });
@@ -16384,6 +16539,26 @@
   $("#story-close").addEventListener("click", closeStories);
   $("#story-next").addEventListener("click", () => { state.storyIndex++; showStory(); });
   $("#story-prev").addEventListener("click", () => { state.storyIndex = Math.max(0, state.storyIndex-1); showStory(); });
+  const storyMore = document.getElementById("story-more");
+  if (storyMore) storyMore.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); openStoryMoreSheet(); });
+  const storyAddMore = document.getElementById("story-add-more");
+  if (storyAddMore) storyAddMore.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); addToOwnStory(); });
+  const storyMoreDel = document.getElementById("story-more-delete");
+  if (storyMoreDel) storyMoreDel.addEventListener("click", function (e) { e.preventDefault(); openStoryDeleteSheet(); });
+  const storyMoreCancel = document.getElementById("story-more-cancel");
+  if (storyMoreCancel) storyMoreCancel.addEventListener("click", function () { closeStoryMoreSheet(true); });
+  const storyDelCancel = document.getElementById("story-delete-cancel");
+  if (storyDelCancel) storyDelCancel.addEventListener("click", function () { closeStoryDeleteSheet(true); });
+  const storyDelConfirm = document.getElementById("story-delete-confirm");
+  if (storyDelConfirm) storyDelConfirm.addEventListener("click", function () { deleteCurrentStory(); });
+  const storyMoreSheet = document.getElementById("story-more-sheet");
+  if (storyMoreSheet) storyMoreSheet.addEventListener("click", function (e) {
+    if (e.target.id === "story-more-sheet") closeStoryMoreSheet(true);
+  });
+  const storyDelSheet = document.getElementById("story-delete-sheet");
+  if (storyDelSheet) storyDelSheet.addEventListener("click", function (e) {
+    if (e.target.id === "story-delete-sheet") closeStoryDeleteSheet(true);
+  });
   $("#snap-close").addEventListener("click", () => {
     // closing early still counts as viewed
     const who = state.activeChat; 

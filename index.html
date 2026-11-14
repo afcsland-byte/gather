@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="8">
+<html lang="en" data-theme="white" data-build="10">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
   <meta name="theme-color" content="#F4F4F5" />
   <script>(function(){try{var s=JSON.parse(localStorage.getItem("gather.v2")||"{}");var theme="white";if(s.themeChosen===true&&s.theme==="black")theme="black";var root=document.documentElement;root.setAttribute("data-theme",theme);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",theme==="white"?"#F4F4F5":"#000000");}catch(e){try{document.documentElement.setAttribute("data-theme","white");}catch(err){}}})();</script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="8" />
+  <meta name="gather-build" content="10" />
   <title>Gather</title>
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
@@ -1629,22 +1629,29 @@
       border-top: 1px solid var(--line);
     }
     html.kb-open { --safe-bot: 0px; }
+    html.kb-open, html.kb-open body { overflow: hidden; }
     html.kb-open .composer,
     #app.kb-open .composer,
-    .thread.kb-open .composer {
-      padding-bottom: 6px;
+    .thread.kb-open .composer,
+    html.kb-open #voice-overlay {
+      padding-bottom: 8px;
     }
     .composer textarea {
       flex: 1; border: 0; background: var(--bubble-in); border-radius: 22px;
       color: var(--bubble-in-text); caret-color: var(--bubble-in-text);
-      padding: 8px 14px; font-size: 16px; font-weight: 400; line-height: 20px; max-height: 120px; resize: none; outline: none; min-height: 36px;
+      padding: 10px 14px; font-size: 16px; font-weight: 400; line-height: 20px; max-height: 120px; resize: none; outline: none; min-height: 40px;
     }
     .composer textarea::placeholder { color: var(--meta-text); opacity: 1; }
-    .send-round, .pic-round {
-      width: 36px; height: 36px; border-radius: 50%; background: var(--accent, var(--yellow)); color: var(--accent-ink, var(--yellow-ink));
+    .pic-round {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--card-2); color: var(--text);
       display: grid; place-items: center; flex: none;
     }
-    .pic-round { background: var(--card-2); color: var(--text); }
+    .send-round, #btn-send {
+      width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0;
+      border-radius: 50%; background: var(--accent, var(--yellow)); color: var(--accent-ink, var(--yellow-ink));
+      display: grid; place-items: center; flex: none;
+    }
+    .send-round svg, #btn-send svg { width: 24px; height: 24px; display: block; }
 
     /* Overlays */
     .overlay {
@@ -3169,7 +3176,7 @@
       background: var(--bg-2); color: var(--text); font-weight: 600; font-size: 12px;
     }
     #btn-send.mic-round { background: var(--card-2); color: var(--text); }
-    #btn-send.mic-round svg { width: 22px; height: 22px; }
+    #btn-send.mic-round svg { width: 24px; height: 24px; }
     #voice-overlay {
       display: none; position: absolute; left: 0; right: 0; bottom: 0; z-index: 8;
       align-items: center; gap: 10px;
@@ -3303,8 +3310,8 @@
     /* ===== v19 chat colours + calls ===== */
     #thread[data-chat-color]:not([data-chat-color="mono"]) .send-round:not(.mic-round),
     #thread[data-chat-color]:not([data-chat-color="mono"]) #btn-send:not(.mic-round) {
-      background: var(--chat-accent);
-      color: var(--chat-accent-ink);
+      background: var(--chat-accent, var(--accent, #007AFF));
+      color: var(--chat-accent-ink, var(--accent-ink, #fff));
     }
     #thread[data-chat-color]:not([data-chat-color="mono"]) .bubble-row.mine .bubble {
       background: var(--bubble-out);
@@ -4238,11 +4245,11 @@
         <button type="button" class="pic-round" id="btn-attach" aria-label="Attach">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         </button>
-        <textarea id="composer-input" rows="1" placeholder="Message" autocomplete="off"></textarea>
+        <textarea id="composer-input" rows="1" placeholder="Message" autocomplete="off" enterkeyhint="send"></textarea>
         <button type="button" class="composer-icon" id="btn-emoji" aria-label="Emoji and stickers">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8.5 15c.8 1.2 2 2 3.5 2s2.7-.8 3.5-2"/></svg>
         </button>
-        <button type="submit" class="send-round" id="btn-send" aria-label="Send">➤</button>
+        <button type="submit" class="send-round" id="btn-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
       </form>
       <div id="blocked-banner">
         <p id="blocked-banner-copy">You blocked this contact</p>
@@ -6215,7 +6222,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 9. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 10. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -6560,6 +6567,10 @@
   function closeThread(opts) {
     opts = opts || {};
     const prev = state.activeChat;
+    try {
+      const taClose = document.getElementById("composer-input");
+      if (taClose) taClose.blur();
+    } catch (e) {}
     try { closeChatPanels(); } catch (e) {}
     try { if (state.qvOpen) finishQuickView(true); } catch (e) {}
     try { clearMocks(); } catch (e) {}
@@ -6728,7 +6739,7 @@
   const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>';
   const ICON_MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg>';
-  const ICON_SEND = "\u27A4";
+  const ICON_SEND = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
 
   state.editing = null;
   state.typing = null;
@@ -7864,7 +7875,7 @@
     btn.setAttribute("aria-label", mic ? "Record voice message" : "Send");
     btn.type = mic ? "button" : "submit";
     if (mic) btn.innerHTML = ICON_MIC;
-    else btn.textContent = ICON_SEND;
+    else btn.innerHTML = ICON_SEND;
   }
   function toastMicDenied() {
     if (location.protocol === "file:") toast("Microphone isn't available from a file page. Open the app from a server, then allow the mic.");
@@ -8120,10 +8131,21 @@
     syncSendMic();
     const sendBtn = $("#btn-send");
     if (sendBtn) {
+      let sentByPointer = false;
+      const keepComposerFocusAndSend = function (e) {
+        if (sendBtn.classList.contains("mic-round")) return;
+        e.preventDefault();
+        if (sentByPointer) return;
+        sentByPointer = true;
+        const ta = $("#composer-input");
+        try { sendText(ta && ta.value); } catch (err) {}
+        setTimeout(function () { sentByPointer = false; }, 400);
+      };
       sendBtn.addEventListener("pointerdown", function (e) {
-        if (!sendBtn.classList.contains("mic-round")) return;
-        onMicPointerDown(e);
+        if (sendBtn.classList.contains("mic-round")) { onMicPointerDown(e); return; }
+        keepComposerFocusAndSend(e);
       });
+      sendBtn.addEventListener("touchstart", keepComposerFocusAndSend, { passive: false });
       sendBtn.addEventListener("pointermove", onMicPointerMove);
       sendBtn.addEventListener("pointerup", onMicPointerUp);
       sendBtn.addEventListener("pointercancel", function () {
@@ -8386,10 +8408,18 @@
     pushMessage(state.activeChat, msg);
     clearReply();
     const ta = $("#composer-input");
-    if (ta) { ta.value = ""; ta.style.height = ""; }
+    if (ta) {
+      ta.value = "";
+      ta.style.height = "";
+      try { if (ta.focus) ta.focus({ preventScroll: true }); } catch (e) { try { ta.focus(); } catch (err) {} }
+    }
     closeChatPanels();
     renderThread();
     syncSendMic();
+    if (ta) {
+      try { if (ta.focus) ta.focus({ preventScroll: true }); } catch (e) { try { ta.focus(); } catch (err) {} }
+    }
+    try { scrollThreadToEnd(true); } catch (e) {}
   }
   var CAM_SOURCE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4V8z"/><circle cx="12" cy="13.5" r="3.2"/></svg>';
   var CAM_VIDEO_MARK = '<span class="cam-source-vid" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 6.2v11.6L19 12 8 6.2z"/></svg></span>';
@@ -14106,17 +14136,27 @@
     const thread = document.getElementById("thread");
     if (thread) thread.classList.toggle("kb-open", on);
   }
+  function lockPageScroll() {
+    try {
+      if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    } catch (e) {}
+    pinAppScroll();
+  }
   function syncVisualViewport() {
     const app = document.getElementById("app");
     if (!app) return;
+    const open = isKeyboardOpen();
     if (!isMobileFrame()) {
       app.style.top = "";
       app.style.left = "";
       app.style.height = "";
+      app.style.maxHeight = "";
       app.style.width = "";
       app.style.right = "";
       app.style.bottom = "";
-      applyKeyboardLayout(isKeyboardOpen());
+      applyKeyboardLayout(open);
       return;
     }
     const vv = window.visualViewport;
@@ -14128,12 +14168,16 @@
     app.style.top = top + "px";
     app.style.left = left + "px";
     app.style.height = height + "px";
+    app.style.maxHeight = height + "px";
     app.style.width = width + "px";
     app.style.right = "auto";
     app.style.bottom = "auto";
-    try { window.scrollTo(0, 0); } catch (e) {}
-    pinAppScroll();
-    applyKeyboardLayout(isKeyboardOpen());
+    try {
+      document.documentElement.style.setProperty("--vv-h", height + "px");
+      document.documentElement.style.setProperty("--vv-top", top + "px");
+    } catch (e) {}
+    lockPageScroll();
+    applyKeyboardLayout(open);
   }
   function scrollThreadToEnd(force) {
     const log = document.getElementById("thread-log");
@@ -14167,18 +14211,27 @@
     const ta = document.getElementById("composer-input");
     if (ta) {
       const onFocus = function () {
-        try { window.scrollTo(0, 0); } catch (e) {}
+        lockPageScroll();
         syncVisualViewport();
         requestAnimationFrame(function () {
-          try { window.scrollTo(0, 0); } catch (e) {}
+          lockPageScroll();
           syncVisualViewport();
           scrollThreadToEnd(true);
           setTimeout(function () {
-            try { window.scrollTo(0, 0); } catch (e) {}
+            lockPageScroll();
             syncVisualViewport();
             scrollThreadToEnd(true);
           }, 60);
-          setTimeout(function () { scrollThreadToEnd(true); }, 280);
+          setTimeout(function () {
+            lockPageScroll();
+            syncVisualViewport();
+            scrollThreadToEnd(true);
+          }, 280);
+          setTimeout(function () {
+            lockPageScroll();
+            syncVisualViewport();
+            scrollThreadToEnd(true);
+          }, 450);
         });
       };
       ta.addEventListener("focus", onFocus);
@@ -14197,6 +14250,9 @@
         if (e.propertyName === "transform" && thread.classList.contains("open")) settleOpenThread();
       });
     }
+    window.addEventListener("scroll", function () {
+      if (isKeyboardOpen()) lockPageScroll();
+    }, { passive: true });
     syncVisualViewport();
   }
 
@@ -16892,7 +16948,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 9. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 10. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";

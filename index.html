@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="6">
+<html lang="en" data-theme="white" data-build="7">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="6" />
+  <meta name="gather-build" content="7" />
   <title>Gather</title>
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
@@ -1807,6 +1807,88 @@
     .feed-card .body { padding: 12px 14px 14px; }
     .feed-card h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
     .feed-card p { font-size: 14px; font-weight: 400; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+    #page-feeds { display: flex; flex-direction: column; }
+    .feeds-head {
+      flex: none; z-index: 6; background: var(--bg);
+      padding-bottom: 2px;
+      border-bottom: 0.5px solid var(--line);
+    }
+    .feeds-tabs {
+      display: flex; gap: 4px;
+      margin: 0 16px 10px; padding: 4px;
+      background: var(--card); border-radius: 12px;
+    }
+    .feeds-tabs button {
+      flex: 1; height: 34px; border-radius: 9px;
+      font-weight: 600; font-size: 14px;
+      color: var(--muted); background: transparent;
+      position: relative; touch-action: manipulation;
+    }
+    .feeds-tabs button.on {
+      background: var(--text); color: var(--bg);
+    }
+    .feeds-tab-badge {
+      display: none; min-width: 16px; height: 16px; padding: 0 5px; margin-left: 5px;
+      border-radius: 999px; background: #FF3B30; color: #fff;
+      font-size: 10px; font-weight: 700; line-height: 16px; vertical-align: middle;
+      box-sizing: border-box;
+    }
+    .feeds-tab-badge.show { display: inline-block; }
+    .nav-dot {
+      position: absolute; top: 6px; left: 50%; margin-left: 10px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #FF3B30; display: none; pointer-events: none;
+      box-shadow: 0 0 0 2px var(--nav-solid, var(--bg));
+    }
+    .nav-dot.show { display: block; }
+    #feeds-pager {
+      flex: 1; min-height: 0; width: 200%;
+      display: flex;
+      transition: transform .32s cubic-bezier(.2,.8,.2,1);
+      will-change: transform;
+    }
+    #feeds-pager.dragging { transition: none; }
+    #page-feeds.tab-foryou #feeds-pager { transform: translateX(0); }
+    #page-feeds.tab-notifications #feeds-pager { transform: translateX(-50%); }
+    .feeds-pane { flex: 0 0 50%; width: 50%; height: 100%; position: relative; overflow: hidden; }
+    .feeds-pane > .scroll { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
+    .feeds-pane > .ptr-indicator {
+      top: 0;
+      z-index: 7;
+    }
+    .notif-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px 4px;
+    }
+    .notif-toolbar .section-label { padding: 0; margin: 0; }
+    #btn-mark-notes-read {
+      border: 0; background: transparent; color: var(--text);
+      font-weight: 600; font-size: 13px; padding: 6px 4px;
+      touch-action: manipulation;
+    }
+    #btn-mark-notes-read[hidden] { display: none; }
+    .notif-row {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; text-align: left; padding: 10px 16px;
+      background: transparent; color: var(--text); border: 0;
+    }
+    .notif-row:active { background: var(--row-active, var(--card)); }
+    .notif-row .av, .notif-row .av-wrap { flex: none; width: 44px; height: 44px; }
+    .notif-mid { flex: 1; min-width: 0; }
+    .notif-mid p { font-size: 14px; font-weight: 400; line-height: 1.3; margin: 0; }
+    .notif-mid p strong { font-weight: 600; }
+    .notif-mid time { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 500; }
+    .notif-thumb {
+      width: 44px; height: 44px; border-radius: 8px; object-fit: cover;
+      background: var(--card); flex: none;
+    }
+    .notif-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--accent, #007AFF);
+      flex: none;
+    }
+    .notif-row.is-read .notif-dot { visibility: hidden; }
+    .notif-empty { text-align: center; padding: 48px 28px; color: var(--muted); font-weight: 500; }
 
     /* Story viewer & snap viewer */
     #story-viewer, #snap-viewer {
@@ -3873,10 +3955,23 @@
   <div id="app">
     <div id="pager">
       <section class="page" data-page="feeds" id="page-feeds">
-        <div class="topbar"><h1>Feeds</h1></div>
-        <div class="scroll">
-          <div class="stories-row" id="feeds-stories"></div>
-          <div class="feed" id="discover-feed"></div>
+        <div class="feeds-head">
+          <div class="topbar"><h1>Feeds</h1></div>
+          <div class="feeds-tabs" id="feeds-tabs" role="tablist" aria-label="Feeds">
+            <button type="button" role="tab" data-feeds-tab="foryou" aria-selected="true" class="on">For you</button>
+            <button type="button" role="tab" data-feeds-tab="notifications" aria-selected="false">Notifications<span class="feeds-tab-badge" id="feeds-notes-badge" hidden></span></button>
+          </div>
+        </div>
+        <div class="feeds-pager" id="feeds-pager">
+          <div class="feeds-pane" data-feeds-pane="foryou">
+            <div class="scroll" id="feeds-scroll-foryou">
+              <div class="stories-row" id="feeds-stories"></div>
+              <div class="feed" id="discover-feed"></div>
+            </div>
+          </div>
+          <div class="feeds-pane" data-feeds-pane="notifications">
+            <div class="scroll" id="feeds-scroll-notes"></div>
+          </div>
         </div>
       </section>
 <section class="page" data-page="chat" id="page-chat">
@@ -4020,6 +4115,7 @@
     <nav id="nav">
       <button type="button" class="nav-btn" data-go="0" aria-label="Feeds">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/></svg>
+        <span class="nav-dot" id="nav-feeds-dot" hidden></span>
         <span class="nav-label">Feeds</span>
       </button>
       <button type="button" class="nav-btn" data-go="1" aria-label="Chat">
@@ -5373,7 +5469,7 @@
     if (!Array.isArray(s.meetups)) s.meetups = [];
     s.gatherHoldHintSeen = s.gatherHoldHintSeen === true;
     s.messages = (s.messages && typeof s.messages === "object" && !Array.isArray(s.messages)) ? s.messages : {};
-    ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports"].forEach(function (k) {
+    ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports","notifications"].forEach(function (k) {
       if (!Array.isArray(s[k])) s[k] = Array.isArray(blank[k]) ? blank[k].slice() : [];
     });
     s.streaks = (s.streaks && typeof s.streaks === "object" && !Array.isArray(s.streaks)) ? s.streaks : Object.assign({}, blank.streaks);
@@ -5455,6 +5551,9 @@
       s.userPosts.push(post);
     });
     s.userPosts.sort(function (a, b) { return (b.at || 0) - (a.at || 0); });
+    if (!Array.isArray(s.notifications)) s.notifications = [];
+    if (s.feedsTab !== "notifications") s.feedsTab = "foryou";
+    s.notifSeeded = s.notifSeeded === true;
     return s;
   }
   function saveStore() {
@@ -5751,10 +5850,12 @@
   }
   function syncNavBadges() {
     const el = $("#nav-chat-badge");
-    if (!el) return;
-    const n = totalUnread();
-    el.textContent = n > 99 ? "99+" : String(n);
-    el.classList.toggle("show", n > 0);
+    if (el) {
+      const n = totalUnread();
+      el.textContent = n > 99 ? "99+" : String(n);
+      el.classList.toggle("show", n > 0);
+    }
+    try { syncFeedsNotifBadges(); } catch (e) {}
   }
   function hideMsgBanner() {
     const el = $("#msg-banner");
@@ -5960,7 +6061,7 @@
     if (i !== PAGE.map) { try { closeGatherSheet(); } catch (e) {} }
     if (i === PAGE.camera) startCamera();
     else stopCameraPreview();
-    if (i === PAGE.feeds) { renderChatPage(); renderDiscover(); syncFeedsStories(); }
+    if (i === PAGE.feeds) { renderChatPage(); renderDiscover(); syncFeedsStories(); try { initFeedsTabs(); } catch (e) {} }
     if (i === PAGE.community) renderCommunityPage();
   }
   function syncFeedsStories() {
@@ -6061,7 +6162,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 6. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 7. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -14719,6 +14820,233 @@
     $("#discover-feed").innerHTML = html;
   }
 
+  function currentFeedsTab() {
+    return (store && store.feedsTab === "notifications") ? "notifications" : "foryou";
+  }
+  function unreadNotificationCount() {
+    return (store.notifications || []).filter(function (n) { return n && !n.read; }).length;
+  }
+  function syncFeedsNotifBadges() {
+    const n = unreadNotificationCount();
+    const tabBadge = document.getElementById("feeds-notes-badge");
+    if (tabBadge) {
+      tabBadge.textContent = n > 99 ? "99+" : String(n);
+      tabBadge.hidden = n <= 0;
+      tabBadge.classList.toggle("show", n > 0);
+    }
+    const dot = document.getElementById("nav-feeds-dot");
+    if (dot) {
+      dot.hidden = n <= 0;
+      dot.classList.toggle("show", n > 0);
+    }
+  }
+  function pushNotification(note) {
+    if (!note || !note.id) return;
+    if (!Array.isArray(store.notifications)) store.notifications = [];
+    if (store.notifications.some(function (x) { return x && x.id === note.id; })) return;
+    if (note.read == null) note.read = false;
+    if (!note.at) note.at = Date.now();
+    store.notifications.unshift(note);
+    try { saveStore(); } catch (e) {}
+    try { syncFeedsNotifBadges(); } catch (e) {}
+    if (state.page === PAGE.feeds && currentFeedsTab() === "notifications") {
+      try { renderNotifications(); } catch (e) {}
+    }
+  }
+  function seedNotificationsOnce() {
+    if (store.notifSeeded) return;
+    store.notifSeeded = true;
+    let pics = {};
+    try { pics = photos() || {}; } catch (e) { pics = {}; }
+    const seeds = [
+      { id: "nf-seed-like-ama", type: "like", actorId: "ama", at: hour(10, 12), read: false, thumb: pics.beach || "", text: "Ama Boateng liked your post" },
+      { id: "nf-seed-view-kwame", type: "story_view", actorId: "kwame", at: hour(9, 40), read: false, thumb: pics.green || "", text: "Kwame Mensah viewed your story" },
+      { id: "nf-seed-req-fiifi", type: "request", actorId: "fiifi", at: hour(8, 5), read: false, text: "Fiifi Hammond sent you a friend request" },
+      { id: "nf-seed-mention-yaw", type: "mention", actorId: "yaw", at: hour(7, 50), read: false, text: "Yaw Darko mentioned you in a comment" },
+      { id: "nf-seed-comment-efua", type: "comment", actorId: "efua", at: daysAgo(2, 16, 20), read: false, thumb: pics.sunset || "", text: "Efua Adjei commented: Love this." },
+      { id: "nf-seed-follow-kojo", type: "follow", actorId: "kojo", at: daysAgo(3, 11, 8), read: false, text: "Kojo Owusu started following you" },
+      { id: "nf-seed-join-ama", type: "meetup_join", actorId: "ama", at: daysAgo(4, 18, 30), read: false, text: "Ama Boateng is going to your meetup" },
+      { id: "nf-seed-like-kojo", type: "like", actorId: "kojo", at: daysAgo(8, 14, 10), read: true, thumb: pics.night || "", text: "Kojo Owusu liked your post" },
+      { id: "nf-seed-view-yaw", type: "story_view", actorId: "yaw", at: daysAgo(9, 20, 15), read: true, text: "Yaw Darko viewed your story" },
+      { id: "nf-seed-invite-kwame", type: "meetup_invite", actorId: "kwame", at: daysAgo(12, 13, 0), read: true, text: "Kwame Mensah invited you to a meetup in Osu" }
+    ];
+    if (!Array.isArray(store.notifications)) store.notifications = [];
+    seeds.forEach(function (s) {
+      if (!store.notifications.some(function (x) { return x && x.id === s.id; })) store.notifications.push(s);
+    });
+    try { saveStore(); } catch (e) {}
+  }
+  function notifGroupLabel(at) {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    const startToday = d.getTime();
+    const weekAgo = startToday - 6 * 24 * 3600 * 1000;
+    if (at >= startToday) return "Today";
+    if (at >= weekAgo) return "This week";
+    return "Earlier";
+  }
+  function renderNotifications() {
+    seedNotificationsOnce();
+    const box = document.getElementById("feeds-scroll-notes");
+    if (!box) return;
+    const list = (store.notifications || []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); });
+    const unread = list.filter(function (n) { return n && !n.read; }).length;
+    let html = '<div class="notif-toolbar">';
+    html += '<div class="section-label">Activity</div>';
+    html += '<button type="button" id="btn-mark-notes-read"'+(unread ? "" : " hidden")+'>Mark all as read</button>';
+    html += "</div>";
+    if (!list.length) {
+      html += '<div class="notif-empty">No notifications yet.</div>';
+    } else {
+      let last = "";
+      list.forEach(function (n) {
+        if (!n) return;
+        const g = notifGroupLabel(n.at || 0);
+        if (g !== last) {
+          html += '<div class="section-label">'+g+"</div>";
+          last = g;
+        }
+        const p = n.actorId ? personById[n.actorId] : null;
+        const av = p ? avHTML(p.avatar, "sm") : '<div class="av sm"></div>';
+        const when = (typeof storyTimeAgo === "function") ? storyTimeAgo(n.at) : "";
+        const thumb = n.thumb ? '<img class="notif-thumb" src="'+escapeHtml(n.thumb)+'" alt="" />' : "";
+        html += '<button type="button" class="notif-row'+(n.read ? " is-read" : "")+'" data-notif-id="'+escapeHtml(n.id)+'">'+
+          av+'<div class="notif-mid"><p>'+escapeHtml(n.text || "New activity")+"</p><time>"+escapeHtml(when)+"</time></div>"+
+          thumb+'<span class="notif-dot" aria-hidden="true"></span></button>';
+      });
+    }
+    box.innerHTML = html;
+    syncFeedsNotifBadges();
+  }
+  function markAllNotificationsRead() {
+    (store.notifications || []).forEach(function (n) { if (n) n.read = true; });
+    try { saveStore(); } catch (e) {}
+    renderNotifications();
+  }
+  function openNotification(id) {
+    const n = (store.notifications || []).find(function (x) { return x && x.id === id; });
+    if (!n) return;
+    if (!n.read) {
+      n.read = true;
+      try { saveStore(); } catch (e) {}
+      try { renderNotifications(); } catch (e) {}
+      try { syncFeedsNotifBadges(); } catch (e) {}
+    }
+    if (n.type === "request") { try { openFriendRequests(); } catch (e) {} return; }
+    if (n.type === "follow" && n.actorId) { try { openCreatorProfile(n.actorId); } catch (e) {} return; }
+    if (n.type === "meetup_invite" || n.type === "meetup_join") {
+      if (n.meetupId && typeof openMeetupSheet === "function") {
+        try { goPage(PAGE.map); openMeetupSheet(n.meetupId); } catch (e) {}
+      } else {
+        try { goPage(PAGE.map); } catch (e) {}
+      }
+      return;
+    }
+    if (n.type === "story_view") {
+      try {
+        if ((store.userStories || []).length) openStories("me");
+        else openCreatorProfile("me");
+      } catch (e) {}
+      return;
+    }
+    if (n.type === "mention" && n.actorId) {
+      try { if (typeof openChat === "function") openChat(n.actorId); else openCreatorProfile(n.actorId); } catch (e) {}
+      return;
+    }
+    try { openCreatorProfile("me"); } catch (e) {}
+  }
+  function setFeedsTab(tab, instant) {
+    tab = (tab === "notifications") ? "notifications" : "foryou";
+    store.feedsTab = tab;
+    try { saveStore(); } catch (e) {}
+    const page = document.getElementById("page-feeds");
+    if (page) {
+      page.classList.toggle("tab-foryou", tab === "foryou");
+      page.classList.toggle("tab-notifications", tab === "notifications");
+    }
+    const pager = document.getElementById("feeds-pager");
+    if (pager && instant) {
+      pager.classList.add("dragging");
+      requestAnimationFrame(function () { pager.classList.remove("dragging"); });
+    }
+    document.querySelectorAll("#feeds-tabs [data-feeds-tab]").forEach(function (b) {
+      const on = b.getAttribute("data-feeds-tab") === tab;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    if (tab === "foryou") {
+      try { renderDiscover(); } catch (e) {}
+      try { syncFeedsStories(); } catch (e) {}
+    } else {
+      try { renderNotifications(); } catch (e) {}
+    }
+    try { syncFeedsNotifBadges(); } catch (e) {}
+  }
+  function initFeedsTabs() {
+    seedNotificationsOnce();
+    setFeedsTab(currentFeedsTab(), true);
+    if (initFeedsTabs._bound) return;
+    initFeedsTabs._bound = true;
+    const tabs = document.getElementById("feeds-tabs");
+    if (tabs) {
+      tabs.addEventListener("click", function (e) {
+        const b = e.target.closest("[data-feeds-tab]");
+        if (!b) return;
+        setFeedsTab(b.getAttribute("data-feeds-tab"));
+      });
+    }
+    const notes = document.getElementById("feeds-scroll-notes");
+    if (notes) {
+      notes.addEventListener("click", function (e) {
+        if (e.target.closest("#btn-mark-notes-read")) { markAllNotificationsRead(); return; }
+        const row = e.target.closest("[data-notif-id]");
+        if (row) openNotification(row.getAttribute("data-notif-id"));
+      });
+    }
+    const pager = document.getElementById("feeds-pager");
+    if (!pager) return;
+    let x0 = 0, y0 = 0, tracking = false, horiz = null, start = 0;
+    function tabIndex() { return currentFeedsTab() === "notifications" ? 1 : 0; }
+    function ignoreSwipe(t) {
+      const el = eventEl(t);
+      if (!el) return true;
+      return !!el.closest(".stories-row, .trend-row, .hash-row, .creator-row, .feeds-tabs, input, textarea");
+    }
+    pager.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (ignoreSwipe(e.target)) return;
+      tracking = true; horiz = null; x0 = e.clientX; y0 = e.clientY; start = tabIndex();
+    });
+    window.addEventListener("pointermove", function (e) {
+      if (!tracking) return;
+      const dx = e.clientX - x0, dy = e.clientY - y0;
+      if (horiz == null && Math.abs(dx) + Math.abs(dy) > 8) horiz = Math.abs(dx) > Math.abs(dy) * 1.15;
+      if (!horiz) return;
+      e.preventDefault();
+      pager.classList.add("dragging");
+      const w = (pager.parentElement && pager.parentElement.clientWidth) || 390;
+      let x = (-start * 50) + (dx / w * 50);
+      x = Math.max(-50, Math.min(0, x));
+      pager.style.transform = "translateX(" + x + "%)";
+    }, { passive: false });
+    function endSwipe(e) {
+      if (!tracking) return;
+      tracking = false;
+      pager.classList.remove("dragging");
+      pager.style.transform = "";
+      if (!horiz) return;
+      const dx = (e && e.clientX != null ? e.clientX : x0) - x0;
+      const w = (pager.parentElement && pager.parentElement.clientWidth) || 390;
+      let next = start;
+      if (dx < -w * 0.18) next = 1;
+      if (dx > w * 0.18) next = 0;
+      setFeedsTab(next === 1 ? "notifications" : "foryou");
+      horiz = null;
+    }
+    window.addEventListener("pointerup", endSwipe);
+    window.addEventListener("pointercancel", endSwipe);
+  }
+
   function spotlightItems() {
     const pics = photos();
     const seed = [
@@ -15813,6 +16141,19 @@
     if (!Array.isArray(store.meetups)) store.meetups = [];
     store.meetups.push(meetup);
     saveStore();
+    try {
+      const pal = (store.friends || ["ama", "kwame"])[0] || "ama";
+      const who = personById[pal];
+      pushNotification({
+        id: "nf-join-" + meetup.id + "-" + pal,
+        type: "meetup_join",
+        actorId: pal,
+        meetupId: meetup.id,
+        at: Date.now(),
+        read: false,
+        text: (who ? who.name : "A friend") + " is going to " + (meetup.title || "your meetup")
+      });
+    } catch (e) {}
     state.meetupDraft = { vis: vis };
     closeGatherSheet();
     renderMapMarkers();
@@ -16221,6 +16562,23 @@
     saveStore();
     closePreview();
     toast("Posted to your story");
+    try {
+      const friends = (store.friends || []).slice(0, 3);
+      friends.forEach(function (fid, i) {
+        const who = personById[fid];
+        const name = who ? who.name : "A friend";
+        pushNotification({
+          id: "nf-view-" + id + "-" + fid,
+          type: "story_view",
+          actorId: fid,
+          at: Date.now() + (i + 1) * 30,
+          read: false,
+          storyId: id,
+          thumb: image || "",
+          text: name + " viewed your story"
+        });
+      });
+    } catch (e) {}
     goPage(1);
     renderChatPage();
   }
@@ -16337,7 +16695,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 6. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 7. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -16709,7 +17067,8 @@
     if (i === PAGE.feeds) {
       try { closeStories(); } catch (e) {}
       try { if (typeof closeSpotlight === "function") closeSpotlight(); } catch (e) {}
-      const sc = document.querySelector("#page-feeds .scroll") || document.getElementById("page-feeds");
+      try { setFeedsTab("foryou"); } catch (e) {}
+      const sc = document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll");
       if (sc) sc.scrollTop = 0;
       return;
     }
@@ -17782,6 +18141,8 @@
         if (!prof || !prof.classList.contains("open")) return false;
         try { if (typeof isPostSheetOpen === "function" && isPostSheetOpen()) return false; } catch (err) {}
       }
+      if (kind === "feeds" && typeof currentFeedsTab === "function" && currentFeedsTab() !== "foryou") return false;
+      if (kind === "notifications" && typeof currentFeedsTab === "function" && currentFeedsTab() !== "notifications") return false;
       const thread = document.getElementById("thread");
       if (thread && thread.classList.contains("open")) return false;
       if (typeof isRowContextOpen === "function" && isRowContextOpen()) return false;
@@ -18353,7 +18714,10 @@
       try { if (typeof syncNavBadges === "function") syncNavBadges(); } catch (err) {}
     } else if (kind === "feeds") {
       try { if (typeof renderDiscover === "function") renderDiscover(); } catch (err) {}
+      try { if (typeof syncFeedsStories === "function") syncFeedsStories(); } catch (err) {}
       try { if (typeof renderStoriesPage === "function") renderStoriesPage(); } catch (err) {}
+    } else if (kind === "notifications") {
+      try { if (typeof renderNotifications === "function") renderNotifications(); } catch (err) {}
     } else if (kind === "archived") {
       try { if (typeof renderArchivedList === "function") renderArchivedList(); } catch (err) {}
     } else if (kind === "profile") {
@@ -18476,7 +18840,8 @@
     opts = opts || {};
     const map = {
       chat: { scroll: document.getElementById("chat-scroll"), host: document.getElementById("page-chat") },
-      feeds: { scroll: document.querySelector("#page-feeds .scroll"), host: document.getElementById("page-feeds") },
+      feeds: (function(){ const s = document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll"); return { scroll: s, host: s && s.parentElement }; })(),
+      notifications: (function(){ const s = document.getElementById("feeds-scroll-notes"); return { scroll: s, host: s && s.parentElement }; })(),
       archived: { scroll: document.getElementById("archived-list"), host: document.getElementById("screen-archived") },
       profile: { scroll: document.querySelector("#screen-profile .overlay-body"), host: document.getElementById("screen-profile") }
     };
@@ -18576,12 +18941,14 @@
     bindAllPullRefresh._done = true;
     const chat = document.getElementById("chat-scroll");
     if (chat) bindPullRefresh(chat, { kind: "chat", host: document.getElementById("page-chat") });
-    const feeds = document.querySelector("#page-feeds .scroll");
-    if (feeds) bindPullRefresh(feeds, { kind: "feeds", host: document.getElementById("page-feeds") });
+    const feeds = document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll");
+    if (feeds) bindPullRefresh(feeds, { kind: "feeds", host: feeds.parentElement });
+    const notes = document.getElementById("feeds-scroll-notes");
+    if (notes) bindPullRefresh(notes, { kind: "notifications", host: notes.parentElement });
     const arch = document.getElementById("archived-list");
     if (arch) bindPullRefresh(arch, { kind: "archived", host: document.getElementById("screen-archived") });
   }
-  bindAllPullRefresh();
+  try { bindAllPullRefresh(); } catch (e) { console.warn("bindAllPullRefresh", e); }
   try { window.__gatherPtr = { set: setPullRefresh, get: getPullRefresh }; } catch (e) {}
 
   function registerGatherSW() {
@@ -18603,6 +18970,7 @@
     try { renderChatPage(); } catch (e) { console.warn("renderChatPage", e); }
     try { renderDiscover(); } catch (e) { console.warn("renderDiscover", e); }
     try { renderStoriesPage(); } catch (e) { console.warn("renderStoriesPage", e); }
+    try { seedNotificationsOnce(); syncFeedsNotifBadges(); } catch (e) {}
     bindAuthEvents();
     if (isSignedIn()) {
       const ready = window.__gatherLibsReady;

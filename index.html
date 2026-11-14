@@ -1031,7 +1031,7 @@
     .map-chips button.on:active {
       background: var(--yellow-pressed);
     }
-    #map-home-btn:active { box-shadow: 0 0 0 3px var(--map-btn-gap), 0 0 0 6px var(--yellow-pressed), 0 6px 14px var(--yellow-glow); }
+    #map-home-btn:active { box-shadow: 0 2px 8px var(--yellow-glow); }
     .btn-ghost { background: var(--ghost); color: var(--ghost-text); }
     .btn-danger { background: #3A1218; color: #FF6B85; width: 100%; }
     html[data-theme="white"] .btn-danger { background: #FDECEE; color: #B00020; }
@@ -1066,6 +1066,91 @@
       background: rgba(0,0,0,.78); color: #fff; font-size: 10px; font-weight: 600;
       padding: 2px 6px; border-radius: 8px; white-space: nowrap; pointer-events: none;
     }
+    .place-pin {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg); color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 5px 10px 5px 5px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.28);
+      min-width: 118px; max-width: 168px;
+      text-align: left; position: relative;
+      cursor: pointer;
+    }
+    .place-pin-ico {
+      width: 30px; height: 30px; border-radius: 10px; flex: none;
+      display: grid; place-items: center; font-size: 15px;
+      background: var(--card);
+    }
+    .place-pin.party .place-pin-ico { background: #2A1020; }
+    .place-pin.meetup .place-pin-ico { background: #111; }
+    html[data-theme="white"] .place-pin.party .place-pin-ico { background: #FDECEE; }
+    html[data-theme="white"] .place-pin.meetup .place-pin-ico { background: #F2F2F7; }
+    .place-pin-copy { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+    .place-pin-name {
+      font-size: 11px; font-weight: 700; line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 118px;
+    }
+    .place-pin-sub { font-size: 10px; font-weight: 600; color: var(--muted); line-height: 1.2; }
+    .place-pin .live-badge, .place-pin .pin-live {
+      position: absolute; top: -8px; right: -6px;
+    }
+    #gather-sheet {
+      display: none; position: absolute; inset: 0; z-index: 70;
+      flex-direction: column; justify-content: flex-end;
+    }
+    #gather-sheet.open { display: flex; }
+    #gather-sheet-backdrop {
+      position: absolute; inset: 0; border: 0; padding: 0;
+      background: rgba(0,0,0,.4); cursor: pointer;
+    }
+    #gather-sheet-body {
+      position: relative; z-index: 1;
+      background: var(--bg); color: var(--text);
+      border-radius: 22px 22px 0 0;
+      padding: 8px 0 calc(var(--nav-h) + var(--safe-bot) + 16px);
+      max-height: 86%; overflow-y: auto;
+      box-shadow: 0 -10px 32px rgba(0,0,0,.22);
+    }
+    .gather-handle {
+      width: 36px; height: 4px; border-radius: 999px; background: var(--line);
+      margin: 6px auto 10px;
+    }
+    .gather-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px 12px;
+    }
+    .gather-head h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+    .gather-section { padding: 4px 0 10px; }
+    .gather-section .section-label { padding-left: 16px; }
+    .gather-form .field { padding: 8px 16px; }
+    .gather-form .field input, .gather-form .field select, .gather-form .field textarea {
+      width: 100%; height: 44px; border-radius: 12px; border: 1px solid var(--line);
+      background: var(--card); color: var(--text); padding: 0 12px; font-size: 15px; font-weight: 600;
+    }
+    .gather-see {
+      display: flex; gap: 8px; padding: 0 16px 8px;
+    }
+    .gather-see button {
+      flex: 1; height: 36px; border-radius: 999px; background: var(--card);
+      color: var(--text); font-size: 13px; font-weight: 600;
+    }
+    .gather-see button.on { background: var(--yellow); color: var(--yellow-ink); }
+    .gather-form .btn-row { padding: 8px 16px 4px; }
+    .gather-row, .meetup-row {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 12px 16px; text-align: left; color: var(--text);
+    }
+    .gather-row:active, .meetup-row:active { background: var(--row-active); }
+    .gather-row .ico, .meetup-row .ico {
+      width: 40px; height: 40px; border-radius: 12px; flex: none;
+      display: grid; place-items: center; font-size: 18px; background: var(--card);
+    }
+    .gather-row .copy, .meetup-row .copy { flex: 1; min-width: 0; }
+    .gather-row h3, .meetup-row h3 { font-size: 15px; font-weight: 600; }
+    .gather-row p, .meetup-row p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .gather-row .btn, .meetup-row .btn { width: auto; flex: none; padding: 8px 14px; font-size: 13px; }
+    .gather-empty { padding: 4px 16px 12px; color: var(--muted); font-size: 13px; }
     .maplibregl-ctrl-bottom-right,
     #map .leaflet-bottom.leaflet-right {
       right: 10px !important;
@@ -1981,7 +2066,7 @@
   
     /* ===== v4 nav, community, creator, live, editor ===== */
     #nav {
-      grid-template-columns: 1fr 1fr 60px 1fr 1fr;
+      grid-template-columns: 1fr 1fr 70px 1fr 1fr;
       align-items: end;
       padding: 4px 4px var(--safe-bot);
     }
@@ -2001,11 +2086,14 @@
     #map-home-btn {
       width: 46px; height: 46px; border-radius: 50%;
       background: var(--yellow);
-      box-shadow: 0 0 0 3px var(--map-btn-gap), 0 0 0 6px var(--yellow), 0 6px 14px var(--yellow-glow);
+      box-shadow: 0 4px 12px var(--yellow-glow);
       display: grid; place-items: center; color: var(--yellow-ink);
     }
     #map-home-btn svg { width: 22px; height: 22px; }
-    .nav-center.active #map-home-btn { box-shadow: 0 0 0 3px var(--map-btn-gap), 0 0 0 7px var(--yellow), 0 6px 14px var(--yellow-glow); }
+    .nav-center .nav-label { color: #5C5C5E; margin-top: 2px; }
+    .nav-center.active { color: var(--text); }
+    .nav-center.active .nav-label { color: var(--text); }
+    .nav-center.active #map-home-btn { box-shadow: 0 4px 14px var(--yellow-glow); }
     #cam-shutter {
       position: absolute; left: 50%; bottom: calc(var(--nav-h) + var(--safe-bot) + 8px);
       transform: translateX(-50%); z-index: 6; border: 0; cursor: pointer;
@@ -3680,7 +3768,7 @@
             <div class="map-chips">
               <button type="button" class="on" id="tog-comms">Communities</button>
               <button type="button" class="on" id="tog-parties">Parties</button>
-              <button type="button" class="on" id="tog-friends">Friends</button>
+              <button type="button" id="tog-friends">Friends</button>
             </div>
             <div id="search-panel"></div>
           </div>
@@ -3765,10 +3853,16 @@
         <span class="nav-badge" id="nav-chat-badge"></span>
         <span class="nav-label">Chat</span>
       </button>
-      <button type="button" class="nav-center" data-go="2" aria-label="Map" id="nav-map-btn">
+      <button type="button" class="nav-center" aria-label="Gather" id="nav-map-btn">
         <div id="map-home-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.2"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="8.2" cy="8" r="2.4"/>
+            <path d="M3.4 18c.4-2.6 2.5-4.1 4.8-4.1s4.4 1.5 4.8 4.1"/>
+            <path d="M17.2 13s2.8-2.2 2.8-4.3a2.8 2.8 0 0 0-5.6 0c0 2.1 2.8 4.3 2.8 4.3z"/>
+            <circle cx="17.2" cy="8.6" r="1" fill="currentColor" stroke="none"/>
+          </svg>
         </div>
+        <span class="nav-label">Gather</span>
       </button>
       <button type="button" class="nav-btn" data-go="3" aria-label="Camera">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="12" cy="13" r="4"/><path d="M4 9h3l1.5-2h7L17 9h3v11H4V9z"/></svg>
@@ -3780,6 +3874,11 @@
       </button>
 
     </nav>
+
+    <div id="gather-sheet" aria-hidden="true">
+      <button type="button" id="gather-sheet-backdrop" aria-label="Close"></button>
+      <div id="gather-sheet-body"></div>
+    </div>
 
     <div id="thread" class="thread">
       <div class="topbar" id="thread-top"></div>
@@ -4973,7 +5072,9 @@
       seenStories: [],
       userStories: [],
       streaks: Object.fromEntries(PEOPLE.filter(p => p.streak).map(p => [p.id, p.streak])),
-      layers: { comms: true, parties: true, friends: true },
+      layers: { comms: true, parties: true, friends: false },
+      meetups: [],
+      placeFirstMap: true,
       theme: "white",
       themeChosen: false,
       mapLayer: "streets",
@@ -5016,7 +5117,12 @@
     s.profile = Object.assign({}, blank.profile, s.profile || {});
     s.profile.avatar = Object.assign({}, defaultAvatar(), (s.profile && s.profile.avatar) || {});
     s.session = Object.assign({}, blank.session, s.session && typeof s.session === "object" ? s.session : {});
-    s.layers = Object.assign({ comms: true, parties: true, friends: true }, s.layers && typeof s.layers === "object" ? s.layers : {});
+    s.layers = Object.assign({ comms: true, parties: true, friends: false }, s.layers && typeof s.layers === "object" ? s.layers : {});
+    if (!s.placeFirstMap) {
+      s.layers.friends = false;
+      s.placeFirstMap = true;
+    }
+    if (!Array.isArray(s.meetups)) s.meetups = [];
     s.messages = (s.messages && typeof s.messages === "object" && !Array.isArray(s.messages)) ? s.messages : {};
     ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports"].forEach(function (k) {
       if (!Array.isArray(s[k])) s[k] = Array.isArray(blank[k]) ? blank[k].slice() : [];
@@ -5117,7 +5223,7 @@
     draft: { name: "", category: "football", description: "", lat: ACCRA.lat, lng: ACCRA.lng, place: "Accra" },
     avatarDraft: null,
     avatarFrom: null,
-    showComms: true, showParties: true, showFriends: true,
+    showComms: true, showParties: true, showFriends: false,
     view3d: false
   };
   state.showComms = store.layers.comms;
@@ -5580,6 +5686,7 @@
     $("#nav").classList.toggle("solid", i === PAGE.feeds || i === PAGE.chat || i === PAGE.community);
     if (i === PAGE.map) { initMap(); setTimeout(() => { try { mapResize(); } catch (e) {} }, 80); }
     if (i === PAGE.chat) { try { renderChatPage(); } catch (e) { console.warn("renderChatPage", e); } }
+    if (i !== PAGE.map) { try { closeGatherSheet(); } catch (e) {} }
     if (i === PAGE.camera) startCamera();
     else stopCameraPreview();
     if (i === PAGE.feeds) { renderChatPage(); renderDiscover(); syncFeedsStories(); }
@@ -14973,6 +15080,32 @@
     }
     return wrap;
   }
+  function placeCountLabel(c) {
+    const n = memberCount(c);
+    if ((c && c.category) === "party") return n + " going";
+    return n + " talking";
+  }
+  function meetupCountLabel(m) {
+    const n = Math.max(1, Number((m && m.going) || 1));
+    return n + " going";
+  }
+  function makePlacePinEl(opts) {
+    const wrap = document.createElement("button");
+    wrap.type = "button";
+    wrap.className = "place-pin " + (opts.kind || "comm") + (opts.live ? " is-live" : "");
+    wrap.innerHTML =
+      '<span class="place-pin-ico" aria-hidden="true">' + (opts.emoji || "\uD83D\uDCCD") + "</span>" +
+      '<span class="place-pin-copy"><span class="place-pin-name">' + escapeHtml(opts.name || "") + "</span>" +
+      '<span class="place-pin-sub">' + escapeHtml(opts.sub || "") + "</span></span>" +
+      (opts.live ? '<span class="live-badge pin-live">LIVE</span>' : "");
+    return wrap;
+  }
+  function allMeetups() {
+    return Array.isArray(store.meetups) ? store.meetups : [];
+  }
+  function findMeetup(id) {
+    return allMeetups().find(function (m) { return m && m.id === id; });
+  }
   function renderMapMarkers() {
     if (!state.map) return;
     clearMarkers();
@@ -14980,6 +15113,32 @@
     pulse.className = "pulse-wrap";
     pulse.innerHTML = '<div class="pulse-ring"></div><div class="pulse-ring d2"></div><div class="pulse-core"></div>';
     state.userMarker = addMapMarker(pulse, state.loc.lng, state.loc.lat, "center");
+    allCommunities().forEach(c => {
+      const isParty = c.category === "party";
+      if (isParty && !state.showParties) return;
+      if (!isParty && !state.showComms) return;
+      const cat = catById[c.category] || catById.other;
+      const el = makePlacePinEl({
+        kind: isParty ? "party" : "comm",
+        emoji: cat.emoji || "\uD83D\uDCCD",
+        name: c.name,
+        sub: placeCountLabel(c),
+        live: !!c.live
+      });
+      el.addEventListener("click", (ev) => { ev.stopPropagation(); if (c.live) openLive("comm", c.id); else openSheet(c.id); });
+      state.markers.push(addMapMarker(el, c.lng, c.lat, "bottom"));
+    });
+    allMeetups().forEach(function (m) {
+      if (!m || !isFinite(m.lat) || !isFinite(m.lng)) return;
+      const el = makePlacePinEl({
+        kind: "meetup",
+        emoji: "\uD83D\uDCCD",
+        name: m.title,
+        sub: meetupCountLabel(m)
+      });
+      el.addEventListener("click", function (ev) { ev.stopPropagation(); openMeetupSheet(m.id); });
+      state.markers.push(addMapMarker(el, m.lng, m.lat, "bottom"));
+    });
     if (state.showFriends) {
       store.friends.map(id => personById[id]).filter(Boolean).forEach(p => {
         const el = makePinEl(avatarSVG(p.avatar, 44), "friend", p.name.split(" ")[0], isLivePerson(p.id), hasActiveStatus(p.id) ? (hasUnseenStatus(p.id) ? "unseen" : "seen") : "");
@@ -14991,16 +15150,179 @@
         state.markers.push(addMapMarker(el, p.lng, p.lat, "bottom"));
       });
     }
-    allCommunities().forEach(c => {
-      const isParty = c.category === "party";
-      if (isParty && !state.showParties) return;
-      if (!isParty && !state.showComms) return;
-      const cat = catById[c.category] || catById.other;
-      const cfg = { skin: SKINS[2], hair: "short", hairColor: "#111", outfit: isParty ? "hoodie" : "jersey", outfitColor: cat.color, acc: "none", bg: cat.color };
-      const el = makePinEl(avatarSVG(cfg, 44), isParty ? "party" : "comm", c.name.split(" ").slice(0,2).join(" "), !!c.live);
-      el.addEventListener("click", (ev) => { ev.stopPropagation(); if (c.live) openLive("comm", c.id); else openSheet(c.id); });
-      state.markers.push(addMapMarker(el, c.lng, c.lat, "bottom"));
+  }
+  function fmtMeetupWhen(ts) {
+    const d = new Date(Number(ts) || Date.now());
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Africa/Accra" });
+  }
+  function defaultMeetupLocal() {
+    const d = new Date();
+    d.setMinutes(0, 0, 0);
+    d.setHours(d.getHours() + (d.getHours() < 19 ? (19 - d.getHours()) : 2));
+    const pad = function (n) { return String(n).padStart(2, "0"); };
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+  function matchPlaceQuery(q) {
+    const s = (q || "").trim().toLowerCase();
+    if (!s) return null;
+    const list = allCommunities();
+    return list.find(function (c) { return (c.name || "").toLowerCase() === s; })
+      || list.find(function (c) { return (c.place || "").toLowerCase() === s; })
+      || list.find(function (c) { return ((c.name || "") + " " + (c.place || "")).toLowerCase().indexOf(s) !== -1; })
+      || null;
+  }
+  function closeGatherSheet() {
+    const sheet = document.getElementById("gather-sheet");
+    if (sheet) {
+      sheet.classList.remove("open");
+      sheet.setAttribute("aria-hidden", "true");
+    }
+    const btn = document.getElementById("nav-map-btn");
+    if (btn) btn.classList.remove("active");
+  }
+  function isGatherSheetOpen() {
+    const sheet = document.getElementById("gather-sheet");
+    return !!(sheet && sheet.classList.contains("open"));
+  }
+  function renderGatherSheet() {
+    const body = document.getElementById("gather-sheet-body");
+    if (!body) return;
+    const places = allCommunities().slice().sort(function (a, b) { return haversine(state.loc, a) - haversine(state.loc, b); });
+    const near = places.filter(function (c) { return haversine(state.loc, c) <= NEARBY_KM; });
+    const list = near.length ? near : places.slice(0, 8);
+    const meetups = allMeetups().slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); });
+    const vis = (state.meetupDraft && state.meetupDraft.vis) || "Friends";
+    let html = '<div class="gather-handle"></div>';
+    html += '<div class="gather-head"><h2>Gather</h2><button type="button" class="icon-round" id="gather-close" aria-label="Close">\u2715</button></div>';
+    html += '<div class="gather-section"><div class="section-label">Start a meetup</div><div class="gather-form">';
+    html += '<label class="field"><span>Title</span><input id="meetup-title" maxlength="60" placeholder="e.g. Sunset hangout" /></label>';
+    html += '<label class="field"><span>Place</span><select id="meetup-place"><option value="">Choose a place</option>';
+    places.forEach(function (c) {
+      html += '<option value="' + escapeHtml(c.id) + '">' + escapeHtml(c.name) + " \u2014 " + escapeHtml(c.place || "") + "</option>";
     });
+    html += '</select></label>';
+    html += '<label class="field"><span>Or type a place</span><input id="meetup-place-text" maxlength="80" placeholder="e.g. Labadi Beach" /></label>';
+    html += '<label class="field"><span>Time</span><input id="meetup-time" type="datetime-local" /></label>';
+    html += '<div class="field"><span>Who can see it</span></div><div class="gather-see" id="meetup-vis">';
+    ["Friends", "Community", "Public"].forEach(function (v) {
+      html += '<button type="button" data-vis="' + v + '" class="' + (vis === v ? "on" : "") + '">' + v + "</button>";
+    });
+    html += "</div>";
+    html += '<div class="btn-row"><button type="button" class="btn btn-primary" id="btn-create-meetup">Create meetup</button></div>';
+    html += "</div></div>";
+    html += '<div class="gather-section"><div class="section-label">Your meetups</div>';
+    if (!meetups.length) html += '<p class="gather-empty">You have not started a meetup yet.</p>';
+    else meetups.forEach(function (m) {
+      html += '<button type="button" class="meetup-row" data-open-meetup="' + escapeHtml(m.id) + '"><span class="ico">\uD83D\uDCCD</span><span class="copy"><h3>' + escapeHtml(m.title) + "</h3><p>" + escapeHtml(m.place || "") + " \u00b7 " + escapeHtml(fmtMeetupWhen(m.time)) + " \u00b7 " + meetupCountLabel(m) + "</p></span></button>";
+    });
+    html += "</div>";
+    html += '<div class="gather-section"><div class="section-label">Happening near you</div>';
+    if (!list.length) html += '<p class="gather-empty">Nothing nearby right now.</p>';
+    else list.forEach(function (c) {
+      const km = fmtKm(haversine(state.loc, c));
+      const cat = catById[c.category] || catById.other;
+      const joined = isJoined(c.id);
+      html += '<div class="gather-row"><span class="ico">' + (cat.emoji || "\uD83D\uDCCD") + '</span><span class="copy"><h3>' + escapeHtml(c.name) + "</h3><p>" + escapeHtml(c.place || "") + " \u00b7 " + km + " \u00b7 " + placeCountLabel(c) + "</p></span>";
+      if (joined) html += '<button type="button" class="btn btn-ghost" data-open-pin="' + c.id + '">Open</button>';
+      else html += '<button type="button" class="btn btn-primary" data-join-near="' + c.id + '">Join</button>';
+      html += "</div>";
+    });
+    html += "</div>";
+    body.innerHTML = html;
+    const time = document.getElementById("meetup-time");
+    if (time && !time.value) time.value = defaultMeetupLocal();
+    if (state.meetupDraft) {
+      const t = document.getElementById("meetup-title");
+      if (t && state.meetupDraft.title) t.value = state.meetupDraft.title;
+      const sel = document.getElementById("meetup-place");
+      if (sel && state.meetupDraft.placeId) sel.value = state.meetupDraft.placeId;
+      const pt = document.getElementById("meetup-place-text");
+      if (pt && state.meetupDraft.placeText) pt.value = state.meetupDraft.placeText;
+      if (time && state.meetupDraft.time) time.value = state.meetupDraft.time;
+    }
+  }
+  function openGatherSheet() {
+    closeSheet();
+    if (state.page !== PAGE.map) goPage(PAGE.map);
+    else { try { initMap(); } catch (e) {} }
+    hideNav(false);
+    state.meetupDraft = state.meetupDraft || { vis: "Friends" };
+    renderGatherSheet();
+    const sheet = document.getElementById("gather-sheet");
+    if (sheet) {
+      sheet.classList.add("open");
+      sheet.setAttribute("aria-hidden", "false");
+    }
+    const btn = document.getElementById("nav-map-btn");
+    if (btn) btn.classList.add("active");
+  }
+  function toggleGatherSheet() {
+    if (isGatherSheetOpen()) closeGatherSheet();
+    else openGatherSheet();
+  }
+  function resolveMeetupPlace() {
+    const sel = document.getElementById("meetup-place");
+    const typed = ((document.getElementById("meetup-place-text") || {}).value || "").trim();
+    const id = sel && sel.value;
+    if (id) {
+      const c = findCommunity(id);
+      if (c) return { id: c.id, name: c.place || c.name, label: c.name, lat: c.lat, lng: c.lng };
+    }
+    if (typed) {
+      const hit = matchPlaceQuery(typed);
+      if (hit) return { id: hit.id, name: typed, label: hit.name, lat: hit.lat, lng: hit.lng };
+      return { id: "", name: typed, label: typed, lat: state.loc.lat + 0.004, lng: state.loc.lng + 0.004 };
+    }
+    return null;
+  }
+  function createMeetup() {
+    const title = (((document.getElementById("meetup-title") || {}).value || "").trim());
+    if (title.length < 2) { toast("Please give your meetup a title"); return; }
+    const place = resolveMeetupPlace();
+    if (!place) { toast("Choose or type a place"); return; }
+    const timeEl = document.getElementById("meetup-time");
+    const timeVal = (timeEl && timeEl.value) || "";
+    const timeTs = timeVal ? new Date(timeVal).getTime() : Date.now();
+    if (!timeVal || isNaN(timeTs)) { toast("Pick a time"); return; }
+    const visBtns = document.querySelectorAll("#meetup-vis button");
+    let vis = "Friends";
+    visBtns.forEach(function (b) { if (b.classList.contains("on")) vis = b.getAttribute("data-vis") || vis; });
+    const meetup = {
+      id: "meet-" + Date.now().toString(36),
+      title: title,
+      place: place.name,
+      placeId: place.id || "",
+      vis: vis,
+      time: timeTs,
+      at: Date.now(),
+      lat: place.lat,
+      lng: place.lng,
+      going: 1,
+      host: (store.profile && store.profile.name) || "You"
+    };
+    if (!Array.isArray(store.meetups)) store.meetups = [];
+    store.meetups.push(meetup);
+    saveStore();
+    state.meetupDraft = { vis: vis };
+    closeGatherSheet();
+    renderMapMarkers();
+    if (state.map) mapEaseTo({ center: [meetup.lng, meetup.lat], zoom: Math.max((typeof mapGetZoom === "function" ? mapGetZoom() : 13), 14), duration: 700 });
+    setTimeout(function () { openMeetupSheet(meetup.id); }, 400);
+    toast("Meetup added to the map");
+  }
+  function openMeetupSheet(id) {
+    const m = findMeetup(id);
+    if (!m) return;
+    closeGatherSheet();
+    const km = haversine(state.loc, m);
+    $("#pin-sheet").innerHTML =
+      '<div class="sheet-top"><div class="place-pin-ico" style="width:44px;height:44px;font-size:20px;border-radius:14px;background:#2A2A2A;color:#fff">\uD83D\uDCCD</div>' +
+      '<div class="sheet-copy" style="color:#fff"><h3 style="color:#fff">' + escapeHtml(m.title) + '</h3><div class="sheet-meta" style="color:#C7C7CC">' + escapeHtml(m.place || "") + " \u00b7 " + fmtKm(km) + " \u00b7 " + escapeHtml(fmtMeetupWhen(m.time)) + '</div></div>' +
+      '<button type="button" class="icon-round" id="sheet-close">\u2715</button></div>' +
+      '<p class="sheet-desc" style="color:#C7C7CC">Visible to ' + escapeHtml((m.vis || "Friends").toLowerCase()) + ". " + meetupCountLabel(m) + ".</p>";
+    $("#pin-sheet").classList.add("open");
+    if (state.map) mapEaseTo({ center: [m.lng, m.lat], zoom: Math.max((typeof mapGetZoom === "function" ? mapGetZoom() : 13), 14), duration: 700 });
   }
 
     function closeSheet() { const s = $("#pin-sheet"); if (s) s.classList.remove("open"); }
@@ -15715,9 +16037,50 @@
     const b = e.target.closest("[data-layer]"); if (!b) return;
     applyMapLayer(b.dataset.layer);
   });
+  function syncLayerChips() {
+    const c = document.getElementById("tog-comms");
+    const p = document.getElementById("tog-parties");
+    const f = document.getElementById("tog-friends");
+    if (c) c.classList.toggle("on", !!state.showComms);
+    if (p) p.classList.toggle("on", !!state.showParties);
+    if (f) f.classList.toggle("on", !!state.showFriends);
+  }
   $("#tog-comms").addEventListener("click", () => { state.showComms = !state.showComms; store.layers.comms = state.showComms; saveStore(); $("#tog-comms").classList.toggle("on", state.showComms); renderMapMarkers(); });
   $("#tog-parties").addEventListener("click", () => { state.showParties = !state.showParties; store.layers.parties = state.showParties; saveStore(); $("#tog-parties").classList.toggle("on", state.showParties); renderMapMarkers(); });
   $("#tog-friends").addEventListener("click", () => { state.showFriends = !state.showFriends; store.layers.friends = state.showFriends; saveStore(); $("#tog-friends").classList.toggle("on", state.showFriends); renderMapMarkers(); });
+  const gatherBtn = document.getElementById("nav-map-btn");
+  if (gatherBtn) gatherBtn.addEventListener("click", function (e) { e.preventDefault(); toggleGatherSheet(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && isGatherSheetOpen()) { e.preventDefault(); closeGatherSheet(); }
+  });
+  const gatherSheet = document.getElementById("gather-sheet");
+  if (gatherSheet) {
+    gatherSheet.addEventListener("click", function (e) {
+      if (e.target.id === "gather-sheet-backdrop" || e.target.closest("#gather-close")) { closeGatherSheet(); return; }
+      const vis = e.target.closest("#meetup-vis [data-vis]");
+      if (vis) {
+        state.meetupDraft = state.meetupDraft || {};
+        state.meetupDraft.vis = vis.getAttribute("data-vis");
+        $$("#meetup-vis [data-vis]").forEach(function (b) { b.classList.toggle("on", b === vis); });
+        return;
+      }
+      if (e.target.closest("#btn-create-meetup")) { createMeetup(); return; }
+      const join = e.target.closest("[data-join-near]");
+      if (join) { closeGatherSheet(); joinCommunity(join.getAttribute("data-join-near")); return; }
+      const openPin = e.target.closest("[data-open-pin]");
+      if (openPin) { closeGatherSheet(); openSheet(openPin.getAttribute("data-open-pin")); return; }
+      const openMeet = e.target.closest("[data-open-meetup]");
+      if (openMeet) { openMeetupSheet(openMeet.getAttribute("data-open-meetup")); return; }
+    });
+    gatherSheet.addEventListener("input", function (e) {
+      if (!e.target || !e.target.id) return;
+      state.meetupDraft = state.meetupDraft || { vis: "Friends" };
+      if (e.target.id === "meetup-title") state.meetupDraft.title = e.target.value;
+      if (e.target.id === "meetup-place") state.meetupDraft.placeId = e.target.value;
+      if (e.target.id === "meetup-place-text") state.meetupDraft.placeText = e.target.value;
+      if (e.target.id === "meetup-time") state.meetupDraft.time = e.target.value;
+    });
+  }
   $("#btn-locate").addEventListener("click", () => useLocation(() => toast("Centered on you")));
   $("#btn-create-fab").addEventListener("click", openCreate);
   $("#pin-sheet").addEventListener("click", (e) => {
@@ -16430,6 +16793,7 @@
     hideAuth();
     hideNav(false);
     goPage(2, true);
+    try { syncLayerChips(); } catch (e) {}
     maybeOnboard();
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {

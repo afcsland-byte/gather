@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="7">
+<html lang="en" data-theme="white" data-build="8">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="7" />
+  <meta name="gather-build" content="8" />
   <title>Gather</title>
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
@@ -1808,25 +1808,68 @@
     .feed-card h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
     .feed-card p { font-size: 14px; font-weight: 400; color: var(--muted); margin-top: 4px; line-height: 1.4; }
 
-    #page-feeds { display: flex; flex-direction: column; }
+    #page-feeds { display: flex; flex-direction: column; --feeds-head-h: 100px; }
     .feeds-head {
-      flex: none; z-index: 6; background: var(--bg);
-      padding-bottom: 2px;
+      position: absolute; top: 0; left: 0; right: 0;
+      z-index: 8; background: var(--bg);
+      padding-top: var(--safe-top);
       border-bottom: 0.5px solid var(--line);
+      transition: transform .22s cubic-bezier(.2,.8,.2,1);
+      will-change: transform;
     }
+    #page-feeds.feeds-head-hidden .feeds-head { transform: translateY(-100%); }
+    .feeds-top {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px; padding: 0 16px; position: relative;
+    }
+    .feeds-avatar {
+      position: relative; width: 36px; height: 36px; padding: 0;
+      border-radius: 50%; flex: none; background: transparent;
+      overflow: visible; touch-action: manipulation;
+    }
+    .feeds-avatar-face {
+      display: block; width: 36px; height: 36px;
+      border-radius: 50%; overflow: hidden; background: var(--card-2);
+    }
+    .feeds-avatar-face svg { width: 36px; height: 36px; display: block; }
+    .feeds-avatar-dot {
+      position: absolute; top: -1px; right: -1px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #007AFF; box-shadow: 0 0 0 2px var(--bg);
+      display: none; pointer-events: none;
+    }
+    .feeds-avatar-dot.show { display: block; }
+    .feeds-brand {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text); pointer-events: none;
+    }
+    .feeds-brand-mark { width: 20px; height: 24px; display: block; flex: none; }
+    .feeds-brand-name {
+      font-weight: 800; font-size: 18px; letter-spacing: -0.04em; line-height: 1;
+    }
+    .feeds-top-spacer { width: 36px; height: 36px; flex: none; }
     .feeds-tabs {
-      display: flex; gap: 4px;
-      margin: 0 16px 10px; padding: 4px;
-      background: var(--card); border-radius: 12px;
+      display: flex; align-items: stretch; gap: 22px;
+      margin: 0; padding: 0 16px;
+      background: transparent; border-radius: 0;
     }
     .feeds-tabs button {
-      flex: 1; height: 34px; border-radius: 9px;
-      font-weight: 600; font-size: 14px;
-      color: var(--muted); background: transparent;
-      position: relative; touch-action: manipulation;
+      flex: none; height: 48px; padding: 0 1px 8px;
+      border-radius: 0; font-weight: 700; font-size: 18px;
+      letter-spacing: -0.03em; color: #8E8E93;
+      background: transparent; position: relative;
+      touch-action: manipulation;
     }
     .feeds-tabs button.on {
-      background: var(--text); color: var(--bg);
+      background: transparent; color: var(--text); font-weight: 800;
+    }
+    .feeds-tabs button.on::after {
+      content: ""; position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 3.5px; border-radius: 4px 4px 0 0;
+      background: var(--text);
     }
     .feeds-tab-badge {
       display: none; min-width: 16px; height: 16px; padding: 0 5px; margin-left: 5px;
@@ -1852,9 +1895,9 @@
     #page-feeds.tab-foryou #feeds-pager { transform: translateX(0); }
     #page-feeds.tab-notifications #feeds-pager { transform: translateX(-50%); }
     .feeds-pane { flex: 0 0 50%; width: 50%; height: 100%; position: relative; overflow: hidden; }
-    .feeds-pane > .scroll { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
+    .feeds-pane > .scroll { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-top: var(--feeds-head-h); box-sizing: border-box; }
     .feeds-pane > .ptr-indicator {
-      top: 0;
+      top: var(--feeds-head-h);
       z-index: 7;
     }
     .notif-toolbar {
@@ -3955,8 +3998,18 @@
   <div id="app">
     <div id="pager">
       <section class="page" data-page="feeds" id="page-feeds">
-        <div class="feeds-head">
-          <div class="topbar"><h1>Feeds</h1></div>
+        <div class="feeds-head" id="feeds-head">
+          <div class="feeds-top">
+            <button type="button" class="feeds-avatar" id="feeds-avatar" aria-label="Profile">
+              <span class="feeds-avatar-face" id="feeds-avatar-face"></span>
+              <span class="feeds-avatar-dot" id="feeds-avatar-dot" hidden></span>
+            </button>
+            <div class="feeds-brand" aria-hidden="true">
+              <svg class="feeds-brand-mark" viewBox="7 5.5 18 21"><path fill="currentColor" d="M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z"/></svg>
+              <span class="feeds-brand-name">Gather</span>
+            </div>
+            <span class="feeds-top-spacer" aria-hidden="true"></span>
+          </div>
           <div class="feeds-tabs" id="feeds-tabs" role="tablist" aria-label="Feeds">
             <button type="button" role="tab" data-feeds-tab="foryou" aria-selected="true" class="on">For you</button>
             <button type="button" role="tab" data-feeds-tab="notifications" aria-selected="false">Notifications<span class="feeds-tab-badge" id="feeds-notes-badge" hidden></span></button>
@@ -6162,7 +6215,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 7. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 8. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -6365,6 +6418,7 @@
   }
   function renderChatPage() {
     $("#btn-profile").innerHTML = avatarSVG(store.profile.avatar, 40);
+    try { paintFeedsAvatar(); } catch (e) {}
     const stories = seedStories();
     const myNew = (store.userStories || []).length > 0;
     let row = '<button type="button" class="story-item" id="story-add"><div class="ring add"><div class="ring-inner">'+avatarSVG(store.profile.avatar, 56)+"</div></div><p>Add</p></button>";
@@ -14839,6 +14893,11 @@
       dot.hidden = n <= 0;
       dot.classList.toggle("show", n > 0);
     }
+    const avDot = document.getElementById("feeds-avatar-dot");
+    if (avDot) {
+      avDot.hidden = n <= 0;
+      avDot.classList.toggle("show", n > 0);
+    }
   }
   function pushNotification(note) {
     if (!note || !note.id) return;
@@ -14955,6 +15014,52 @@
     }
     try { openCreatorProfile("me"); } catch (e) {}
   }
+  function paintFeedsAvatar() {
+    const face = document.getElementById("feeds-avatar-face");
+    if (!face) return;
+    try { face.innerHTML = avatarSVG(store.profile && store.profile.avatar, 36); } catch (e) {}
+  }
+  function measureFeedsHead() {
+    const head = document.getElementById("feeds-head");
+    const page = document.getElementById("page-feeds");
+    if (!head || !page) return;
+    const h = head.offsetHeight;
+    if (h) page.style.setProperty("--feeds-head-h", h + "px");
+  }
+  function showFeedsHead() {
+    const page = document.getElementById("page-feeds");
+    if (page) page.classList.remove("feeds-head-hidden");
+  }
+  function hideFeedsHead() {
+    const page = document.getElementById("page-feeds");
+    if (page) page.classList.add("feeds-head-hidden");
+  }
+  function bindFeedsHeadScroll() {
+    if (bindFeedsHeadScroll._bound) return;
+    bindFeedsHeadScroll._bound = true;
+    function onScroll(e) {
+      const el = e.currentTarget;
+      try {
+        if (typeof ptrActive !== "undefined" && ptrActive && (ptrActive.refreshing || ptrActive.visual)) {
+          showFeedsHead();
+          el._feedsY = el.scrollTop;
+          return;
+        }
+      } catch (err) {}
+      const y = el.scrollTop || 0;
+      const last = el._feedsY || 0;
+      const dy = y - last;
+      el._feedsY = y;
+      if (y < 24) { showFeedsHead(); return; }
+      if (dy > 6) hideFeedsHead();
+      else if (dy < -6) showFeedsHead();
+    }
+    ["feeds-scroll-foryou", "feeds-scroll-notes"].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("scroll", onScroll, { passive: true });
+    });
+    try { window.addEventListener("resize", measureFeedsHead); } catch (e) {}
+  }
   function setFeedsTab(tab, instant) {
     tab = (tab === "notifications") ? "notifications" : "foryou";
     store.feedsTab = tab;
@@ -14981,12 +15086,26 @@
       try { renderNotifications(); } catch (e) {}
     }
     try { syncFeedsNotifBadges(); } catch (e) {}
+    try { showFeedsHead(); } catch (e) {}
   }
   function initFeedsTabs() {
     seedNotificationsOnce();
+    try { paintFeedsAvatar(); } catch (e) {}
+    try { measureFeedsHead(); } catch (e) {}
     setFeedsTab(currentFeedsTab(), true);
+    try { bindFeedsHeadScroll(); } catch (e) {}
+    requestAnimationFrame(function () { try { measureFeedsHead(); } catch (e) {} });
     if (initFeedsTabs._bound) return;
     initFeedsTabs._bound = true;
+    const avBtn = document.getElementById("feeds-avatar");
+    if (avBtn) {
+      avBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        try { openProfile(); } catch (err) {
+          try { openCreatorProfile("me"); } catch (e2) {}
+        }
+      });
+    }
     const tabs = document.getElementById("feeds-tabs");
     if (tabs) {
       tabs.addEventListener("click", function (e) {
@@ -16695,7 +16814,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 7. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 8. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -17068,6 +17187,7 @@
       try { closeStories(); } catch (e) {}
       try { if (typeof closeSpotlight === "function") closeSpotlight(); } catch (e) {}
       try { setFeedsTab("foryou"); } catch (e) {}
+      try { showFeedsHead(); } catch (e) {}
       const sc = document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll");
       if (sc) sc.scrollTop = 0;
       return;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="5">
+<html lang="en" data-theme="white" data-build="6">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="5" />
+  <meta name="gather-build" content="6" />
   <title>Gather</title>
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
@@ -505,9 +505,11 @@
       overflow: visible;
     }
     #page-chat > .ptr-indicator,
-    #screen-archived > .ptr-indicator {
+    #screen-archived > .ptr-indicator,
+    #screen-profile > .ptr-indicator {
       top: var(--ptr-top, calc(56px + var(--safe-top)));
     }
+    #screen-profile > .ptr-indicator { z-index: 6; }
     .ptr-spinner {
       width: 28px;
       height: 28px;
@@ -1850,22 +1852,24 @@
       display: inline-flex; align-items: center; gap: 6px;
       touch-action: manipulation;
     }
-    #story-more-sheet, #story-delete-sheet {
+    #story-more-sheet, #story-delete-sheet, #post-more-sheet, #post-delete-sheet {
       display: none; position: absolute; inset: 0; z-index: 120;
       background: rgba(0,0,0,.48);
       -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
       align-items: flex-end; justify-content: center;
       pointer-events: auto; touch-action: manipulation;
     }
-    #story-more-sheet.open, #story-delete-sheet.open { display: flex; }
-    #story-delete-sheet { z-index: 130; align-items: center; padding: 24px; }
+    #story-more-sheet.open, #story-delete-sheet.open,
+    #post-more-sheet.open, #post-delete-sheet.open { display: flex; }
+    #story-delete-sheet, #post-delete-sheet { z-index: 130; align-items: center; padding: 24px; }
     .story-action-card {
       width: 100%; background: #1C1C1E; color: #fff;
       border-radius: 20px 20px 0 0;
       padding: 8px 12px calc(12px + var(--safe-bot));
       box-shadow: 0 -8px 32px rgba(0,0,0,.35);
     }
-    #story-more-sheet.open .story-action-card { animation: storySheetUp .2s ease both; }
+    #story-more-sheet.open .story-action-card,
+    #post-more-sheet.open .story-action-card { animation: storySheetUp .2s ease both; }
     @keyframes storySheetUp {
       from { transform: translateY(24px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
@@ -1901,7 +1905,8 @@
       border-radius: 20px; padding: 22px 18px 16px; text-align: center;
       box-shadow: 0 16px 48px rgba(0,0,0,.4);
     }
-    #story-delete-sheet.open .story-confirm-card { animation: storyConfirmIn .2s ease both; }
+    #story-delete-sheet.open .story-confirm-card,
+    #post-delete-sheet.open .story-confirm-card { animation: storyConfirmIn .2s ease both; }
     @keyframes storyConfirmIn {
       from { transform: scale(.94); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
@@ -1913,9 +1918,9 @@
       height: 48px; border-radius: 14px; font-weight: 700; font-size: 16px; border: 0;
       touch-action: manipulation;
     }
-    #story-delete-confirm { background: #FF3B30; color: #fff; }
-    #story-delete-confirm:active { background: #D70015; }
-    #story-delete-cancel { background: var(--card); color: var(--text); }
+    #story-delete-confirm, #post-delete-confirm { background: #FF3B30; color: #fff; }
+    #story-delete-confirm:active, #post-delete-confirm:active { background: #D70015; }
+    #story-delete-cancel, #post-delete-cancel { background: var(--card); color: var(--text); }
     .countdown {
       position: absolute; top: calc(62px + var(--safe-top)); right: 14px; z-index: 3;
       width: 42px; height: 42px; border-radius: 50%;
@@ -2331,8 +2336,26 @@
     .hl-item { flex: none; width: 72px; text-align: center; color: #fff; }
     .hl-item p { font-size: 11px; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .post-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
-    .post-grid .cell { aspect-ratio: 1; overflow: hidden; background: #111; }
-    .post-grid .cell img { width: 100%; height: 100%; object-fit: cover; }
+    .post-grid .cell { aspect-ratio: 1; overflow: hidden; background: #111; position: relative; padding: 0; border: 0; color: inherit; display: block; width: 100%; }
+    .post-grid .cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .post-ph {
+      width: 100%; height: 100%; display: grid; place-items: center;
+      background: #1C1C1E; color: #fff; font-size: 13px; font-weight: 600;
+      padding: 8px; text-align: center; line-height: 1.25;
+    }
+    .post-cell-more {
+      position: absolute; top: 0; right: 0; width: 44px; height: 44px;
+      display: grid; place-items: center; z-index: 3;
+      background: transparent; border: 0; padding: 0; color: #fff;
+      touch-action: manipulation;
+    }
+    .post-cell-more span {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.16);
+      display: grid; place-items: center;
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    }
+    .post-cell-more svg { width: 16px; height: 16px; display: block; }
 
     .spot-cta { display: block; width: calc(100% - 28px); margin: 8px 14px 16px; border-radius: 20px; overflow: hidden; position: relative; height: 160px; }
     .spot-cta img { width: 100%; height: 100%; object-fit: cover; }
@@ -4501,6 +4524,37 @@
         </div>
       </div>
     </div>
+    <div id="post-more-sheet">
+      <div class="story-action-card" role="dialog" aria-label="Post options">
+        <div class="story-grab" aria-hidden="true"></div>
+        <div class="story-sheet-head">
+          <img id="post-sheet-thumb" alt="" hidden />
+          <div class="story-sheet-ph" id="post-sheet-ph" hidden></div>
+          <div>
+            <p>Your post</p>
+            <span id="post-sheet-meta">Posted just now</span>
+          </div>
+        </div>
+        <button type="button" class="story-action-row" id="post-more-save">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>
+          Save to phone
+        </button>
+        <button type="button" class="story-action-row danger" id="post-more-delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14"/><path d="M10 7V5h4v2"/><path d="M7 7l1 13h8l1-13"/></svg>
+          Delete post
+        </button>
+      </div>
+    </div>
+    <div id="post-delete-sheet">
+      <div class="story-confirm-card" role="dialog" aria-label="Delete this post">
+        <h3>Delete this post?</h3>
+        <p id="post-delete-body">This can't be undone.</p>
+        <div class="story-confirm-actions">
+          <button type="button" id="post-delete-confirm">Delete</button>
+          <button type="button" id="post-delete-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
 
     <div id="snap-viewer">
       <img id="snap-media" alt="" />
@@ -5385,6 +5439,22 @@
       if (typeof item.at !== "number") item.at = Date.now();
       return item;
     });
+    if (!Array.isArray(s.userPosts)) s.userPosts = [];
+    s.userPosts = s.userPosts.filter(function (item) { return item && typeof item === "object"; });
+    s.userStories.forEach(function (st) {
+      if (!st || !st.id) return;
+      const expectedId = st.postId || ("up-" + st.id);
+      const exists = s.userPosts.some(function (pt) {
+        return pt && (pt.id === expectedId || pt.storyId === st.id || pt.id === st.id || (st.postId && pt.id === st.postId));
+      });
+      if (exists) return;
+      const post = { id: expectedId, storyId: st.id, src: st.src || st.video || "", caption: st.caption && st.caption !== "You" ? st.caption : (st.caption || ""), likes: 0, at: st.at || Date.now() };
+      if (st.video) post.video = st.video;
+      if (st.source) post.source = st.source;
+      st.postId = post.id;
+      s.userPosts.push(post);
+    });
+    s.userPosts.sort(function (a, b) { return (b.at || 0) - (a.at || 0); });
     return s;
   }
   function saveStore() {
@@ -5991,7 +6061,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 5. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 6. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -8038,6 +8108,10 @@
         if (storyDel && storyDel.classList.contains("open")) { e.preventDefault(); closeStoryDeleteSheet(true); return; }
         const storyMore = document.getElementById("story-more-sheet");
         if (storyMore && storyMore.classList.contains("open")) { e.preventDefault(); closeStoryMoreSheet(true); return; }
+        const postDel = document.getElementById("post-delete-sheet");
+        if (postDel && postDel.classList.contains("open")) { e.preventDefault(); closePostDeleteSheet(); return; }
+        const postMore = document.getElementById("post-more-sheet");
+        if (postMore && postMore.classList.contains("open")) { e.preventDefault(); closePostMoreSheet(); return; }
         const pin = document.getElementById("pin-pad") || document.getElementById("lock-pad") || document.querySelector(".pin-pad.open, #pin-sheet.open");
         if (pin && (pin.classList.contains("open") || pin.style.display === "flex")) return;
         const msg = document.getElementById("msg-context");
@@ -14490,14 +14564,13 @@
     });
     if (!q.length) {
       closeStories();
-      try { renderChatPage(); } catch (e) {}
-      try { if (state.page === 3) renderStoriesPage(); } catch (e) {}
+      try { refreshStoryPostUI(); } catch (e) {}
       return;
     }
     state.storyQueue = q;
     if (state.storyIndex >= q.length) state.storyIndex = q.length - 1;
-    try { renderChatPage(); } catch (e) {}
     showStory();
+    try { refreshStoryPostUI(); } catch (e) {}
   }
   function undoDeleteStory(item, index) {
     if (!item) return;
@@ -14506,14 +14579,13 @@
     const i = Math.max(0, Math.min(index == null ? store.userStories.length : index, store.userStories.length));
     store.userStories.splice(i, 0, item);
     try { saveStore(); } catch (e) {}
-    try { renderChatPage(); } catch (e) {}
-    try { if (state.page === 3) renderStoriesPage(); } catch (e) {}
     const sv = document.getElementById("story-viewer");
     if (sv && sv.classList.contains("open")) {
       state.storyQueue = storiesByAuthor("me");
       state.storyIndex = Math.min(i, state.storyQueue.length - 1);
       showStory();
     }
+    try { refreshStoryPostUI(); } catch (e) {}
     toast("Story restored");
   }
   function saveStoryToPhone() {
@@ -16141,9 +16213,10 @@
     if (!Array.isArray(store.userStories)) store.userStories = [];
     store.userStories.push(story);
     if (!store.userPosts) store.userPosts = [];
-    const post = { id: "up-"+id, src: image || videoUrl, caption: currentCaption(), likes: 0, at: Date.now() };
+    const post = { id: "up-"+id, storyId: id, src: image || videoUrl, caption: currentCaption(), likes: 0, at: Date.now() };
     if (videoUrl) post.video = videoUrl;
     if (fromCam) post.source = "camera";
+    story.postId = post.id;
     store.userPosts.unshift(post);
     saveStore();
     closePreview();
@@ -16264,13 +16337,197 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 5. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 6. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
     $("#screen-settings").classList.add("open"); hideNav(true);
   }
-  function openProfile() { openCreatorProfile("me"); }
+
+  function storyIdForPost(post) {
+    if (!post) return "";
+    if (post.storyId) return post.storyId;
+    const id = String(post.id || "");
+    if (id.indexOf("up-st-") === 0) return id.slice(3);
+    return "";
+  }
+  function findPostById(id) {
+    if (!id) return null;
+    return (store.userPosts || []).find(function (p) { return p && p.id === id; }) || null;
+  }
+  function liveStoryForPost(post) {
+    const sid = storyIdForPost(post);
+    if (!sid) return null;
+    return (store.userStories || []).find(function (s) { return s && s.id === sid; }) || null;
+  }
+  function postCellHtml(pt, mine) {
+    pt = pt || {};
+    const src = pt.src || "";
+    const vid = pt.video || "";
+    const sid = storyIdForPost(pt);
+    let media;
+    if (src) media = '<img src="'+escapeHtml(src)+'" alt="" />';
+    else if (vid) media = '<div class="post-ph post-ph-video">\u25B6</div>';
+    else media = '<div class="post-ph post-ph-text">'+escapeHtml((pt.caption || "Post").slice(0, 48))+"</div>";
+    const more = mine
+      ? '<button type="button" class="post-cell-more" data-post-more="'+escapeHtml(pt.id||"")+'" aria-label="More"><span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg></span></button>'
+      : "";
+    return '<div class="cell'+(mine?" is-mine":"")+'" data-post-id="'+escapeHtml(pt.id||"")+'" data-highlight="'+escapeHtml(src)+'" data-hl-id="'+escapeHtml(sid)+'" data-hl-author="me" data-hl-source="'+(pt.source||"")+'" data-hl-video="'+escapeHtml(vid)+'">'+media+cameraSourceHtml(pt, { video: !!vid })+more+"</div>";
+  }
+  function isPostSheetOpen() {
+    const more = document.getElementById("post-more-sheet");
+    const del = document.getElementById("post-delete-sheet");
+    return !!(more && more.classList.contains("open")) || !!(del && del.classList.contains("open"));
+  }
+  function closePostSheets() {
+    const more = document.getElementById("post-more-sheet");
+    const del = document.getElementById("post-delete-sheet");
+    if (more) more.classList.remove("open");
+    if (del) del.classList.remove("open");
+  }
+  function fillPostMoreSheet(post) {
+    const thumb = document.getElementById("post-sheet-thumb");
+    const ph = document.getElementById("post-sheet-ph");
+    const meta = document.getElementById("post-sheet-meta");
+    const img = post && post.src;
+    if (thumb && ph) {
+      if (img) {
+        thumb.src = img;
+        thumb.hidden = false;
+        ph.hidden = true;
+      } else {
+        thumb.removeAttribute("src");
+        thumb.hidden = true;
+        ph.hidden = false;
+        ph.textContent = (post && post.video) ? "\u25B6" : "\u25CF";
+      }
+    }
+    if (meta) meta.textContent = "Posted " + storyTimeAgo(post && post.at);
+  }
+  function openPostMoreSheet(postId) {
+    const post = typeof postId === "object" && postId ? postId : findPostById(postId);
+    if (!post) return;
+    state.activePost = post;
+    try { hideToast(); } catch (e) {}
+    try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {}
+    fillPostMoreSheet(post);
+    const sheet = document.getElementById("post-more-sheet");
+    if (sheet) sheet.classList.add("open");
+  }
+  function closePostMoreSheet() {
+    const sheet = document.getElementById("post-more-sheet");
+    if (sheet) sheet.classList.remove("open");
+  }
+  function openPostDeleteSheet() {
+    const post = state.activePost || null;
+    if (!post) return;
+    try { hideToast(); } catch (e) {}
+    try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {}
+    closePostMoreSheet();
+    const body = document.getElementById("post-delete-body");
+    if (body) body.textContent = liveStoryForPost(post) ? "This also removes it from your story." : "This can't be undone.";
+    const sheet = document.getElementById("post-delete-sheet");
+    if (sheet) sheet.classList.add("open");
+  }
+  function closePostDeleteSheet() {
+    const sheet = document.getElementById("post-delete-sheet");
+    if (sheet) sheet.classList.remove("open");
+  }
+  function refreshStoryPostUI() {
+    try { renderChatPage(); } catch (e) {}
+    try { syncFeedsStories(); } catch (e) {}
+    try { renderStoriesPage(); } catch (e) {}
+    try {
+      document.querySelectorAll("[data-open-status]").forEach(function (el) {
+        const id = el.getAttribute("data-open-status");
+        const on = typeof hasActiveStatus === "function" && hasActiveStatus(id);
+        el.classList.toggle("has-status", !!on);
+        el.classList.toggle("unseen", !!(on && hasUnseenStatus(id)));
+        el.classList.toggle("seen", !!(on && !hasUnseenStatus(id)));
+      });
+    } catch (e) {}
+    try {
+      if ((state.page === PAGE.map || state.page === 2) && typeof renderMapMarkers === "function") renderMapMarkers();
+    } catch (e) {}
+    try { if (typeof archivedIsOpen === "function" && archivedIsOpen()) renderArchivedList(); } catch (e) {}
+    const el = document.getElementById("screen-profile");
+    if (el && el.classList.contains("open")) {
+      try { openCreatorProfile("me"); } catch (e) {}
+    }
+  }
+  function refreshOwnProfileIfOpen() { refreshStoryPostUI(); }
+  function refreshViewerIfStoryGone(removedId) {
+    const sv = document.getElementById("story-viewer");
+    if (!sv || !sv.classList.contains("open")) return;
+    const cur = currentStory();
+    if (!cur || cur.id !== removedId) return;
+    const q = storiesByAuthor("me");
+    if (!q.length) { closeStories(); return; }
+    state.storyQueue = q;
+    if (state.storyIndex >= q.length) state.storyIndex = q.length - 1;
+    showStory();
+  }
+  function savePostToPhone() {
+    const post = state.activePost;
+    const url = post && (post.src || post.video);
+    if (!url) { toast("Can't save this post"); return; }
+    try {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "gather-post" + (post.video && !post.src ? ".mp4" : ".jpg");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast("Saved to phone");
+    } catch (e) {
+      toast("Can't save this post");
+    }
+    closePostMoreSheet();
+  }
+  function deleteActivePost() {
+    const post = state.activePost;
+    if (!post) return;
+    const list = store.userPosts || [];
+    const pidx = list.findIndex(function (x) { return x && x.id === post.id; });
+    if (pidx < 0) return;
+    const removedPost = list.splice(pidx, 1)[0];
+    let removedStory = null, sidx = -1;
+    const live = liveStoryForPost(removedPost);
+    if (live) {
+      sidx = (store.userStories || []).findIndex(function (x) { return x && x.id === live.id; });
+      if (sidx >= 0) removedStory = store.userStories.splice(sidx, 1)[0];
+    }
+    try { saveStore(); } catch (e) {}
+    closePostDeleteSheet();
+    closePostMoreSheet();
+    if (removedStory) refreshViewerIfStoryGone(removedStory.id);
+    try { refreshStoryPostUI(); } catch (e) {}
+    toast("Post deleted", {
+      action: {
+        label: "Undo",
+        onClick: function () { undoDeletePost(removedPost, pidx, removedStory, sidx); }
+      }
+    });
+  }
+  function undoDeletePost(post, pidx, story, sidx) {
+    if (!post) return;
+    if (!Array.isArray(store.userPosts)) store.userPosts = [];
+    if (post.id && store.userPosts.some(function (x) { return x && x.id === post.id; })) return;
+    const pi = Math.max(0, Math.min(pidx == null ? store.userPosts.length : pidx, store.userPosts.length));
+    store.userPosts.splice(pi, 0, post);
+    if (story) {
+      if (!Array.isArray(store.userStories)) store.userStories = [];
+      if (!store.userStories.some(function (x) { return x && x.id === story.id; })) {
+        const si = Math.max(0, Math.min(sidx == null ? store.userStories.length : sidx, store.userStories.length));
+        store.userStories.splice(si, 0, story);
+      }
+    }
+    try { saveStore(); } catch (e) {}
+    try { refreshStoryPostUI(); } catch (e) {}
+    toast("Post restored");
+  }
+
+    function openProfile() { openCreatorProfile("me"); }
   function isFollowing(id) { return (store.following || []).indexOf(id) !== -1; }
   function toggleFollow(id) {
     if (!id || id === "me") return;
@@ -16289,7 +16546,9 @@
       meta.followers = (meta.followers || 0) + (isFollowing(p.id) ? 1 : 0);
       meta.following = meta.following || 0;
     }
-    const posts = mine ? (store.userPosts || []).concat(creatorPosts("ama").slice(0,0)) : creatorPosts(p.id);
+    const posts = mine
+      ? (store.userPosts || []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); })
+      : creatorPosts(p.id);
     const highs = mine ? (store.userStories||[]).map((s,i)=>({id:s.id,title:s.caption||"Story",src:s.src,source:s.source,video:s.video})) : creatorHighlights(p.id);
     const followOn = !mine && isFollowing(p.id);
     $("#screen-profile").innerHTML =
@@ -16319,10 +16578,11 @@
         '<button type="button" class="hl-item" data-highlight="'+escapeHtml(h.src||"")+'" data-hl-id="'+escapeHtml(h.id||"")+'" data-hl-author="'+(mine?"me":p.id)+'" data-hl-source="'+(h.source||"")+'" data-hl-video="'+escapeHtml(h.video||"")+'"><div class="ring unseen" style="width:64px;height:64px"><div class="ring-inner"><img src="'+(h.src||h.video||"")+'" alt="" /></div></div><p>'+escapeHtml(h.title)+"</p></button>"
       ).join("")+"</div>" : '<p class="hint">'+(mine?"Post a story to start your highlights.":"No highlights yet.")+"</p>")+
       '<div class="section-label">Posts</div>'+
-      (posts.length ? '<div class="post-grid">'+posts.map(pt => '<button type="button" class="cell" data-highlight="'+escapeHtml(pt.src||"")+'" data-hl-source="'+(pt.source||"")+'" data-hl-video="'+escapeHtml(pt.video||"")+'"><img src="'+(pt.src||pt.video||"")+'" alt="" />'+cameraSourceHtml(pt, { video: !!pt.video })+"</button>").join("")+"</div>"
+      (posts.length ? '<div class="post-grid">'+posts.map(function (pt) { return postCellHtml(pt, mine); }).join("")+"</div>"
         : '<p class="hint">'+(mine?"Your Spotlight and story posts will land here.":"No posts yet.")+"</p>")+
       "</div>";
     $("#screen-profile").classList.add("open"); hideNav(true);
+    try { bindProfilePullRefresh(); } catch (e) {}
   }
 
   function openAvatarBuilder(from) {
@@ -16812,6 +17072,73 @@
     storyDelSheet.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
     storyDelSheet.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
   }
+  bindStoryTap(document.getElementById("post-more-save"), savePostToPhone);
+  bindStoryTap(document.getElementById("post-more-delete"), openPostDeleteSheet);
+  bindStoryTap(document.getElementById("post-delete-cancel"), closePostDeleteSheet);
+  bindStoryTap(document.getElementById("post-delete-confirm"), deleteActivePost);
+  const postMoreSheet = document.getElementById("post-more-sheet");
+  if (postMoreSheet) {
+    postMoreSheet.addEventListener("click", function (e) {
+      if (e.target.id === "post-more-sheet") closePostMoreSheet();
+    });
+    postMoreSheet.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+    postMoreSheet.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
+  }
+  const postDelSheet = document.getElementById("post-delete-sheet");
+  if (postDelSheet) {
+    postDelSheet.addEventListener("click", function (e) {
+      if (e.target.id === "post-delete-sheet") closePostDeleteSheet();
+    });
+    postDelSheet.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+    postDelSheet.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
+  }
+  (function setupPostGridMenu() {
+    let pressTimer = 0, pressId = "", x0 = 0, y0 = 0, moved = false, opened = false;
+    function clearPress() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = 0; } }
+    document.addEventListener("pointerdown", function (e) {
+      const more = e.target.closest && e.target.closest("[data-post-more]");
+      if (more) return;
+      const cell = e.target.closest && e.target.closest(".post-grid .cell.is-mine[data-post-id]");
+      if (!cell) return;
+      pressId = cell.getAttribute("data-post-id") || "";
+      x0 = e.clientX; y0 = e.clientY; moved = false; opened = false;
+      clearPress();
+      pressTimer = setTimeout(function () {
+        pressTimer = 0;
+        opened = true;
+        state.suppressPostClick = true;
+        openPostMoreSheet(pressId);
+      }, 450);
+    });
+    document.addEventListener("pointermove", function (e) {
+      if (!pressTimer && !opened) return;
+      if (Math.abs(e.clientX - x0) + Math.abs(e.clientY - y0) > 12) {
+        moved = true;
+        clearPress();
+      }
+    });
+    document.addEventListener("pointerup", function () { clearPress(); });
+    document.addEventListener("pointercancel", function () { clearPress(); opened = false; });
+    document.addEventListener("click", function (e) {
+      const more = e.target.closest && e.target.closest("[data-post-more]");
+      if (more) {
+        e.preventDefault();
+        e.stopPropagation();
+        openPostMoreSheet(more.getAttribute("data-post-more"));
+        state.suppressPostClick = true;
+        setTimeout(function () { state.suppressPostClick = false; }, 400);
+        return;
+      }
+      if (state.suppressPostClick) {
+        const cell = e.target.closest && e.target.closest(".post-grid .cell, [data-highlight]");
+        if (cell) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        state.suppressPostClick = false;
+      }
+    }, true);
+  })();
   $("#snap-close").addEventListener("click", () => {
     // closing early still counts as viewed
     const who = state.activeChat; 
@@ -16919,6 +17246,7 @@
     }
     if (e.target.closest("[data-ed-sticker]")) { addEditorSticker(e.target.closest("[data-ed-sticker]").getAttribute("data-ed-sticker")); return; }
     if (e.target.closest("[data-highlight]")) {
+      if (e.target.closest("[data-post-more]") || state.suppressPostClick || isPostSheetOpen()) return;
       const btn = e.target.closest("[data-highlight]");
       const author = btn.getAttribute("data-hl-author") || "me";
       const hid = btn.getAttribute("data-hl-id");
@@ -17449,6 +17777,11 @@
     if (!scrollEl) return false;
     try {
       if (kind === "chat" && (state.chatSearchOpen || (document.getElementById("page-chat") && document.getElementById("page-chat").classList.contains("searching")))) return false;
+      if (kind === "profile") {
+        const prof = document.getElementById("screen-profile");
+        if (!prof || !prof.classList.contains("open")) return false;
+        try { if (typeof isPostSheetOpen === "function" && isPostSheetOpen()) return false; } catch (err) {}
+      }
       const thread = document.getElementById("thread");
       if (thread && thread.classList.contains("open")) return false;
       if (typeof isRowContextOpen === "function" && isRowContextOpen()) return false;
@@ -18023,6 +18356,18 @@
       try { if (typeof renderStoriesPage === "function") renderStoriesPage(); } catch (err) {}
     } else if (kind === "archived") {
       try { if (typeof renderArchivedList === "function") renderArchivedList(); } catch (err) {}
+    } else if (kind === "profile") {
+      try { if (navigator.vibrate) navigator.vibrate(10); } catch (err) {}
+      try {
+        const raw = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
+        if (raw && typeof raw === "object") {
+          const fresh = normalizeStore(raw);
+          if (Array.isArray(fresh.userStories)) store.userStories = fresh.userStories;
+          if (Array.isArray(fresh.userPosts)) store.userPosts = fresh.userPosts;
+          if (Array.isArray(fresh.seenStories)) store.seenStories = fresh.seenStories;
+        }
+      } catch (err) {}
+      try { if (typeof refreshStoryPostUI === "function") refreshStoryPostUI(); } catch (err) {}
     }
   }
 
@@ -18072,6 +18417,7 @@
 
     scrollEl.addEventListener("pointerdown", function (e) {
       if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (kind === "profile" && e.pointerType === "mouse") return;
       if (ptrActive && ptrActive.refreshing) return;
       if (!ptrAllowed(kind, scrollEl)) return;
       if (scrollEl.scrollTop > 1) return;
@@ -18093,6 +18439,7 @@
         try { cancelAllRowSwipeTracking(); } catch (err) {}
         try { clearTimeout(state.rowPressTimer); state.rowPressTimer = null; } catch (err) {}
         try { state.suppressChatClick = true; } catch (err) {}
+        try { state.suppressPostClick = true; } catch (err) {}
         try { if (scrollEl.setPointerCapture && drag.pid != null) scrollEl.setPointerCapture(drag.pid); } catch (err) {}
         scrollEl.classList.add("ptr-host-pulling");
         scrollEl.style.overflowY = "hidden";
@@ -18130,7 +18477,8 @@
     const map = {
       chat: { scroll: document.getElementById("chat-scroll"), host: document.getElementById("page-chat") },
       feeds: { scroll: document.querySelector("#page-feeds .scroll"), host: document.getElementById("page-feeds") },
-      archived: { scroll: document.getElementById("archived-list"), host: document.getElementById("screen-archived") }
+      archived: { scroll: document.getElementById("archived-list"), host: document.getElementById("screen-archived") },
+      profile: { scroll: document.querySelector("#screen-profile .overlay-body"), host: document.getElementById("screen-profile") }
     };
     const target = map[kind] || map.chat;
     if (!target.scroll || !target.host) return null;
@@ -18207,6 +18555,22 @@
     };
   }
 
+  function bindProfilePullRefresh() {
+    const host = document.getElementById("screen-profile");
+    if (!host) return;
+    const body = host.querySelector(".overlay-body");
+    if (!body) return;
+    bindPullRefresh(body, { kind: "profile", host: host });
+    const ind = ensurePtrIndicator(host, "profile");
+    if (typeof ptrActive !== "undefined" && ptrActive && ptrActive.kind === "profile") {
+      ptrActive.scrollEl = body;
+      ptrActive.host = host;
+      ptrActive.indicator = ind;
+      if (ptrActive.refreshing || ptrActive.visual) {
+        try { ptrPaint(ptrActive, ptrActive.visual || PTR_THRESHOLD, { locked: !!ptrActive.refreshing }); } catch (err) {}
+      }
+    }
+  }
   function bindAllPullRefresh() {
     if (bindAllPullRefresh._done) return;
     bindAllPullRefresh._done = true;
@@ -18218,6 +18582,7 @@
     if (arch) bindPullRefresh(arch, { kind: "archived", host: document.getElementById("screen-archived") });
   }
   bindAllPullRefresh();
+  try { window.__gatherPtr = { set: setPullRefresh, get: getPullRefresh }; } catch (e) {}
 
   function registerGatherSW() {
     if (!("serviceWorker" in navigator)) return;

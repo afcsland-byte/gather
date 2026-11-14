@@ -1,6 +1,6 @@
-/* Gather service worker — Version 5
+/* Gather service worker — Version 6
    Network-first for the app document so a new deploy is seen on the next load. */
-const CACHE = "gather-v5";
+const CACHE = "gather-v6";
 
 self.addEventListener("install", function (event) {
   self.skipWaiting();

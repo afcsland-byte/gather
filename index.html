@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="10">
+<html lang="en" data-theme="white" data-build="11">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="10" />
+  <meta name="gather-build" content="11" />
   <title>Gather</title>
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
@@ -3936,6 +3936,278 @@
       .bubble.wave-bounce { animation: none !important; }
     }
 
+    /* ===== v11 community hub, games, voice, ranks, map pins ===== */
+    .place-pin.comm {
+      border-color: rgba(0,122,255,.45);
+      box-shadow: 0 4px 16px rgba(0,122,255,.22);
+    }
+    .place-pin.comm .place-pin-ico {
+      background: #007AFF; color: #fff;
+      border-radius: 50%;
+      font-size: 14px;
+    }
+    html[data-theme="black"] .place-pin.comm {
+      border-color: rgba(10,132,255,.5);
+      box-shadow: 0 4px 16px rgba(10,132,255,.28);
+    }
+    html[data-theme="black"] .place-pin.comm .place-pin-ico { background: #0A84FF; color: #fff; }
+    .place-pin.comm .place-pin-sub { color: #007AFF; }
+    html[data-theme="black"] .place-pin.comm .place-pin-sub { color: #64B5FF; }
+
+    #community-list { padding: 8px 0 24px; }
+    .comm-toolbar { display: flex; gap: 8px; padding: 4px 16px 12px; }
+    .comm-toolbar .btn { flex: 1; padding: 10px 12px; font-size: 13px; }
+    .comm-card { display: flex; align-items: center; gap: 10px; padding: 10px 16px; }
+    .comm-card .go { margin-left: auto; }
+    .req-card {
+      margin: 0 16px 10px; padding: 12px 14px; border-radius: 14px;
+      background: var(--card); border: 1px solid var(--line); text-align: left;
+    }
+    .req-card h4 { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+    .req-card p { color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .req-status {
+      display: inline-block; margin-top: 8px; padding: 3px 8px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+      background: var(--card-2); color: var(--text);
+    }
+    .req-status.pending { background: rgba(255,159,10,.16); color: #C93400; }
+    html[data-theme="black"] .req-status.pending { color: #FFD60A; }
+    .req-status.approved { background: rgba(52,199,89,.16); color: #248A3D; }
+    html[data-theme="black"] .req-status.approved { color: #32D74B; }
+    .rules-banner {
+      margin: 8px 16px 12px; padding: 12px 14px; border-radius: 14px;
+      background: var(--card); border: 1px solid var(--line);
+      font-size: 13px; line-height: 1.4; color: var(--text);
+    }
+    .rules-banner b { display: block; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .chan-row, .room-row, .raid-row, .game-entry {
+      display: flex; align-items: center; gap: 12px; width: 100%;
+      text-align: left; padding: 12px 16px; background: transparent; color: var(--text); border: 0;
+    }
+    .chan-row:active, .room-row:active, .raid-row:active, .game-entry:active { background: var(--row-active, var(--card)); }
+    .chan-ico, .room-ico, .game-ico {
+      width: 40px; height: 40px; border-radius: 12px; flex: none;
+      display: grid; place-items: center; background: var(--card-2); font-size: 18px;
+    }
+    .chan-row .mid, .room-row .mid, .raid-row .mid, .game-entry .mid { flex: 1; min-width: 0; text-align: left; }
+    .chan-row h4, .room-row h4, .raid-row h4, .game-entry h4 { font-size: 15px; font-weight: 700; }
+    .chan-row p, .room-row p, .raid-row p, .game-entry p { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .wyr-card, .odd-card, .prompt-card, .raid-card {
+      margin: 12px 16px; padding: 16px; border-radius: 16px;
+      background: var(--card); border: 1px solid var(--line);
+    }
+    .wyr-card h3, .odd-card h3, .prompt-card h3, .raid-card h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.03em; }
+    .wyr-opts, .odd-opts { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+    .wyr-opt, .odd-opt {
+      width: 100%; text-align: left; padding: 14px 14px; border-radius: 14px;
+      background: var(--bg); border: 1px solid var(--line); color: var(--text);
+      font-weight: 650; font-size: 15px; position: relative; overflow: hidden;
+    }
+    .wyr-opt .bar, .odd-opt .bar {
+      position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+      background: rgba(0,122,255,.16); pointer-events: none;
+    }
+    .wyr-opt .lab, .odd-opt .lab { position: relative; z-index: 1; }
+    .wyr-opt.picked, .odd-opt.picked { border-color: #007AFF; }
+    .wyr-opt.correct, .odd-opt.correct { border-color: #34C759; }
+    .wyr-opt.wrong, .odd-opt.wrong { border-color: #FF3B30; }
+    .wyr-pct { float: right; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .game-result { margin-top: 12px; font-size: 14px; font-weight: 650; }
+    #screen-voice-room { background: #0B0B0F; color: #fff; }
+    html[data-theme="white"] #screen-voice-room { background: #111114; color: #fff; }
+    #screen-voice-room .voice-stage { flex: 1; overflow-y: auto; padding: 12px 16px 24px; }
+    .voice-speakers {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 10px;
+      padding: 16px 4px 8px; text-align: center;
+    }
+    .voice-spk p { font-size: 12px; font-weight: 650; margin-top: 6px; }
+    .voice-spk .av { margin: 0 auto; }
+    .voice-spk.is-muted .av { opacity: .55; }
+    .voice-listen { color: #A1A1AA; font-size: 13px; text-align: center; margin: 8px 0 16px; }
+    .voice-dock {
+      display: flex; gap: 16px; justify-content: center; align-items: center;
+      padding: 16px 16px calc(18px + var(--safe-bot));
+      border-top: 0.5px solid rgba(255,255,255,.12);
+    }
+    .voice-dock .btn { width: auto; min-width: 120px; padding: 12px 18px; }
+    .voice-mic {
+      width: 58px; height: 58px; border-radius: 50%;
+      background: #2C2C2E; color: #fff; display: grid; place-items: center;
+    }
+    .voice-mic svg { width: 24px; height: 24px; }
+    .voice-mic.on { background: #FF3B30; }
+    .rank-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 7px; border-radius: 999px; margin-left: 6px;
+      font-size: 10px; font-weight: 800; letter-spacing: .02em; vertical-align: middle;
+      background: rgba(0,122,255,.14); color: #007AFF;
+    }
+    .rank-badge.sm { padding: 1px 6px; font-size: 9px; margin-left: 5px; }
+    .rank-badge[data-rank="newcomer"] { background: var(--card-2); color: var(--muted); }
+    .rank-badge[data-rank="member"] { background: rgba(0,122,255,.14); color: #007AFF; }
+    .rank-badge[data-rank="regular"] { background: rgba(52,199,89,.16); color: #248A3D; }
+    .rank-badge[data-rank="active"] { background: rgba(255,159,10,.18); color: #C93400; }
+    .rank-badge[data-rank="veteran"] { background: rgba(175,82,222,.16); color: #8944AB; }
+    .rank-badge[data-rank="leader"] { background: rgba(255,214,10,.22); color: #A88700; }
+    html[data-theme="black"] .rank-badge[data-rank="regular"] { color: #32D74B; }
+    html[data-theme="black"] .rank-badge[data-rank="active"] { color: #FFD60A; }
+    html[data-theme="black"] .rank-badge[data-rank="veteran"] { color: #BF5AF2; }
+    html[data-theme="black"] .rank-badge[data-rank="leader"] { color: #FFD60A; }
+    .rank-wrap { margin: 8px 16px 4px; padding: 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); text-align: left; }
+    .rank-wrap .rank-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .rank-bar { height: 6px; border-radius: 99px; background: var(--card-2); margin: 10px 0 6px; overflow: hidden; }
+    .rank-bar > span { display: block; height: 100%; border-radius: 99px; background: #007AFF; }
+    .rank-wrap p { color: var(--muted); font-size: 12px; }
+    .bubble .who .rank-badge { opacity: 1; }
+    #search-panel .result-row .chip.comm-chip {
+      background: rgba(0,122,255,.14); color: #007AFF; font-weight: 700;
+    }
+
+    /* v11 live now + group parties */
+    .live-now { padding: 6px 0 2px; }
+    .live-now-head {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 10px; padding: 2px 16px 10px;
+    }
+    .live-now-head h2 {
+      margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
+    }
+    .live-now-actions { display: flex; gap: 8px; flex: none; }
+    .live-now-actions .btn { width: auto; padding: 8px 12px; font-size: 13px; font-weight: 700; }
+    .live-now-row {
+      display: flex; gap: 10px; overflow-x: auto; padding: 0 16px 14px;
+      scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    }
+    .live-now-row::-webkit-scrollbar { display: none; }
+    .live-card {
+      flex: none; width: 168px; height: 214px; border-radius: 20px; overflow: hidden;
+      position: relative; color: #fff; text-align: left; padding: 0; background: #111;
+    }
+    .live-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .live-card .live-badge { position: absolute; top: 8px; left: 8px; z-index: 2; }
+    .live-card-meta {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 28px 10px 10px;
+      background: linear-gradient(transparent, rgba(0,0,0,.84));
+    }
+    .live-card-meta h4 { font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+    .live-card-meta p { font-size: 11px; opacity: .9; margin-top: 3px; }
+    .live-card.party { background: #1A1020; }
+    .live-card-tiles {
+      display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+      gap: 3px; height: 132px; padding: 6px; background: #0B0B0F;
+    }
+    .live-tile { border-radius: 12px; overflow: hidden; background: #222; display: grid; place-items: center; }
+    .live-tile svg { width: 100%; height: 100%; }
+
+    #live-video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; display: none; background: #000;
+    }
+    .live-ph {
+      position: absolute; inset: 0; display: none; place-items: center;
+      color: #fff; font-weight: 700; text-align: center; padding: 24px;
+      background: radial-gradient(circle at 30% 20%, #3B1020, #000 70%);
+    }
+    .live-ph.show { display: grid; }
+    .live-top-copy { min-width: 0; flex: 1; }
+    #live-host { font-size: 11px; opacity: .85; margin-top: 1px; }
+    #live-follow {
+      flex: none; width: auto; padding: 6px 10px; font-size: 12px; height: 30px;
+    }
+    #live-follow.following { background: rgba(255,255,255,.16); color: #fff; }
+    #live-side-actions {
+      position: absolute; right: 12px; bottom: 88px; z-index: 4;
+      display: flex; flex-direction: column; gap: 10px; align-items: center;
+    }
+    #live-side-actions #live-heart-btn,
+    #live-gift-btn, #live-react-btn {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(255,255,255,.16); color: #fff; font-size: 22px;
+      border: 0; position: static; right: auto; bottom: auto;
+    }
+    #live-side-actions #live-heart-btn { color: #FF375F; }
+    #live-comments { bottom: 128px; }
+    #live-hearts { right: 16px; bottom: 250px; height: 180px; }
+    #live-chat-form {
+      position: absolute; left: 12px; right: 72px; bottom: 22px; z-index: 5;
+      display: flex; gap: 8px; align-items: center;
+    }
+    #live-chat-input {
+      flex: 1; height: 40px; border-radius: 20px; border: 0; padding: 0 14px;
+      background: rgba(255,255,255,.14); color: #fff; font-size: 14px; outline: none;
+    }
+    #live-chat-input::placeholder { color: rgba(255,255,255,.7); }
+    #live-chat-send { width: auto; padding: 0 14px; height: 40px; flex: none; font-size: 13px; }
+    #live-end-btn {
+      position: absolute; top: calc(10px + var(--safe-top)); right: 56px; z-index: 5;
+      width: auto; padding: 6px 12px; height: 34px; font-size: 12px;
+      background: rgba(255,59,48,.9); color: #fff;
+    }
+
+    #live-party {
+      display: none; position: absolute; inset: 0; z-index: 85;
+      background: #0B0B0F; color: #fff; flex-direction: column;
+    }
+    #live-party.open { display: flex; }
+    .party-top {
+      display: flex; align-items: center; gap: 10px;
+      padding: calc(10px + var(--safe-top)) 12px 10px;
+    }
+    .party-top h2 { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+    .party-top p { font-size: 12px; opacity: .8; margin: 2px 0 0; }
+    .party-top > div { flex: 1; min-width: 0; }
+    .party-grid {
+      flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      padding: 4px 12px; overflow-y: auto; align-content: start;
+    }
+    .party-tile {
+      position: relative; aspect-ratio: 3/4; border-radius: 16px; overflow: hidden;
+      background: #1C1C22; display: grid; place-items: center;
+    }
+    .party-tile video {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    }
+    .party-tile .name {
+      position: absolute; left: 8px; right: 8px; bottom: 8px;
+      font-size: 12px; font-weight: 700; text-shadow: 0 1px 6px #000;
+    }
+    .party-tile.muted .name::after { content: " · muted"; font-weight: 600; opacity: .8; }
+    .party-dock {
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+      padding: 8px 12px 6px;
+    }
+    .party-dock .btn { width: auto; padding: 10px 14px; }
+    .party-chat { padding: 0 12px calc(12px + var(--safe-bottom)); }
+    .party-comments {
+      max-height: 76px; overflow: hidden; display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;
+    }
+    .party-comments .live-c { font-size: 13px; }
+    #party-chat-form { display: flex; gap: 8px; }
+    #party-chat-input {
+      flex: 1; height: 40px; border-radius: 20px; border: 0; padding: 0 14px;
+      background: rgba(255,255,255,.12); color: #fff; font-size: 14px; outline: none;
+    }
+    #party-chat-form .btn { width: auto; padding: 0 14px; height: 40px; flex: none; font-size: 13px; }
+
+    .place-pin.is-live { border-color: #FF375F; z-index: 3; }
+    .place-pin.is-live .place-pin-ico {
+      box-shadow: 0 0 0 0 rgba(255, 55, 95, 0.55);
+      animation: live-pin-pulse 1.5s ease-out infinite;
+    }
+    @keyframes live-pin-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 55, 95, 0.55); }
+      70% { box-shadow: 0 0 0 14px rgba(255, 55, 95, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 55, 95, 0); }
+    }
+    .place-pin.live-stream .place-pin-ico { background: #3B1020; }
+    .place-pin.live-party .place-pin-ico { background: #FF375F; color: #fff; }
+    html[data-theme="white"] .place-pin.live-stream .place-pin-ico { background: #FDECEE; }
+    html[data-theme="white"] .place-pin.live-party .place-pin-ico { background: #FF375F; color: #fff; }
+    #search-panel .result-row .chip.live-chip {
+      background: rgba(255,55,95,.16); color: #FF375F; font-weight: 700;
+    }
+
     </style>
   <script>
   window.__gatherLibsReady = (function () {
@@ -4165,7 +4437,7 @@
       <section class="page" data-page="community" id="page-community">
         <div class="topbar">
           <h1>Community</h1>
-          <button type="button" class="icon-round" id="btn-create-comm-page" aria-label="Create community">+</button>
+          <button type="button" class="icon-round" id="btn-create-comm-page" aria-label="Request a community">+</button>
         </div>
         <div class="scroll" id="community-list"></div>
       </section>
@@ -4610,6 +4882,12 @@
     <div id="screen-sendto" class="overlay"></div>
     <div id="screen-picker" class="overlay"></div>
     <div id="screen-requests" class="overlay"></div>
+    <div id="screen-comm-hub" class="overlay"></div>
+    <div id="screen-game" class="overlay"></div>
+    <div id="screen-voice-room" class="overlay"></div>
+    <div id="screen-comm-request" class="overlay"></div>
+    <div id="screen-support" class="overlay"></div>
+    <div id="screen-ranks" class="overlay"></div>
 
     <div id="story-viewer">
       <img id="story-media" alt="" />
@@ -4731,18 +5009,32 @@
     </div>
     <div id="live-viewer">
       <img id="live-media" alt="" />
+      <video id="live-video" playsinline autoplay muted></video>
+      <div id="live-ph" class="live-ph">Camera not available</div>
       <button type="button" class="icon-round" id="live-close" aria-label="Close">✕</button>
+      <button type="button" class="btn btn-ghost" id="live-end-btn" hidden>End live</button>
       <div class="live-top">
         <div class="av sm" id="live-av"></div>
-        <div>
+        <div class="live-top-copy">
           <div id="live-who"></div>
-          <div id="live-badge" class="live-badge">LIVE</div>
+          <div id="live-host"></div>
         </div>
+        <div id="live-badge" class="live-badge">LIVE</div>
+        <button type="button" class="btn btn-primary" id="live-follow">Follow</button>
       </div>
       <div id="live-comments"></div>
       <div id="live-hearts"></div>
-      <button type="button" id="live-heart-btn" aria-label="Send heart">♥</button>
+      <div id="live-side-actions">
+        <button type="button" id="live-heart-btn" aria-label="Send heart">♥</button>
+        <button type="button" id="live-gift-btn" aria-label="Send a gift">🎁</button>
+        <button type="button" id="live-react-btn" aria-label="React">✨</button>
+      </div>
+      <form id="live-chat-form" autocomplete="off">
+        <input id="live-chat-input" maxlength="120" placeholder="Say something..." />
+        <button type="submit" class="btn btn-primary" id="live-chat-send">Send</button>
+      </form>
     </div>
+    <div id="live-party"></div>
     <div id="stories-page" hidden></div>
 
     <div id="onboarding">
@@ -5167,6 +5459,10 @@
     { id: "lifestyle", label: "Lifestyle", emoji: "\u2728", color: "#C2410C" },
     { id: "meme", label: "Meme", emoji: "\uD83D\uDE02", color: "#B45309" },
     { id: "party", label: "Party", emoji: "\uD83C\uDF89", color: "#BE185D" },
+    { id: "games", label: "Games", emoji: "\uD83C\uDFAE", color: "#6D28D9" },
+    { id: "voice", label: "Voice", emoji: "\uD83C\uDF99\uFE0F", color: "#0F766E" },
+    { id: "fans", label: "Fan club", emoji: "\u2B50", color: "#A16207" },
+    { id: "gist", label: "Gist", emoji: "\uD83D\uDCAC", color: "#0369A1" },
     { id: "other", label: "Other", emoji: "\uD83D\uDCCD", color: "#374151" }
   ];
   const catById = Object.fromEntries(CATS.map(c => [c.id, c]));
@@ -5505,7 +5801,14 @@
       hideLockedChats: false,
       blockedContacts: [],
       deletedChats: [],
-      reports: []
+      reports: [],
+      commRequests: [],
+      supportTickets: [],
+      rank: { xp: 0, messages: 0, games: 0, roomsJoined: 0, roomsHosted: 0, lastDay: "", streak: 0 },
+      gameVotes: {},
+      gameClears: {},
+      raidJoins: {},
+      dailyAnswers: {}
     };
   }
   function loadStore() {
@@ -5529,9 +5832,14 @@
     if (!Array.isArray(s.meetups)) s.meetups = [];
     s.gatherHoldHintSeen = s.gatherHoldHintSeen === true;
     s.messages = (s.messages && typeof s.messages === "object" && !Array.isArray(s.messages)) ? s.messages : {};
-    ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports","notifications"].forEach(function (k) {
+    ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports","notifications","commRequests","supportTickets"].forEach(function (k) {
       if (!Array.isArray(s[k])) s[k] = Array.isArray(blank[k]) ? blank[k].slice() : [];
     });
+    if (!s.rank || typeof s.rank !== "object" || Array.isArray(s.rank)) s.rank = { xp: 0, messages: 0, games: 0, roomsJoined: 0, roomsHosted: 0, lastDay: "", streak: 0 };
+    if (!s.gameVotes || typeof s.gameVotes !== "object" || Array.isArray(s.gameVotes)) s.gameVotes = {};
+    if (!s.gameClears || typeof s.gameClears !== "object" || Array.isArray(s.gameClears)) s.gameClears = {};
+    if (!s.raidJoins || typeof s.raidJoins !== "object" || Array.isArray(s.raidJoins)) s.raidJoins = {};
+    if (!s.dailyAnswers || typeof s.dailyAnswers !== "object" || Array.isArray(s.dailyAnswers)) s.dailyAnswers = {};
     s.streaks = (s.streaks && typeof s.streaks === "object" && !Array.isArray(s.streaks)) ? s.streaks : Object.assign({}, blank.streaks);
     s.themeChosen = s.themeChosen === true;
     if (!s.themeChosen) {
@@ -6025,10 +6333,14 @@
   function meAv(size) { return avHTML(store.profile.avatar, size); }
 
   function allCommunities() {
-    const left = new Set(store.left);
-    return SEED.concat(store.created).filter(c => !left.has(c.id));
+    const left = new Set(store.left || []);
+    // Pending requests are never included — only seed, curated, and approved created communities.
+    return SEED.concat(typeof CURATED_COMMS !== "undefined" ? CURATED_COMMS : [], store.created || []).filter(function (c) { return c && !left.has(c.id); });
   }
-  function findCommunity(id) { return SEED.concat(store.created).find(c => c.id === id); }
+  function findCommunity(id) {
+    const cid = (typeof parentCommunityId === "function") ? parentCommunityId(id) : id;
+    return SEED.concat(typeof CURATED_COMMS !== "undefined" ? CURATED_COMMS : [], store.created || []).find(function (c) { return c && c.id === cid; });
+  }
   function isJoined(id) { return store.joined.indexOf(id) !== -1 && store.left.indexOf(id) === -1; }
   function memberCount(c) { return (c.members||[]).length + (isJoined(c.id)?1:0); }
 
@@ -6172,6 +6484,1159 @@
         '<button type="button" class="btn btn-ghost" data-leave-comm="'+c.id+'" style="width:auto;padding:8px 10px;flex:none;color:#FF375F">Leave</button></div>';
     }).join("");
   }
+
+  /* ---------- v11 curated communities, games, voice, requests, ranks ---------- */
+  const CURATED_COMMS = [
+    { id: "games-arena", name: "Games Arena", category: "games", description: "Would You Rather, Odd One Out, raids and daily game prompts. Play with people around Accra.", place: "Accra Mall, Accra", lat: 5.6195, lng: -0.1738, members: ["Fiifi Hammond", "Ama Serwaa", "Nii Armah", "Yaw Antwi", "Efua Nyarko", "Kojo Palms", "Sena Kay"],
+      channels: [{ id: "general", name: "General", kind: "chat" }, { id: "games", name: "Games", kind: "games" }, { id: "voice", name: "Voice", kind: "voice" }, { id: "gist", name: "Gist", kind: "chat" }, { id: "raids", name: "Raids", kind: "raids" }],
+      rooms: [
+        { id: "vr-games-1", title: "Late Game Night", host: "Fiifi Hammond", when: "Tonight 9 PM", listeners: 22, speakers: ["Fiifi Hammond", "Ama Serwaa", "Nii Armah"] },
+        { id: "vr-games-2", title: "Sunday Warm-up", host: "Yaw Antwi", when: "Sun 4 PM", listeners: 14, speakers: ["Yaw Antwi", "Efua Nyarko"] }
+      ],
+      rules: "",
+      messages: [
+        { from: "Fiifi Hammond", text: "Raid tonight at 8. Who's in?", at: hour(15, 10) },
+        { from: "Ama Serwaa", text: "I'm down. Don't start without me.", at: hour(15, 14) }
+      ]},
+    { id: "accra-town-hall", name: "Accra Town Hall", category: "voice", description: "Scheduled voice rooms and an open town hall for the city. Listen in or take the mic.", place: "Independence Square, Accra", lat: 5.5486, lng: -0.1963, members: ["Ama Boateng", "Kwame Mensah", "Yaw Darko", "Lydia Mensah", "Kojo Owusu", "Efua Adjei"],
+      channels: [{ id: "general", name: "General", kind: "chat" }, { id: "voice", name: "Voice", kind: "voice" }, { id: "gist", name: "Gist", kind: "chat" }, { id: "events", name: "Events", kind: "chat" }],
+      rooms: [
+        { id: "vr-town-1", title: "Saturday Town Hall", host: "Ama Boateng", when: "Sat 6 PM", listeners: 48, speakers: ["Ama Boateng", "Kwame Mensah", "Yaw Darko"] },
+        { id: "vr-town-2", title: "Morning briefing", host: "Kwame Mensah", when: "Weekdays 8 AM", listeners: 19, speakers: ["Kwame Mensah", "Lydia Mensah"] }
+      ],
+      rules: "Be respectful. No harassment. Give others time to speak.",
+      messages: [
+        { from: "Ama Boateng", text: "Town hall is at 6 on Saturday. Bring questions.", at: daysAgo(1, 17, 5) }
+      ]},
+    { id: "starlight-club", name: "Starlight Club", category: "fans", description: "A fan room for the fictional pop group Starlight. Gist, watch parties and kind energy only.", place: "Airport City, Accra", lat: 5.6058, lng: -0.1755, members: ["Akosua Frimpong", "Naana Cole", "Esi Lamptey", "Jason Addo", "Abena Osei"],
+      channels: [{ id: "general", name: "General", kind: "chat" }, { id: "gist", name: "Gist", kind: "chat" }, { id: "events", name: "Events", kind: "chat" }, { id: "voice", name: "Voice", kind: "voice" }],
+      rooms: [
+        { id: "vr-star-1", title: "New drop listen-through", host: "Akosua Frimpong", when: "Fri 7 PM", listeners: 36, speakers: ["Akosua Frimpong", "Naana Cole"] }
+      ],
+      rules: "Be kind. No rumours presented as fact. No fake accounts. Keep photos and clips to official or fan-made work \u2014 never pretend to be the artists.",
+      messages: [
+        { from: "Naana Cole", text: "The new chorus is stuck in my head.", at: hour(12, 40) }
+      ]},
+    { id: "nightwave-collective", name: "Nightwave Collective", category: "fans", description: "Fans of the fictional Accra music house Nightwave. Sets, recaps and quiet boast boards.", place: "Osu, Accra", lat: 5.5592, lng: -0.1842, members: ["DJ Kweku", "Ruby Annan", "Naa Dede", "Kojo Night"],
+      channels: [{ id: "general", name: "General", kind: "chat" }, { id: "gist", name: "Gist", kind: "chat" }, { id: "playlists", name: "Playlists", kind: "chat" }, { id: "voice", name: "Voice", kind: "voice" }],
+      rooms: [
+        { id: "vr-nw-1", title: "After-set debrief", host: "DJ Kweku", when: "Sat 11 PM", listeners: 27, speakers: ["DJ Kweku", "Ruby Annan", "Naa Dede"] }
+      ],
+      rules: "Keep it welcoming. No gatekeeping. Credit DJs and artists when you share a clip.",
+      messages: [
+        { from: "Ruby Annan", text: "Last night's close was beautiful.", at: daysAgo(0, 1, 20) }
+      ]},
+    { id: "gist-circle", name: "The Gist Circle", category: "gist", description: "City gist, honest recs and light banter. Facts over noise.", place: "Kwame Nkrumah Circle, Accra", lat: 5.5612, lng: -0.2062, members: ["Papa J", "Sena Lartey", "Afia Meme", "Kwadwo Bro", "Lydia Mensah"],
+      channels: [{ id: "general", name: "General", kind: "chat" }, { id: "gist", name: "Gist", kind: "chat" }, { id: "voice", name: "Voice", kind: "voice" }, { id: "tips", name: "Tips", kind: "chat" }],
+      rooms: [
+        { id: "vr-gist-1", title: "Sunday gist hour", host: "Papa J", when: "Sun 5 PM", listeners: 41, speakers: ["Papa J", "Sena Lartey", "Lydia Mensah"] }
+      ],
+      rules: "No bullying. No sharing private numbers or photos. If you didn't see it, don't state it as fact.",
+      messages: [
+        { from: "Papa J", text: "What's the move this weekend?", at: hour(11, 2) }
+      ]}
+  ];
+  const ACCRA_PLACES = [
+    { id: "osu", name: "Osu, Accra", lat: 5.5574, lng: -0.1829 },
+    { id: "labadi", name: "Labadi, Accra", lat: 5.5589, lng: -0.1452 },
+    { id: "east-legon", name: "East Legon, Accra", lat: 5.6358, lng: -0.1524 },
+    { id: "airport", name: "Airport City, Accra", lat: 5.6052, lng: -0.1768 },
+    { id: "circle", name: "Kwame Nkrumah Circle, Accra", lat: 5.5604, lng: -0.2058 },
+    { id: "independence", name: "Independence Square, Accra", lat: 5.5486, lng: -0.1963 }
+  ];
+  const RANK_TIERS = [
+    { id: "newcomer", name: "Newcomer", min: 0 },
+    { id: "member", name: "Member", min: 50 },
+    { id: "regular", name: "Regular", min: 150 },
+    { id: "active", name: "Active", min: 350 },
+    { id: "veteran", name: "Veteran", min: 700 },
+    { id: "leader", name: "Leader", min: 1200 }
+  ];
+  const WYR_PROMPTS = [
+    { id: "wyr-1", a: "Live in East Legon", b: "Live in Osu", baseA: 42, baseB: 58 },
+    { id: "wyr-2", a: "Beach day at Labadi", b: "Rooftop in Airport City", baseA: 61, baseB: 39 },
+    { id: "wyr-3", a: "Waakye for breakfast", b: "Jollof for dinner", baseA: 47, baseB: 53 }
+  ];
+  const ODD_ROUNDS = [
+    { id: "odd-1", q: "Which is the odd one out?", opts: ["Trotro", "Taxi", "Ride-hail", "Banku"], odd: 3, why: "Banku is food. The others are ways to get around." },
+    { id: "odd-2", q: "Which is the odd one out?", opts: ["Osu", "Labadi", "East Legon", "Jollof"], odd: 3, why: "Jollof is a dish. The others are places in Accra." },
+    { id: "odd-3", q: "Which is the odd one out?", opts: ["Football", "eFootball", "Referee", "Sunset"], odd: 3, why: "Sunset isn't a game or a match role." }
+  ];
+  const RAID_EVENTS = [
+    { id: "raid-fri", title: "Night Raid", when: "Fri 8 PM", where: "Games Arena", blurb: "A short timed event. Join the lobby before 8." },
+    { id: "raid-sun", title: "Sunday Cup", when: "Sun 4 PM", where: "Games Arena", blurb: "Casual bracket. Winner stays on." }
+  ];
+  const DAILY_PROMPTS = [
+    "Describe your worst trotro moment in five words.",
+    "Name a place in Accra everyone should visit once.",
+    "One song for a Labadi sunset \u2014 go."
+  ];
+
+  function parentCommunityId(id) {
+    if (!id) return id;
+    const s = String(id);
+    const i = s.indexOf("__");
+    return i > 0 ? s.slice(0, i) : s;
+  }
+  function communityChannelId(commId, chanId) { return commId + "__" + chanId; }
+  function curatedById(id) {
+    const cid = parentCommunityId(id);
+    return CURATED_COMMS.find(function (c) { return c.id === cid; }) || null;
+  }
+  function communityCatalog() {
+    return SEED.concat(CURATED_COMMS, store.created || []);
+  }
+  function communityChannels(c) {
+    if (c && Array.isArray(c.channels) && c.channels.length) return c.channels;
+    return [
+      { id: "general", name: "General", kind: "chat" },
+      { id: "gist", name: "Gist", kind: "chat" },
+      { id: "events", name: "Events", kind: "chat" }
+    ];
+  }
+  function communityChannel(chatId) {
+    const s = String(chatId || "");
+    const i = s.indexOf("__");
+    if (i < 1) return null;
+    const c = findCommunity(s);
+    if (!c) return null;
+    const id = s.slice(i + 2);
+    return communityChannels(c).find(function (ch) { return ch.id === id; }) || { id: id, name: id, kind: "chat" };
+  }
+  function isCommunityChat(id) { return !!findCommunity(id); }
+  function ensureRankStore() {
+    if (!store.rank || typeof store.rank !== "object") store.rank = { xp: 0, messages: 0, games: 0, roomsJoined: 0, roomsHosted: 0, lastDay: "", streak: 0 };
+    if (!Array.isArray(store.commRequests)) store.commRequests = [];
+    if (!Array.isArray(store.supportTickets)) store.supportTickets = [];
+    if (!store.gameVotes || typeof store.gameVotes !== "object") store.gameVotes = {};
+    if (!store.gameClears || typeof store.gameClears !== "object") store.gameClears = {};
+    if (!store.raidJoins || typeof store.raidJoins !== "object") store.raidJoins = {};
+    if (!store.dailyAnswers || typeof store.dailyAnswers !== "object") store.dailyAnswers = {};
+    return store.rank;
+  }
+  function currentRank(xp) {
+    ensureRankStore();
+    const n = (xp == null) ? (Number(store.rank.xp) || 0) : Number(xp) || 0;
+    let t = RANK_TIERS[0];
+    RANK_TIERS.forEach(function (r) { if (n >= r.min) t = r; });
+    return t;
+  }
+  function nextRank(xp) {
+    const n = (xp == null) ? (Number((store.rank || {}).xp) || 0) : Number(xp) || 0;
+    for (let i = 0; i < RANK_TIERS.length; i++) if (RANK_TIERS[i].min > n) return RANK_TIERS[i];
+    return null;
+  }
+  function rankProgress(xp) {
+    const n = (xp == null) ? (Number((store.rank || {}).xp) || 0) : Number(xp) || 0;
+    const cur = currentRank(n);
+    const nxt = nextRank(n);
+    if (!nxt) return 1;
+    const span = nxt.min - cur.min;
+    return span <= 0 ? 1 : Math.max(0, Math.min(1, (n - cur.min) / span));
+  }
+  function rankBadgeHtml(rank, compact) {
+    if (!rank) return "";
+    return '<span class="rank-badge' + (compact ? " sm" : "") + '" data-rank="' + rank.id + '">' + escapeHtml(rank.name) + "</span>";
+  }
+  function rankForSender(name, mine) {
+    ensureRankStore();
+    if (mine || name === "You" || (store.profile && name === store.profile.name)) return currentRank();
+    let h = 0;
+    String(name || "").split("").forEach(function (ch) { h = (h * 31 + ch.charCodeAt(0)) | 0; });
+    return RANK_TIERS[Math.abs(h) % (RANK_TIERS.length - 1)];
+  }
+  function todayKey() {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function noteRankActivity(kind, chatId) {
+    const r = ensureRankStore();
+    const day = todayKey();
+    if (r.lastDay !== day) {
+      const y = new Date(); y.setDate(y.getDate() - 1);
+      const yk = y.getFullYear() + "-" + String(y.getMonth() + 1).padStart(2, "0") + "-" + String(y.getDate()).padStart(2, "0");
+      r.streak = (r.lastDay === yk) ? (r.streak || 0) + 1 : 1;
+      r.lastDay = day;
+      r.xp += 5;
+    }
+    if (kind === "message") {
+      if (chatId && !isCommunityChat(chatId)) return;
+      r.messages = (r.messages || 0) + 1;
+      r.xp += 5;
+    } else if (kind === "game") {
+      r.games = (r.games || 0) + 1;
+      r.xp += 15;
+    } else if (kind === "room") {
+      r.roomsJoined = (r.roomsJoined || 0) + 1;
+      r.xp += 10;
+    } else if (kind === "host") {
+      r.roomsHosted = (r.roomsHosted || 0) + 1;
+      r.xp += 25;
+    }
+    try { saveStore(); } catch (e) {}
+  }
+  function visibleMapCommunities() {
+    const left = new Set((store && store.left) || []);
+    return allCommunities().filter(function (c) {
+      if (!c || left.has(c.id)) return false;
+      if (!isFinite(c.lat) || !isFinite(c.lng)) return false;
+      const isMine = (store.created || []).some(function (x) { return x && x.id === c.id; });
+      if (isMine && store.privacyPublic === false) return false;
+      return true;
+    });
+  }
+
+  function defaultChannelsForSeed() {
+    return [
+      { id: "general", name: "General", kind: "chat" },
+      { id: "gist", name: "Gist", kind: "chat" },
+      { id: "events", name: "Events", kind: "chat" }
+    ];
+  }
+  function openCommOverlay(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add("open");
+    try { hideNav(true); } catch (e) {}
+  }
+  function closeCommOverlay(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("open");
+  }
+  function closeAllCommOverlays() {
+    ["screen-comm-hub", "screen-game", "screen-voice-room", "screen-comm-request", "screen-support", "screen-ranks"].forEach(closeCommOverlay);
+  }
+
+  function renderCommunityPage() {
+    const el = $("#community-list"); if (!el) return;
+    ensureRankStore();
+    const all = allCommunities();
+    const joined = all.filter(function (c) { return isJoined(c.id); });
+    const discover = all.filter(function (c) { return !isJoined(c.id); });
+    const reqs = store.commRequests || [];
+    let html = (typeof liveNowBlockHtml === "function") ? liveNowBlockHtml() : "";
+    html += '<div class="comm-toolbar">';
+    html += '<button type="button" class="btn btn-primary" id="btn-request-comm-open">Request a community</button>';
+    html += '<button type="button" class="btn btn-ghost" id="btn-comm-support">Support</button></div>';
+    if (reqs.length) {
+      html += '<div class="section-label">My requests</div><div id="my-comm-requests">';
+      reqs.slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); }).forEach(function (r) {
+        html += '<button type="button" class="req-card" data-comm-request="'+escapeHtml(r.id)+'"><h4>'+escapeHtml(r.name)+'</h4><p>'+escapeHtml(r.categoryLabel || r.category || "")+(r.place ? " \u00b7 " + escapeHtml(r.place) : "")+'</p><span class="req-status '+escapeHtml(r.status || "pending")+'">'+(r.status === "approved" ? "Approved" : "Pending review")+"</span></button>";
+      });
+      html += "</div>";
+    }
+    html += '<div class="section-label">My communities</div>';
+    if (!joined.length) {
+      html += '<p class="hint">You have not joined a community yet. Open one below or find it on the map.</p>';
+    } else {
+      joined.forEach(function (c) { html += commCardHtml(c, true); });
+    }
+    html += '<div class="section-label">Curated communities</div>';
+    html += '<p class="hint">These rooms are chosen by Gather. Request a new one if you don\'t see your scene.</p>';
+    (discover.length ? discover : []).forEach(function (c) { html += commCardHtml(c, false); });
+    if (!all.length) html += '<div class="empty-comm"><h3>No communities yet</h3><p>Check back soon.</p></div>';
+    el.innerHTML = html;
+  }
+  function commCardHtml(c, joined) {
+    const cat = catById[c.category] || catById.other;
+    const live = !!c.live;
+    return '<div class="comm-card" data-comm-id="'+c.id+'">'+
+      '<button type="button" class="av-wrap" data-open-hub="'+c.id+'"><div class="av">'+avatarSVG({ skin:SKINS[2], hair:"short", hairColor:"#111", outfit:"jersey", outfitColor:cat.color, acc:"none", bg:"#111" }, 56)+"</div>"+(live?liveBadgeHtml(c.liveViewers):"")+"</button>"+
+      '<button type="button" class="chat-main chat-mid" data-open-hub="'+c.id+'"><h3>'+escapeHtml(c.name)+'</h3><p style="color:var(--muted);font-size:12px;margin-top:2px">'+escapeHtml(cat.label)+" \u00b7 "+escapeHtml(c.place || "")+" \u00b7 "+memberCount(c)+' members</p></button>'+
+      '<button type="button" class="btn btn-ghost go" data-open-hub="'+c.id+'" style="width:auto;padding:8px 12px;flex:none">'+(joined ? "Open" : "View")+"</button></div>";
+  }
+
+  function openCommHub(id) {
+    const c = findCommunity(id); if (!c) return;
+    const root = document.getElementById("screen-comm-hub");
+    if (!root) return;
+    state.activeComm = c.id;
+    const cat = catById[c.category] || catById.other;
+    const joined = isJoined(c.id);
+    const chans = communityChannels(c);
+    const rooms = c.rooms || [];
+    let html = '<div class="topbar"><button type="button" class="icon-round" data-close-ov="screen-comm-hub">\u2190</button><h1>'+escapeHtml(c.name)+"</h1></div>";
+    html += '<div class="overlay-body">';
+    html += '<div style="text-align:center;padding:12px 16px 4px">'+avHTML({skin:SKINS[2],hair:"short",hairColor:"#111",outfit:"jersey",outfitColor:cat.color,acc:"none",bg:"#111"},"lg");
+    html += "<h3 style=\"margin-top:8px;font-size:20px;font-weight:700;letter-spacing:-0.02em\">"+escapeHtml(c.name)+"</h3>";
+    html += '<p style="color:var(--muted)">'+escapeHtml(c.place || "")+" \u00b7 "+memberCount(c)+" members</p></div>";
+    html += '<p class="hint">'+escapeHtml(c.description || "")+"</p>";
+    if (c.rules) html += '<div class="rules-banner" id="comm-rules"><b>Room rules</b>'+escapeHtml(c.rules)+"</div>";
+    html += '<div style="padding:0 16px 12px;display:flex;gap:8px">';
+    if (!joined) html += '<button type="button" class="btn btn-primary" data-join-hub="'+c.id+'">Join</button>';
+    html += '<button type="button" class="btn btn-ghost" data-comm-info="'+c.id+'">Info</button>';
+    if (isFinite(c.lat) && isFinite(c.lng)) html += '<button type="button" class="btn btn-ghost" data-show-on-map="'+c.id+'">Show on map</button>';
+    html += "</div>";
+    html += '<div class="section-label">Channels</div><div class="group">';
+    chans.forEach(function (ch) {
+      const ico = ch.kind === "games" ? "\uD83C\uDFAE" : ch.kind === "voice" ? "\uD83C\uDF99\uFE0F" : ch.kind === "raids" ? "\u23F1\uFE0F" : "#";
+      html += '<button type="button" class="chan-row" data-open-channel="'+c.id+"__"+ch.id+'"><span class="chan-ico">'+ico+'</span><span class="mid"><h4>'+escapeHtml(ch.name)+"</h4><p>"+(ch.kind === "games" ? "Play daily games" : ch.kind === "voice" ? "Rooms and talks" : ch.kind === "raids" ? "Timed events" : "Chat")+"</p></span></button>";
+    });
+    html += "</div>";
+    if (rooms.length) {
+      html += '<div class="section-label">Voice rooms</div><div class="group">';
+      rooms.forEach(function (r) {
+        html += '<button type="button" class="room-row" data-join-voice="'+escapeHtml(r.id)+'" data-voice-comm="'+c.id+'"><span class="room-ico">\uD83C\uDF99\uFE0F</span><span class="mid"><h4>'+escapeHtml(r.title)+"</h4><p>"+escapeHtml(r.when)+" \u00b7 Hosted by "+escapeHtml(r.host)+" \u00b7 "+(r.listeners||0)+' listening</p></span><span class="btn btn-primary" style="width:auto;padding:8px 12px;flex:none">Join</span></button>';
+      });
+      html += "</div>";
+    }
+    if (c.id === "games-arena" || (chans.some(function (ch) { return ch.kind === "games" || ch.kind === "raids"; }))) {
+      html += '<div class="section-label">Games</div><div class="group">';
+      html += '<button type="button" class="game-entry" data-open-game="wyr"><span class="game-ico">\u2696\uFE0F</span><span class="mid"><h4>Would You Rather</h4><p>Pick one and see how the room voted</p></span></button>';
+      html += '<button type="button" class="game-entry" data-open-game="odd"><span class="game-ico">\uD83D\uDD0D</span><span class="mid"><h4>Odd One Out</h4><p>Find the one that does not belong</p></span></button>';
+      html += '<button type="button" class="game-entry" data-open-game="raids"><span class="game-ico">\u23F1\uFE0F</span><span class="mid"><h4>Raids</h4><p>Timed events \u2014 like Fri 8 PM</p></span></button>';
+      html += '<button type="button" class="game-entry" data-open-game="daily"><span class="game-ico">\u2728</span><span class="mid"><h4>Daily prompt</h4><p>A short challenge that resets each day</p></span></button>';
+      html += "</div>";
+    }
+    html += "</div>";
+    root.innerHTML = html;
+    openCommOverlay("screen-comm-hub");
+  }
+
+  function openCommunityChannel(chatId) {
+    const c = findCommunity(chatId);
+    if (!c) return;
+    if (!isJoined(c.id)) {
+      store.left = (store.left || []).filter(function (x) { return x !== c.id; });
+      if ((store.joined || []).indexOf(c.id) === -1) store.joined.push(c.id);
+      saveStore();
+      try { renderCommunityPage(); } catch (e) {}
+      try { renderMapMarkers(); } catch (e) {}
+    }
+    closeAllCommOverlays();
+    const ch = communityChannel(chatId);
+    if (ch && (ch.kind === "games" || ch.kind === "raids")) { openGameSheet(ch.kind === "raids" ? "raids" : "wyr", c.id); return; }
+    if (ch && ch.kind === "voice") { openCommHub(c.id); const first = (c.rooms || [])[0]; if (first) openVoiceRoom(first.id, c.id); return; }
+    try { hideNav(false); } catch (e) {}
+    openChat(chatId);
+  }
+
+  function openGameSheet(kind, commId) {
+    const root = document.getElementById("screen-game");
+    if (!root) return;
+    state.activeGame = kind;
+    state.activeComm = commId || state.activeComm || "games-arena";
+    ensureRankStore();
+    let html = '<div class="topbar"><button type="button" class="icon-round" data-close-ov="screen-game" data-back-hub="'+escapeHtml(state.activeComm)+'">\u2190</button><h1>'+(kind === "wyr" ? "Would You Rather" : kind === "odd" ? "Odd One Out" : kind === "raids" ? "Raids" : "Daily prompt")+"</h1></div><div class=\"overlay-body\">";
+    if (kind === "wyr") html += renderWyrHtml();
+    else if (kind === "odd") html += renderOddHtml();
+    else if (kind === "raids") html += renderRaidsHtml();
+    else html += renderDailyHtml();
+    if (kind === "wyr" || kind === "odd") {
+      html += '<div style="padding:8px 16px 24px;display:flex;gap:8px">';
+      if (kind === "wyr") html += '<button type="button" class="btn btn-ghost" data-open-game="odd">Play Odd One Out</button>';
+      if (kind === "odd") html += '<button type="button" class="btn btn-ghost" data-open-game="wyr">Play Would You Rather</button>';
+      html += "</div>";
+    }
+    html += "</div>";
+    root.innerHTML = html;
+    closeCommOverlay("screen-comm-hub");
+    openCommOverlay("screen-game");
+  }
+  function currentWyr() {
+    const i = (new Date()).getDate() % WYR_PROMPTS.length;
+    return WYR_PROMPTS[i];
+  }
+  function currentOdd() {
+    const i = (new Date()).getDate() % ODD_ROUNDS.length;
+    return ODD_ROUNDS[i];
+  }
+  function renderWyrHtml() {
+    const p = currentWyr();
+    const vote = (store.gameVotes || {})[p.id];
+    let a = p.baseA, b = p.baseB;
+    if (vote === "a") a += 1;
+    if (vote === "b") b += 1;
+    const t = a + b;
+    const pa = Math.round((a / t) * 100), pb = 100 - pa;
+    let html = '<div class="wyr-card" id="game-wyr"><h3>Would you rather\u2026</h3><div class="wyr-opts">';
+    [["a", p.a, pa], ["b", p.b, pb]].forEach(function (row) {
+      const picked = vote === row[0];
+      html += '<button type="button" class="wyr-opt'+(picked?" picked":"")+(vote?" voted":"")+'" data-wyr-vote="'+row[0]+'" '+(vote?"disabled":"")+'>';
+      if (vote) html += '<span class="bar" style="width:'+row[2]+'%"></span>';
+      html += '<span class="lab">'+escapeHtml(row[1])+(vote ? '<span class="wyr-pct">'+row[2]+"%</span>" : "")+"</span></button>";
+    });
+    html += "</div>";
+    if (vote) html += '<div class="game-result">Your pick is in. Here is how the room voted.</div>';
+    html += "</div>";
+    return html;
+  }
+  function voteWouldYouRather(side) {
+    const p = currentWyr();
+    ensureRankStore();
+    if ((store.gameVotes || {})[p.id]) { openGameSheet("wyr", state.activeComm); return; }
+    store.gameVotes[p.id] = side === "b" ? "b" : "a";
+    noteRankActivity("game");
+    saveStore();
+    openGameSheet("wyr", state.activeComm);
+  }
+  function renderOddHtml() {
+    const p = currentOdd();
+    const pick = (store.gameClears || {})[p.id];
+    let html = '<div class="odd-card" id="game-odd"><h3>'+escapeHtml(p.q)+'</h3><div class="odd-opts">';
+    p.opts.forEach(function (opt, i) {
+      let cls = "odd-opt";
+      if (pick != null) {
+        if (i === p.odd) cls += " correct";
+        if (Number(pick) === i && i !== p.odd) cls += " wrong picked";
+        if (Number(pick) === i && i === p.odd) cls += " picked";
+      }
+      html += '<button type="button" class="'+cls+'" data-odd-pick="'+i+'" '+(pick!=null?"disabled":"")+'><span class="lab">'+escapeHtml(opt)+"</span></button>";
+    });
+    html += "</div>";
+    if (pick != null) {
+      const ok = Number(pick) === p.odd;
+      html += '<div class="game-result">'+(ok ? "Yes \u2014 that's the odd one." : "Not that one.")+" "+escapeHtml(p.why)+"</div>";
+    }
+    html += "</div>";
+    return html;
+  }
+  function pickOddOne(i) {
+    const p = currentOdd();
+    ensureRankStore();
+    if ((store.gameClears || {})[p.id] != null) { openGameSheet("odd", state.activeComm); return; }
+    store.gameClears[p.id] = Number(i);
+    noteRankActivity("game");
+    saveStore();
+    openGameSheet("odd", state.activeComm);
+  }
+  function renderRaidsHtml() {
+    ensureRankStore();
+    let html = '<p class="hint">Raids are short, timed events. This is a demo \u2014 joining saves your spot on this device.</p>';
+    RAID_EVENTS.forEach(function (r) {
+      const inR = !!(store.raidJoins || {})[r.id];
+      html += '<div class="raid-card"><h3>'+escapeHtml(r.title)+'</h3><p style="color:var(--muted);margin-top:4px">'+escapeHtml(r.when)+" \u00b7 "+escapeHtml(r.where)+"</p><p style=\"margin-top:8px\">"+escapeHtml(r.blurb)+"</p>";
+      html += '<div style="margin-top:12px"><button type="button" class="btn '+(inR?"btn-ghost":"btn-primary")+'" data-join-raid="'+r.id+'" style="width:auto;padding:10px 16px">'+(inR?"You're in":"Join raid")+"</button></div></div>";
+    });
+    return html;
+  }
+  function joinRaid(id) {
+    ensureRankStore();
+    if (!(store.raidJoins || {})[id]) {
+      store.raidJoins[id] = Date.now();
+      noteRankActivity("game");
+      saveStore();
+      toast("You're in. See you at the raid.");
+    }
+    openGameSheet("raids", state.activeComm);
+  }
+  function renderDailyHtml() {
+    const key = todayKey();
+    const q = DAILY_PROMPTS[(new Date()).getDate() % DAILY_PROMPTS.length];
+    const ans = (store.dailyAnswers || {})[key] || "";
+    let html = '<div class="prompt-card"><h3>Today\'s prompt</h3><p style="margin:10px 0 14px;font-size:16px">'+escapeHtml(q)+"</p>";
+    if (ans) html += '<p class="game-result">You answered: '+escapeHtml(ans)+"</p>";
+    else {
+      html += '<label class="field"><span>Your answer</span><input id="daily-answer" maxlength="80" placeholder="Keep it short" /></label>';
+      html += '<button type="button" class="btn btn-primary" id="btn-daily-submit" style="margin-top:10px">Send answer</button>';
+    }
+    html += "</div>";
+    return html;
+  }
+  function submitDailyPrompt() {
+    const key = todayKey();
+    const el = document.getElementById("daily-answer");
+    const t = ((el && el.value) || "").trim();
+    if (!t) { toast("Write a short answer first"); return; }
+    ensureRankStore();
+    store.dailyAnswers[key] = t;
+    noteRankActivity("game");
+    saveStore();
+    toast("Answer saved");
+    openGameSheet("daily", state.activeComm);
+  }
+
+  function findVoiceRoom(roomId, commId) {
+    const list = commId ? [findCommunity(commId)].filter(Boolean) : allCommunities();
+    let found = null, comm = null;
+    list.forEach(function (c) {
+      if (!c || !c.rooms) return;
+      const r = c.rooms.find(function (x) { return x.id === roomId; });
+      if (r) { found = r; comm = c; }
+    });
+    if (!found) {
+      allCommunities().forEach(function (c) {
+        if (found || !c.rooms) return;
+        const r = c.rooms.find(function (x) { return x.id === roomId; });
+        if (r) { found = r; comm = c; }
+      });
+    }
+    return found ? { room: found, comm: comm } : null;
+  }
+  function openVoiceRoom(roomId, commId) {
+    const hit = findVoiceRoom(roomId, commId);
+    if (!hit) { toast("That room isn't open"); return; }
+    const r = hit.room, c = hit.comm;
+    if (c && !isJoined(c.id)) {
+      store.left = (store.left || []).filter(function (x) { return x !== c.id; });
+      if ((store.joined || []).indexOf(c.id) === -1) store.joined.push(c.id);
+      saveStore();
+    }
+    noteRankActivity("room");
+    state.activeVoice = { id: r.id, commId: c && c.id, muted: false };
+    const speakers = (r.speakers || []).slice();
+    const you = (store.profile && store.profile.name) || "You";
+    if (speakers.indexOf(you) === -1) speakers.push(you);
+    const root = document.getElementById("screen-voice-room");
+    let html = '<div class="topbar"><button type="button" class="icon-round" data-leave-voice="1" aria-label="Leave">\u2190</button><h1>'+escapeHtml(r.title)+"</h1></div>";
+    html += '<div class="voice-stage">';
+    html += '<p class="hint" style="color:#A1A1AA">Hosted by '+escapeHtml(r.host)+" \u00b7 "+escapeHtml(r.when)+". This is a demo room \u2014 no live audio.</p>";
+    html += '<div class="voice-speakers">';
+    speakers.forEach(function (name, i) {
+      const mine = name === you;
+      const av = mine ? avHTML(store.profile.avatar, "sm") : avHTML({skin:SKINS[i%SKINS.length],hair:HAIR_STYLES[i%HAIR_STYLES.length],hairColor:HAIR_COLORS[i%HAIR_COLORS.length],outfit:"tee",outfitColor:OUTFIT_COLORS[i%OUTFIT_COLORS.length],acc:"none",bg:"#1A1A1A"}, "");
+      html += '<div class="voice-spk" data-spk="'+i+'">'+av+"<p>"+escapeHtml(mine ? "You" : name)+(name === r.host ? " \u00b7 Host" : "")+"</p></div>";
+    });
+    html += "</div>";
+    html += '<div class="voice-listen" id="voice-listen-count">'+(Number(r.listeners)||0)+" listening</div>";
+    html += "</div>";
+    html += '<div class="voice-dock"><button type="button" class="voice-mic" id="btn-voice-mute" aria-label="Mute">' + ICON_MIC + "</button>";
+    html += '<button type="button" class="btn btn-danger" id="btn-voice-leave" style="width:auto;background:#FF3B30;color:#fff">Leave</button></div>';
+    root.innerHTML = html;
+    closeCommOverlay("screen-comm-hub");
+    openCommOverlay("screen-voice-room");
+  }
+  function toggleVoiceMute() {
+    if (!state.activeVoice) return;
+    state.activeVoice.muted = !state.activeVoice.muted;
+    const btn = document.getElementById("btn-voice-mute");
+    if (btn) {
+      btn.classList.toggle("on", state.activeVoice.muted);
+      btn.setAttribute("aria-label", state.activeVoice.muted ? "Unmute" : "Mute");
+    }
+    toast(state.activeVoice.muted ? "Mic off" : "Mic on");
+  }
+  function leaveVoiceRoom() {
+    state.activeVoice = null;
+    closeCommOverlay("screen-voice-room");
+    const cid = state.activeComm;
+    if (cid) openCommHub(cid);
+    else { try { hideNav(false); } catch (e) {} }
+  }
+
+  function openCommRequestForm() {
+    ensureRankStore();
+    const root = document.getElementById("screen-comm-request");
+    const cats = CATS;
+    let html = '<div class="topbar"><button type="button" class="icon-round" data-close-ov="screen-comm-request">\u2190</button><h1>Request a community</h1></div>';
+    html += '<div class="overlay-body">';
+    html += '<p class="hint">Tell us about the room you want. We review every request. It will not appear on the map or in Community until it is approved.</p>';
+    html += '<label class="field"><span>Name</span><input id="req-name" maxlength="40" placeholder="e.g. Labadi Chess Club" /></label>';
+    html += '<div class="field"><span>Category</span></div><div class="cats" id="req-cats"></div>';
+    html += '<label class="field"><span>Description</span><textarea id="req-desc" maxlength="240" placeholder="What is this community about?"></textarea></label>';
+    html += '<label class="field"><span>Location in Accra (optional)</span><select id="req-place"><option value="">No pin yet</option>';
+    ACCRA_PLACES.forEach(function (p) { html += '<option value="'+p.id+'">'+escapeHtml(p.name)+"</option>"; });
+    html += "</select></label>";
+    html += '<div style="padding:16px 16px 28px"><button type="button" class="btn btn-primary" id="btn-request-submit">Submit request</button></div>';
+    html += "</div>";
+    root.innerHTML = html;
+    state.draft = state.draft || {};
+    state.draft.reqCategory = state.draft.reqCategory || "other";
+    const box = document.getElementById("req-cats");
+    if (box) {
+      box.innerHTML = cats.map(function (cat) {
+        return '<button type="button" class="cat-opt'+(state.draft.reqCategory===cat.id?" selected":"")+'" data-req-cat="'+cat.id+'"><div style="font-size:18px">'+cat.emoji+"</div>"+cat.label+"</button>";
+      }).join("");
+    }
+    openCommOverlay("screen-comm-request");
+  }
+  function submitCommRequest() {
+    const name = (($("#req-name") && $("#req-name").value) || "").trim();
+    const description = (($("#req-desc") && $("#req-desc").value) || "").trim();
+    if (!name) { toast("Please give your community a name"); return; }
+    ensureRankStore();
+    const catId = (state.draft && state.draft.reqCategory) || "other";
+    const cat = catById[catId] || catById.other;
+    const placeId = ($("#req-place") && $("#req-place").value) || "";
+    const place = ACCRA_PLACES.find(function (p) { return p.id === placeId; }) || null;
+    const req = {
+      id: "req-" + Date.now().toString(36),
+      name: name,
+      category: catId,
+      categoryLabel: cat.label,
+      description: description || "A community on Gather.",
+      place: place ? place.name : "",
+      lat: place ? place.lat : null,
+      lng: place ? place.lng : null,
+      status: "pending",
+      at: Date.now()
+    };
+    store.commRequests.unshift(req);
+    saveStore();
+    closeCommOverlay("screen-comm-request");
+    try { hideNav(false); } catch (e) {}
+    goPage(PAGE.community);
+    renderCommunityPage();
+    toast("Request sent \u00b7 Pending review");
+  }
+  function approveCommRequest(id) {
+    ensureRankStore();
+    const req = (store.commRequests || []).find(function (r) { return r && r.id === id; });
+    if (!req) { toast("No pending request"); return false; }
+    if (req.status === "approved" && (store.created || []).some(function (c) { return c.id === req.commId; })) {
+      toast("Already approved");
+      return true;
+    }
+    const commId = "c-" + Date.now().toString(36);
+    const comm = {
+      id: commId,
+      name: req.name,
+      category: req.category || "other",
+      description: req.description || "",
+      place: req.place || "Accra",
+      lat: isFinite(req.lat) ? req.lat : 5.5600,
+      lng: isFinite(req.lng) ? req.lng : -0.1960,
+      members: [],
+      messages: [],
+      admin: true,
+      channels: defaultChannelsForSeed(),
+      requested: true
+    };
+    if (!Array.isArray(store.created)) store.created = [];
+    store.created.push(comm);
+    if (!Array.isArray(store.joined)) store.joined = [];
+    if (store.joined.indexOf(commId) === -1) store.joined.push(commId);
+    req.status = "approved";
+    req.commId = commId;
+    req.approvedAt = Date.now();
+    store.messages[commId] = [{ from: store.profile.name, text: "Welcome to " + comm.name + ". This is the start of the group chat.", at: Date.now(), mine: true }];
+    saveStore();
+    try { renderCommunityPage(); } catch (e) {}
+    try { renderMapMarkers(); } catch (e) {}
+    toast("Community approved \u00b7 It's now in Community and on the map");
+    return true;
+  }
+  function approveAllPendingRequests() {
+    ensureRankStore();
+    const pending = (store.commRequests || []).filter(function (r) { return r && r.status !== "approved"; });
+    if (!pending.length) { toast("No pending requests"); return; }
+    pending.forEach(function (r) { approveCommRequest(r.id); });
+  }
+  function openSupportSheet() {
+    ensureRankStore();
+    const root = document.getElementById("screen-support");
+    const tickets = store.supportTickets || [];
+    let html = '<div class="topbar"><button type="button" class="icon-round" data-close-ov="screen-support">\u2190</button><h1>Support</h1></div><div class="overlay-body">';
+    html += '<p class="hint">Ask a question about communities, ranks or the app. This demo keeps tickets on your device.</p>';
+    html += '<label class="field"><span>Subject</span><input id="sup-subject" maxlength="60" placeholder="What do you need help with?" /></label>';
+    html += '<label class="field"><span>Message</span><textarea id="sup-body" maxlength="400" placeholder="Write a short note"></textarea></label>';
+    html += '<div style="padding:12px 16px 20px"><button type="button" class="btn btn-primary" id="btn-support-submit">Send ticket</button></div>';
+    if (tickets.length) {
+      html += '<div class="section-label">Your tickets</div>';
+      tickets.forEach(function (t) {
+        html += '<div class="req-card"><h4>'+escapeHtml(t.subject)+'</h4><p>'+escapeHtml(t.body)+'</p><span class="req-status pending">Open</span></div>';
+      });
+    }
+    html += "</div>";
+    root.innerHTML = html;
+    openCommOverlay("screen-support");
+  }
+  function submitSupportTicket() {
+    const subject = (($("#sup-subject") && $("#sup-subject").value) || "").trim();
+    const body = (($("#sup-body") && $("#sup-body").value) || "").trim();
+    if (!subject || !body) { toast("Add a subject and a message"); return; }
+    ensureRankStore();
+    store.supportTickets.unshift({ id: "tkt-" + Date.now().toString(36), subject: subject, body: body, status: "open", at: Date.now() });
+    saveStore();
+    toast("Ticket sent");
+    openSupportSheet();
+  }
+  function openRanksSheet() {
+    ensureRankStore();
+    const r = store.rank;
+    const cur = currentRank();
+    const nxt = nextRank();
+    const root = document.getElementById("screen-ranks");
+    let html = '<div class="topbar"><button type="button" class="icon-round" data-close-ov="screen-ranks">\u2190</button><h1>How ranks work</h1></div><div class="overlay-body">';
+    html += '<div class="rank-wrap"><div class="rank-top"><strong>'+escapeHtml(cur.name)+"</strong>"+rankBadgeHtml(cur)+"</div>";
+    html += '<div class="rank-bar"><span style="width:'+Math.round(rankProgress()*100)+'%"></span></div>';
+    html += "<p>"+(nxt ? (r.xp||0)+" XP \u00b7 "+(nxt.min - (r.xp||0))+" XP to "+nxt.name : "You're at the top rank.")+"</p></div>";
+    html += '<p class="hint">Ranks come from what you do in communities: messages you send, games you play, voice rooms you join or host, and the days you stay active.</p>';
+    html += '<div class="group">';
+    html += '<div class="set-row"><div class="set-copy"><h4>Messages</h4><p>'+(r.messages||0)+' sent in community channels \u00b7 5 XP each</p></div></div>';
+    html += '<div class="set-row"><div class="set-copy"><h4>Games</h4><p>'+(r.games||0)+' played \u00b7 15 XP each</p></div></div>';
+    html += '<div class="set-row"><div class="set-copy"><h4>Voice rooms</h4><p>'+(r.roomsJoined||0)+' joined, '+(r.roomsHosted||0)+' hosted</p></div></div>';
+    html += '<div class="set-row"><div class="set-copy"><h4>Daily streak</h4><p>'+(r.streak||0)+' day'+(r.streak===1?"":"s")+' \u00b7 5 XP when you come back</p></div></div>';
+    html += "</div>";
+    html += '<div class="section-label">Levels</div><div class="group">';
+    RANK_TIERS.forEach(function (t) {
+      html += '<div class="set-row"><div class="set-copy"><h4>'+escapeHtml(t.name)+" "+rankBadgeHtml(t)+"</h4><p>From "+t.min+" XP</p></div></div>";
+    });
+    html += "</div></div>";
+    root.innerHTML = html;
+    openCommOverlay("screen-ranks");
+  }
+  function rankProfileBlock() {
+    ensureRankStore();
+    const r = store.rank;
+    const cur = currentRank();
+    const nxt = nextRank();
+    return '<div class="rank-wrap" id="rank-badge-profile"><div class="rank-top"><span>Your rank '+rankBadgeHtml(cur)+'</span><button type="button" class="btn btn-ghost" id="btn-how-ranks" style="width:auto;padding:6px 10px;flex:none;font-size:12px">How ranks work</button></div>'+
+      '<div class="rank-bar"><span style="width:'+Math.round(rankProgress()*100)+'%"></span></div>'+
+      "<p>"+(nxt ? (r.xp||0)+" XP \u00b7 "+(nxt.min-(r.xp||0))+" XP to "+nxt.name : (r.xp||0)+" XP \u00b7 Top rank")+"</p></div>";
+  }
+  function settingsDemoToolsHtml() {
+    const n = (store.commRequests || []).filter(function (r) { return r && r.status !== "approved"; }).length;
+    return '<div class="section-label">Demo tools</div>'+
+      '<div class="group">'+
+      '<button type="button" class="set-row" id="btn-approve-requests"><div class="set-copy"><h4>Approve community requests</h4><p>'+(n ? (n+" pending \u00b7 They then appear in Community and on the map") : "No pending requests")+"</p></div></button>"+
+      "</div>";
+  }
+
+  const SEED_LIVE_PARTIES = [
+    { id: "party-labadi-hang", type: "party", title: "Labadi sunset hangout", place: "Labadi Beach, Accra", lat: 5.5580, lng: -0.1480, viewers: 6, host: "Efua Adjei", hostId: "efua", participants: ["efua", "ama", "lydia", "kojo"], thumb: "beach" },
+    { id: "party-roof-east", type: "party", title: "East Legon rooftop party", place: "East Legon, Accra", lat: 5.6365, lng: -0.1510, viewers: 8, host: "Kojo Owusu", hostId: "kojo", participants: ["kojo", "abena", "fiifi", "sena"], thumb: "fun" }
+  ];
+  const SEED_LIVE_STREAMS = [
+    { id: "stream-starlight", type: "stream", kind: "comm", targetId: "starlight-club", host: "Akosua Boateng", hostId: "akosua", title: "Starlight \u2014 Late rehearsal", viewers: 128, lat: 5.6058, lng: -0.1755, place: "Airport City, Accra", thumb: "fun" },
+    { id: "stream-arena", type: "stream", kind: "comm", targetId: "games-arena", host: "Fiifi Hammond", hostId: "fiifi", title: "Games Arena \u2014 Friday cup", viewers: 94, lat: 5.6195, lng: -0.1738, place: "Accra Mall, Accra", thumb: "green" }
+  ];
+  function ensureUserLives() {
+    if (!Array.isArray(store.userLives)) store.userLives = [];
+    return store.userLives;
+  }
+  function allLiveItems() {
+    const items = [];
+    const seen = {};
+    function push(it) {
+      if (!it || !it.id || seen[it.id]) return;
+      seen[it.id] = true;
+      items.push(it);
+    }
+    PEOPLE.forEach(function (p) {
+      const m = creatorMeta(p.id);
+      if (!m || !m.live) return;
+      push({
+        type: "stream", id: "stream-person-" + p.id, kind: "person", targetId: p.id,
+        host: p.name, hostId: p.id, title: m.liveTitle || (p.name + " is live"),
+        viewers: m.liveViewers || 80, lat: p.lat, lng: p.lng, place: p.handle || "", thumb: "green"
+      });
+    });
+    (typeof allCommunities === "function" ? allCommunities() : []).forEach(function (c) {
+      if (!c || !c.live) return;
+      push({
+        type: "stream", id: "stream-comm-" + c.id, kind: "comm", targetId: c.id,
+        host: c.name, hostId: null, title: c.name, viewers: c.liveViewers || 120,
+        lat: c.lat, lng: c.lng, place: c.place || "", thumb: "night"
+      });
+    });
+    SEED_LIVE_PARTIES.forEach(push);
+    SEED_LIVE_STREAMS.forEach(push);
+    ensureUserLives().forEach(push);
+    return items;
+  }
+  function findLiveItem(id) {
+    if (!id) return null;
+    return allLiveItems().find(function (x) { return x && x.id === id; }) || null;
+  }
+  function liveCardHtml(it) {
+    const pics = photos();
+    if (it.type === "party") {
+      const tiles = (it.participants || []).slice(0, 4).map(function (pid) {
+        const av = pid === "me" ? (store.profile && store.profile.avatar) : (personById[pid] && personById[pid].avatar);
+        return '<div class="live-tile">' + (av ? avatarSVG(av, 44) : "") + "</div>";
+      }).join("");
+      const n = it.viewers || (it.participants || []).length || 1;
+      return '<button type="button" class="live-card party" data-open-live="'+escapeHtml(it.id)+'">'+
+        '<div class="live-card-tiles">'+tiles+"</div>"+
+        '<span class="live-badge">PARTY</span>'+
+        '<div class="live-card-meta"><h4>'+escapeHtml(it.title)+"</h4><p>"+fmtCount(n)+" in the room</p></div></button>";
+    }
+    const src = pics[it.thumb] || pics.night;
+    return '<button type="button" class="live-card stream" data-open-live="'+escapeHtml(it.id)+'">'+
+      '<img src="'+src+'" alt="" />'+
+      '<span class="live-badge">LIVE</span>'+
+      '<div class="live-card-meta"><h4>'+escapeHtml(it.title)+"</h4><p>"+escapeHtml(it.host || "")+" \u00b7 "+fmtCount(it.viewers || 0)+" watching</p></div></button>";
+  }
+  function liveNowBlockHtml() {
+    const items = allLiveItems();
+    let html = '<div class="live-now" id="live-now">';
+    html += '<div class="live-now-head"><h2>Live now</h2><div class="live-now-actions">';
+    html += '<button type="button" class="btn btn-primary" id="btn-go-live">Go live</button>';
+    html += '<button type="button" class="btn btn-ghost" id="btn-start-party">Start a party</button></div></div>';
+    html += '<div class="live-now-row">';
+    if (!items.length) html += '<p class="hint" style="margin:0">No one is live yet. Start the first stream or party.</p>';
+    items.forEach(function (it) { html += liveCardHtml(it); });
+    html += "</div></div>";
+    return html;
+  }
+  function isLiveQuery(q) {
+    const s = (q || "").trim().toLowerCase();
+    return s === "live" || s === "livestream" || s === "livestreams" || s === "go live" || s === "watching" || s.indexOf("live now") !== -1 || s === "hangout" || s === "hangouts" || s === "group party" || s === "group parties";
+  }
+  function searchLiveItems(q) {
+    const query = (q || "").trim().toLowerCase();
+    if (!query) return [];
+    const items = allLiveItems();
+    const liveQ = isLiveQuery(query);
+    const partyQ = typeof isPartyQuery === "function" && isPartyQuery(query);
+    return items.filter(function (it) {
+      if (liveQ) return true;
+      if (partyQ) return it.type === "party";
+      return ((it.title || "") + " " + (it.host || "") + " " + (it.place || "") + " " + (it.type || "")).toLowerCase().indexOf(query) !== -1;
+    }).map(function (it) {
+      return { live: it, km: haversine(state.loc, it) };
+    }).sort(function (a, b) { return a.km - b.km; });
+  }
+  function stopLiveMedia() {
+    ["live-video", "party-self-video"].forEach(function (id) {
+      const v = document.getElementById(id);
+      if (!v) return;
+      try {
+        if (v.srcObject) v.srcObject.getTracks().forEach(function (t) { t.stop(); });
+      } catch (err) {}
+      v.srcObject = null;
+      if (id === "live-video") v.style.display = "none";
+    });
+    const img = document.getElementById("live-media");
+    if (img) img.style.display = "";
+    const ph = document.getElementById("live-ph");
+    if (ph) ph.classList.remove("show");
+  }
+  function attachLiveCamera(videoEl) {
+    if (!videoEl) return Promise.resolve(false);
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return Promise.resolve(false);
+    return navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false }).then(function (stream) {
+      videoEl.srcObject = stream;
+      videoEl.style.display = "block";
+      const img = document.getElementById("live-media");
+      if (img && videoEl.id === "live-video") img.style.display = "none";
+      const ph = document.getElementById("live-ph");
+      if (ph) ph.classList.remove("show");
+      return true;
+    }).catch(function () { return false; });
+  }
+  function appendLiveComment(box, name, text) {
+    if (!box) return;
+    const el = document.createElement("div");
+    el.className = "live-c";
+    el.innerHTML = "<strong>" + escapeHtml(name) + "</strong>" + escapeHtml(text);
+    box.appendChild(el);
+    while (box.children.length > 6) box.removeChild(box.firstChild);
+  }
+  function sendLiveChat() {
+    const input = document.getElementById("live-chat-input");
+    if (!input) return;
+    const text = (input.value || "").trim();
+    if (!text) return;
+    input.value = "";
+    appendLiveComment(document.getElementById("live-comments"), (store.profile && store.profile.name) || "You", text);
+  }
+  function sendPartyChat() {
+    const input = document.getElementById("party-chat-input");
+    if (!input) return;
+    const text = (input.value || "").trim();
+    if (!text) return;
+    input.value = "";
+    state.partyComments = state.partyComments || [];
+    state.partyComments.push([(store.profile && store.profile.name) || "You", text]);
+    appendLiveComment(document.getElementById("party-comments"), (store.profile && store.profile.name) || "You", text);
+  }
+  function giftLive() {
+    spawnHeart();
+    const box = document.getElementById("live-hearts") || document.getElementById("live-viewer");
+    if (box) {
+      const b = document.createElement("div");
+      b.className = "fh";
+      b.textContent = "\uD83C\uDF81";
+      b.style.left = (8 + Math.random() * 36) + "px";
+      box.appendChild(b);
+      setTimeout(function () { b.remove(); }, 2000);
+    }
+    toast("You sent a gift");
+  }
+  function reactLive() {
+    spawnHeart();
+    const box = document.getElementById("live-hearts");
+    if (box) {
+      const b = document.createElement("div");
+      b.className = "fh";
+      b.textContent = ["\u2728", "\uD83D\uDD25", "\uD83D\uDC4F"][Math.floor(Math.random() * 3)];
+      b.style.left = (8 + Math.random() * 36) + "px";
+      box.appendChild(b);
+      setTimeout(function () { b.remove(); }, 2000);
+    }
+  }
+  function openLiveItem(id) {
+    const it = (id && typeof id === "object") ? id : findLiveItem(id);
+    if (!it) return;
+    if (it.type === "party") return openPartyLive(it);
+    if (it.kind === "person" && it.targetId && !it.isMine) return openLive("person", it.targetId, it);
+    if (it.kind === "comm" && it.targetId && !it.isMine) return openLive("comm", it.targetId, it);
+    return openLive("item", it.id, it);
+  }
+  function endUserLive(id) {
+    const list = ensureUserLives();
+    store.userLives = list.filter(function (x) { return !x || x.id !== id; });
+    try { saveStore(); } catch (err) {}
+    try { renderCommunityPage(); } catch (err) {}
+    try { renderMapMarkers(); } catch (err) {}
+    closeLive();
+    closePartyLive();
+    toast("You're offline");
+  }
+  function startGoLive() {
+    const me = store.profile || {};
+    const loc = state.loc || {};
+    const item = {
+      type: "stream", id: "user-live-" + Date.now(), kind: "user", isMine: true,
+      host: me.name || "You", hostId: "me", title: (me.name || "You") + " is live",
+      viewers: 1, lat: loc.lat, lng: loc.lng, place: "Near you", thumb: "green"
+    };
+    ensureUserLives().unshift(item);
+    try { saveStore(); } catch (err) {}
+    try { renderCommunityPage(); } catch (err) {}
+    try { renderMapMarkers(); } catch (err) {}
+    openLive("item", item.id, item);
+    attachLiveCamera(document.getElementById("live-video")).then(function (ok) {
+      if (!ok) {
+        const ph = document.getElementById("live-ph");
+        if (ph) ph.classList.add("show");
+        toast("Camera not available. Showing a placeholder.");
+      }
+    });
+  }
+  function startUserParty() {
+    const me = store.profile || {};
+    const loc = state.loc || {};
+    const item = {
+      type: "party", id: "user-party-" + Date.now(), isMine: true,
+      host: me.name || "You", hostId: "me", title: (me.name || "You") + "'s party",
+      viewers: 1, participants: ["me"], lat: loc.lat, lng: loc.lng, place: "Near you"
+    };
+    ensureUserLives().unshift(item);
+    try { saveStore(); } catch (err) {}
+    try { renderCommunityPage(); } catch (err) {}
+    try { renderMapMarkers(); } catch (err) {}
+    openPartyLive(item);
+  }
+  function partyParticipantIds(item) {
+    const ids = ((item && item.participants) || []).slice();
+    if (state.partyJoined && ids.indexOf("me") === -1) ids.unshift("me");
+    return ids;
+  }
+  function openPartyLive(item) {
+    closeLive();
+    state.liveParty = item;
+    state.partyJoined = !!item.isMine;
+    state.partyMic = false;
+    state.partyCam = false;
+    state.partyComments = [["Ama", "The light is perfect."], ["Kojo", "Join us!"]];
+    const root = document.getElementById("live-party");
+    if (!root) return;
+    renderPartyLive();
+    root.classList.add("open");
+    hideNav(true);
+    try { closeSheet(); } catch (err) {}
+  }
+  function renderPartyLive() {
+    const item = state.liveParty;
+    const root = document.getElementById("live-party");
+    if (!item || !root) return;
+    const ids = partyParticipantIds(item);
+    let grid = "";
+    ids.forEach(function (pid) {
+      const mine = pid === "me";
+      const p = mine ? store.profile : personById[pid];
+      const name = mine ? ((store.profile && store.profile.name) || "You") : ((p && p.name) || "Guest");
+      const av = (mine ? (store.profile && store.profile.avatar) : (p && p.avatar)) || defaultAvatar();
+      grid += '<div class="party-tile' + (mine && state.partyJoined && !state.partyMic ? " muted" : "") + '">';
+      if (mine && state.partyCam) grid += '<video id="party-self-video" playsinline autoplay muted></video>';
+      else grid += avatarSVG(av, 96);
+      grid += '<span class="name">' + escapeHtml(String(name).split(" ")[0]) + (mine ? " (you)" : "") + "</span></div>";
+    });
+    let html = '<div class="party-top"><button type="button" class="icon-round" id="party-close" aria-label="Close">\u2190</button>';
+    html += "<div><h2>" + escapeHtml(item.title) + "</h2><p>" + fmtCount(Math.max(ids.length, item.viewers || 0)) + " in the room</p></div>";
+    html += '<span class="live-badge">LIVE</span></div>';
+    html += '<div class="party-grid">' + grid + "</div>";
+    html += '<div class="party-dock">';
+    if (state.partyJoined) {
+      html += '<button type="button" class="btn btn-ghost" id="btn-party-mic">' + (state.partyMic ? "Mic on" : "Mic off") + "</button>";
+      html += '<button type="button" class="btn btn-ghost" id="btn-party-cam">' + (state.partyCam ? "Camera on" : "Camera off") + "</button>";
+      html += '<button type="button" class="btn btn-danger" id="btn-party-leave">' + (item.isMine ? "End party" : "Leave") + "</button>";
+    } else {
+      html += '<button type="button" class="btn btn-primary" id="btn-party-join">Join</button>';
+      html += '<button type="button" class="btn btn-ghost" id="party-close-2">Close</button>';
+    }
+    html += "</div>";
+    html += '<div class="party-chat"><div id="party-comments" class="party-comments"></div>';
+    html += '<form id="party-chat-form" autocomplete="off"><input id="party-chat-input" maxlength="120" placeholder="Chat with the room" /><button type="submit" class="btn btn-primary">Send</button></form></div>';
+    root.innerHTML = html;
+    (state.partyComments || []).forEach(function (c) { appendLiveComment(document.getElementById("party-comments"), c[0], c[1]); });
+    if (state.partyJoined && state.partyCam) {
+      attachLiveCamera(document.getElementById("party-self-video")).then(function (ok) {
+        if (!ok) {
+          state.partyCam = false;
+          toast("Camera not available. Showing a placeholder.");
+          renderPartyLive();
+        }
+      });
+    }
+  }
+  function closePartyLive() {
+    stopLiveMedia();
+    const root = document.getElementById("live-party");
+    if (root) {
+      root.classList.remove("open");
+      root.innerHTML = "";
+    }
+    state.liveParty = null;
+    if (!(document.getElementById("live-viewer") && document.getElementById("live-viewer").classList.contains("open"))) {
+      try { hideNav(false); } catch (err) {}
+    }
+  }
+  function togglePartyMic() {
+    state.partyMic = !state.partyMic;
+    renderPartyLive();
+  }
+  function togglePartyCam() {
+    if (state.partyCam) {
+      stopLiveMedia();
+      state.partyCam = false;
+      renderPartyLive();
+      return;
+    }
+    state.partyCam = true;
+    renderPartyLive();
+  }
+  function joinPartyLive() {
+    state.partyJoined = true;
+    const item = state.liveParty;
+    if (item) item.viewers = Math.max((item.viewers || 0) + 1, partyParticipantIds(item).length);
+    renderPartyLive();
+    toast("You joined the party");
+  }
+  function leavePartyLive() {
+    const item = state.liveParty;
+    if (item && item.isMine) {
+      endUserLive(item.id);
+      return;
+    }
+    closePartyLive();
+  }
+
+  function bindCommV11() {
+    if (bindCommV11._done) return;
+    bindCommV11._done = true;
+    document.addEventListener("click", function (e) {
+      if (!e.target || typeof e.target.closest !== "function") return;
+      const closeOv = e.target.closest("[data-close-ov]");
+      if (closeOv && /^screen-(comm-hub|game|voice-room|comm-request|support|ranks)$/.test(closeOv.getAttribute("data-close-ov") || "")) {
+        const back = closeOv.getAttribute("data-back-hub");
+        closeCommOverlay(closeOv.getAttribute("data-close-ov"));
+        if (back) { openCommHub(back); return; }
+        const still = document.querySelector("#screen-comm-hub.open, #screen-game.open, #screen-voice-room.open, #screen-comm-request.open, #screen-support.open, #screen-ranks.open, #screen-profile.open, #screen-settings.open, #screen-info.open");
+        if (!still) try { hideNav(false); } catch (err) {}
+        return;
+      }
+      if (e.target.closest("#btn-request-comm-open")) { openCommRequestForm(); return; }
+      if (e.target.closest("#btn-comm-support")) { openSupportSheet(); return; }
+      if (e.target.closest("#btn-request-submit")) { submitCommRequest(); return; }
+      if (e.target.closest("#btn-support-submit")) { submitSupportTicket(); return; }
+      if (e.target.closest("#btn-approve-requests")) { approveAllPendingRequests(); try { if (typeof openSettings === "function") openSettings(); } catch (err) {} return; }
+      if (e.target.closest("#btn-how-ranks")) { openRanksSheet(); return; }
+      if (e.target.closest("#btn-daily-submit")) { submitDailyPrompt(); return; }
+      if (e.target.closest("#btn-voice-mute")) { toggleVoiceMute(); return; }
+      if (e.target.closest("#btn-voice-leave") || e.target.closest("[data-leave-voice]")) { leaveVoiceRoom(); return; }
+      const reqCat = e.target.closest("[data-req-cat]");
+      if (reqCat) {
+        state.draft = state.draft || {};
+        state.draft.reqCategory = reqCat.getAttribute("data-req-cat");
+        document.querySelectorAll("#req-cats .cat-opt").forEach(function (b) { b.classList.toggle("selected", b === reqCat); });
+        return;
+      }
+      const hub = e.target.closest("[data-open-hub]");
+      if (hub) { openCommHub(hub.getAttribute("data-open-hub")); return; }
+      const joinHub = e.target.closest("[data-join-hub]");
+      if (joinHub) {
+        const id = joinHub.getAttribute("data-join-hub");
+        if ((store.left || []).indexOf(id) !== -1) store.left = store.left.filter(function (x) { return x !== id; });
+        if ((store.joined || []).indexOf(id) === -1) store.joined.push(id);
+        try { saveStore(); } catch (err) {}
+        try { renderCommunityPage(); } catch (err) {}
+        try { renderMapMarkers(); } catch (err) {}
+        toast("Joined. It's in Community");
+        openCommHub(id);
+        return;
+      }
+      const info = e.target.closest("[data-comm-info]");
+      if (info) { openInfo(info.getAttribute("data-comm-info")); return; }
+      const onMap = e.target.closest("[data-show-on-map]");
+      if (onMap) {
+        const c = findCommunity(onMap.getAttribute("data-show-on-map"));
+        if (!c) return;
+        closeAllCommOverlays();
+        try { hideNav(false); } catch (err) {}
+        goPage(PAGE.map);
+        if (state.map && isFinite(c.lng)) {
+          mapEaseTo({ center: [c.lng, c.lat], zoom: 14.2, duration: 900 });
+          setTimeout(function () { try { openSheet(c.id); } catch (err) {} }, 700);
+        }
+        return;
+      }
+      const ch = e.target.closest("[data-open-channel]");
+      if (ch) { openCommunityChannel(ch.getAttribute("data-open-channel")); return; }
+      const game = e.target.closest("[data-open-game]");
+      if (game) { openGameSheet(game.getAttribute("data-open-game"), state.activeComm); return; }
+      const wyr = e.target.closest("[data-wyr-vote]");
+      if (wyr) { voteWouldYouRather(wyr.getAttribute("data-wyr-vote")); return; }
+      const odd = e.target.closest("[data-odd-pick]");
+      if (odd) { pickOddOne(odd.getAttribute("data-odd-pick")); return; }
+      const raid = e.target.closest("[data-join-raid]");
+      if (raid) { joinRaid(raid.getAttribute("data-join-raid")); return; }
+      const vr = e.target.closest("[data-join-voice]");
+      if (vr) { openVoiceRoom(vr.getAttribute("data-join-voice"), vr.getAttribute("data-voice-comm")); return; }
+      if (e.target.closest("#btn-go-live")) { startGoLive(); return; }
+      if (e.target.closest("#btn-start-party")) { startUserParty(); return; }
+      const openLiveBtn = e.target.closest("[data-open-live]");
+      if (openLiveBtn) { openLiveItem(openLiveBtn.getAttribute("data-open-live")); return; }
+      if (e.target.closest("#live-follow")) {
+        const btn = document.getElementById("live-follow");
+        const id = btn && btn.dataset ? btn.dataset.follow : "";
+        if (id) {
+          toggleFollow(id);
+          const on = isFollowing(id);
+          btn.textContent = on ? "Following" : "Follow";
+          btn.classList.toggle("following", on);
+        }
+        return;
+      }
+      if (e.target.closest("#live-gift-btn")) { giftLive(); return; }
+      if (e.target.closest("#live-react-btn")) { reactLive(); return; }
+      if (e.target.closest("#live-end-btn")) {
+        const t = state.liveTarget || {};
+        endUserLive(t.itemId || t.id);
+        return;
+      }
+      if (e.target.closest("#party-close") || e.target.closest("#party-close-2")) { closePartyLive(); return; }
+      if (e.target.closest("#btn-party-join")) { joinPartyLive(); return; }
+      if (e.target.closest("#btn-party-leave")) { leavePartyLive(); return; }
+      if (e.target.closest("#btn-party-mic")) { togglePartyMic(); return; }
+      if (e.target.closest("#btn-party-cam")) { togglePartyCam(); return; }
+    });
+    document.addEventListener("submit", function (e) {
+      if (!e.target) return;
+      if (e.target.id === "live-chat-form") { e.preventDefault(); sendLiveChat(); }
+      if (e.target.id === "party-chat-form") { e.preventDefault(); sendPartyChat(); }
+    });
+    let holdT = null, holdId = null;
+    document.addEventListener("pointerdown", function (e) {
+      const card = e.target && e.target.closest && e.target.closest("[data-comm-request]");
+      if (!card) return;
+      const id = card.getAttribute("data-comm-request");
+      holdId = id;
+      holdT = setTimeout(function () {
+        holdT = null;
+        const req = (store.commRequests || []).find(function (r) { return r && r.id === id; });
+        if (!req) return;
+        if (req.status === "approved") { toast("Already approved"); return; }
+        if (confirm("Approve \u201c" + req.name + "\u201d? It will appear in Community and on the map.")) approveCommRequest(id);
+      }, 600);
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
+      document.addEventListener(ev, function () { if (holdT) { clearTimeout(holdT); holdT = null; } holdId = null; }, true);
+    });
+  }
   function renderSettingsPage() {
     const el = $("#settings-page"); if (!el) return;
     el.innerHTML =
@@ -6222,7 +7687,8 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 10. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
+      '<div class="hint">About Gather \u00b7 Version 11. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -6237,7 +7703,7 @@
     const ignore = (t) => {
       const el = eventEl(t);
       if (!el) return true;
-      return !!el.closest(".stories-row, .lenses, .map-ui, #map, .thread, .overlay, .chat-sheet, #story-viewer, #snap-viewer, #qv-viewer, #sticker-crop, #attach-sheet, #qv-sheet, #thread-more-sheet, #wallpaper-sheet, #disappear-sheet, #msg-action-sheet, #delete-sheet, #block-chat-sheet, #delete-chat-sheet, #clear-chat-sheet, #report-sheet, #voice-overlay, #pin-pad, #chat-row-sheet, #screen-locked, #screen-blocked, #blocked-banner, #story-reply, #reply-bar, #thread-search, #mention-pop, #btn-new-chat, textarea, input, .scroll, .chat-row, button, a, #nav");
+      return !!el.closest(".stories-row, .lenses, .map-ui, #map, .thread, .overlay, .chat-sheet, #story-viewer, #snap-viewer, #qv-viewer, #sticker-crop, #attach-sheet, #qv-sheet, #thread-more-sheet, #wallpaper-sheet, #disappear-sheet, #msg-action-sheet, #delete-sheet, #block-chat-sheet, #delete-chat-sheet, #clear-chat-sheet, #report-sheet, #voice-overlay, #live-viewer, #live-party, #pin-pad, #chat-row-sheet, #screen-locked, #screen-blocked, #blocked-banner, #story-reply, #reply-bar, #thread-search, #mention-pop, #btn-new-chat, textarea, input, .scroll, .chat-row, button, a, #nav");
     };
     pager.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
@@ -6482,7 +7948,12 @@
     if (typeof findGroup === "function") { const g = findGroup(id); if (g) return g.name; }
     if (id === "family") return "Family";
     const c = findCommunity(id);
-    return c ? c.name : "Chat";
+    if (c) {
+      const ch = (typeof communityChannel === "function") ? communityChannel(id) : null;
+      if (ch && String(id).indexOf("__") > 0) return c.name + " \u00b7 " + ch.name;
+      return c.name;
+    }
+    return "Chat";
   }
   function openChatUnlocked(id, andJoin) {
     if (!id) return;
@@ -7205,7 +8676,7 @@
       const rxHtml = (typeof reactionsHtml === "function") ? reactionsHtml(m) : "";
       if (m.kind === "wave") extraClass += " wave-bounce";
       body += '<div class="bubble-row ' + (mine ? "mine" : "") + (rxHtml ? " has-rxn" : "") + '" data-mid="' + escapeHtml(mid) + '" data-mine="' + (mine ? "1" : "0") + '"><div class="bubble' + extraClass + '">' +
-        (mine ? "" : '<div class="who">' + escapeHtml(m.from) + "</div>") + inner + whenRow(m) + "</div>" + rxHtml + "</div>";
+        (mine ? "" : '<div class="who">' + escapeHtml(m.from) + ((typeof isCommunityChat === "function" && isCommunityChat(id) && typeof rankBadgeHtml === "function") ? rankBadgeHtml(rankForSender(m.from, false), true) : "") + "</div>") + inner + whenRow(m) + "</div>" + rxHtml + "</div>";
     });
     if (state.typing && state.typing.chatId === id) {
       body += '<div class="typing-row" id="typing-row"><div class="typing-bubble" aria-label="Typing"><i></i><i></i><i></i></div></div>';
@@ -8406,6 +9877,7 @@
     }
     try { const u = urlIn(t); if (u) msg.link = u; } catch (e) {}
     pushMessage(state.activeChat, msg);
+    try { if (typeof noteRankActivity === "function") noteRankActivity("message", state.activeChat); } catch (err) {}
     clearReply();
     const ta = $("#composer-input");
     if (ta) {
@@ -14288,7 +15760,7 @@
     function isOpen() { return thread.classList.contains("open"); }
     function shouldIgnore(el, isEdge) {
       if (!el) return true;
-      if (el.closest("#composer, #composer-tray, #reply-bar, #thread-search, #mention-pop, .chat-sheet, .overlay.open, #voice-overlay, #pin-pad, textarea, input, #btn-thread-more, #btn-call-voice, #btn-call-video")) return true;
+      if (el.closest("#composer, #composer-tray, #reply-bar, #thread-search, #mention-pop, .chat-sheet, .overlay.open, #voice-overlay, #live-viewer, #live-party, #pin-pad, textarea, input, #btn-thread-more, #btn-call-voice, #btn-call-video")) return true;
       if (!isEdge && el.closest("[data-mid]")) return true;
       return false;
     }
@@ -14568,6 +16040,7 @@
   try { bindStatusAvatars(); } catch (e) { console.warn("bindStatusAvatars", e); }
 
   try { bindVisualViewport(); } catch (e) { console.warn("bindVisualViewport", e); }
+  try { bindCommV11(); } catch (e) { console.warn("bindCommV11", e); }
 
   try { bindChatV20(); } catch (e) { console.warn("bindChatV20", e); }
   try { bindV23(); } catch (e) { console.warn("bindV23", e); }
@@ -15374,47 +16847,87 @@
     ["Nii", "Just joined. Hello!"],
     ["Abena", "That clip was perfect."]
   ];
-  function openLive(kind, id) {
+  function openLive(kind, id, item) {
+    try { closePartyLive(); } catch (err) {}
+    stopLiveMedia();
     const pics = photos();
-    let title, av, viewers, src;
-    if (kind === "comm") {
+    let title, av, viewers, src, hostName, hostId, isMine;
+    item = item || (kind === "item" ? findLiveItem(id) : null);
+    if (item) {
+      title = item.title;
+      viewers = item.viewers || 1;
+      hostName = item.host || title;
+      hostId = item.hostId;
+      isMine = !!item.isMine;
+      src = pics[item.thumb] || pics.night;
+      if (hostId === "me" || isMine) av = (store.profile && store.profile.avatar) || defaultAvatar();
+      else if (hostId && personById[hostId]) av = personById[hostId].avatar;
+      else av = { skin: SKINS[2], hair: "short", hairColor: "#111", outfit: "hoodie", outfitColor: "#BE185D", acc: "none", bg: "#3B1020" };
+      state.liveTarget = { kind: item.kind || kind, id: item.targetId || id, itemId: item.id, hostId: hostId, isMine: isMine };
+    } else if (kind === "comm") {
       const c = findCommunity(id);
       if (!c) return;
-      title = c.name; viewers = c.liveViewers || 120;
+      title = c.name; viewers = c.liveViewers || 120; hostName = c.name; hostId = null; isMine = false;
       av = { skin: SKINS[2], hair: "short", hairColor: "#111", outfit: "hoodie", outfitColor: "#BE185D", acc: "none", bg: "#3B1020" };
       src = pics.night;
-      state.liveTarget = { kind, id };
+      state.liveTarget = { kind: kind, id: id, hostId: null, isMine: false };
     } else {
       const p = personById[id]; if (!p) return;
       const m = creatorMeta(id);
       title = m.liveTitle || (p.name + " is live"); viewers = m.liveViewers || 80;
+      hostName = p.name; hostId = p.id; isMine = false;
       av = p.avatar; src = pics.green;
-      state.liveTarget = { kind, id };
+      state.liveTarget = { kind: kind, id: id, hostId: p.id, isMine: false };
     }
-    $("#live-media").src = src;
+    const img = document.getElementById("live-media");
+    if (img) { img.style.display = ""; img.src = src; }
+    const vid = document.getElementById("live-video");
+    if (vid) vid.style.display = "none";
+    const ph = document.getElementById("live-ph");
+    if (ph) ph.classList.remove("show");
     $("#live-av").innerHTML = avatarSVG(av, 40);
     $("#live-who").textContent = title;
+    const hostEl = document.getElementById("live-host");
+    if (hostEl) hostEl.textContent = hostName && hostName !== title ? hostName : (isMine ? "You" : "");
     $("#live-badge").innerHTML = "LIVE <i>" + fmtCount(viewers) + "</i>";
     $("#live-comments").innerHTML = "";
     $("#live-hearts").innerHTML = "";
+    const follow = document.getElementById("live-follow");
+    if (follow) {
+      if (!hostId || hostId === "me" || isMine) follow.hidden = true;
+      else {
+        follow.hidden = false;
+        follow.dataset.follow = hostId;
+        const on = typeof isFollowing === "function" && isFollowing(hostId);
+        follow.textContent = on ? "Following" : "Follow";
+        follow.classList.toggle("following", !!on);
+      }
+    }
+    const endBtn = document.getElementById("live-end-btn");
+    if (endBtn) endBtn.hidden = !isMine;
+    const chatIn = document.getElementById("live-chat-input");
+    if (chatIn) chatIn.value = "";
     $("#live-viewer").classList.add("open");
     hideNav(true);
-    closeSheet();
+    try { closeSheet(); } catch (err) {}
     let n = 0;
     function pushC() {
       const c = LIVE_COMMENTS[n % LIVE_COMMENTS.length];
-      const el = document.createElement("div");
-      el.className = "live-c";
-      el.innerHTML = "<strong>"+escapeHtml(c[0])+"</strong>"+escapeHtml(c[1]);
-      const box = $("#live-comments");
-      box.appendChild(el);
-      while (box.children.length > 6) box.removeChild(box.firstChild);
+      appendLiveComment(document.getElementById("live-comments"), c[0], c[1]);
       n++;
     }
     pushC(); pushC();
     clearInterval(state.liveTimer); clearInterval(state.heartTimer);
     state.liveTimer = setInterval(pushC, 1800);
-    state.heartTimer = setInterval(() => spawnHeart(), 900);
+    state.heartTimer = setInterval(function () { spawnHeart(); }, 900);
+    if (isMine) {
+      attachLiveCamera(document.getElementById("live-video")).then(function (ok) {
+        if (!ok) {
+          const ph2 = document.getElementById("live-ph");
+          if (ph2) ph2.classList.add("show");
+        }
+      });
+    }
   }
   function spawnHeart() {
     const box = $("#live-hearts"); if (!box) return;
@@ -15427,8 +16940,12 @@
   }
   function closeLive() {
     clearInterval(state.liveTimer); clearInterval(state.heartTimer);
-    $("#live-viewer").classList.remove("open");
-    hideNav(false);
+    stopLiveMedia();
+    const el = document.getElementById("live-viewer");
+    if (el) el.classList.remove("open");
+    if (!(document.getElementById("live-party") && document.getElementById("live-party").classList.contains("open"))) {
+      hideNav(false);
+    }
   }
 
   const OSM_RASTER = {
@@ -16161,16 +17678,16 @@
     pulse.className = "pulse-wrap";
     pulse.innerHTML = '<div class="pulse-ring"></div><div class="pulse-ring d2"></div><div class="pulse-core"></div>';
     state.userMarker = addMapMarker(pulse, state.loc.lng, state.loc.lat, "center");
-    allCommunities().forEach(c => {
+    (typeof visibleMapCommunities === "function" ? visibleMapCommunities() : allCommunities()).forEach(c => {
       const isParty = c.category === "party";
       if (isParty && !state.showParties) return;
       if (!isParty && !state.showComms) return;
       const cat = catById[c.category] || catById.other;
       const el = makePlacePinEl({
         kind: isParty ? "party" : "comm",
-        emoji: cat.emoji || "\uD83D\uDCCD",
+        emoji: isParty ? (cat.emoji || "\uD83C\uDF89") : "\uD83D\uDC65",
         name: c.name,
-        sub: placeCountLabel(c),
+        sub: isParty ? placeCountLabel(c) : ("Community \u00b7 " + placeCountLabel(c)),
         live: !!c.live
       });
       el.addEventListener("click", (ev) => { ev.stopPropagation(); if (c.live) openLive("comm", c.id); else openSheet(c.id); });
@@ -16187,15 +17704,40 @@
       el.addEventListener("click", function (ev) { ev.stopPropagation(); openMeetupSheet(m.id); });
       state.markers.push(addMapMarker(el, m.lng, m.lat, "bottom"));
     });
+    const markedLive = {};
     if (state.showFriends) {
       store.friends.map(id => personById[id]).filter(Boolean).forEach(p => {
         const el = makePinEl(avatarSVG(p.avatar, 44), "friend", p.name.split(" ")[0], isLivePerson(p.id), hasActiveStatus(p.id) ? (hasUnseenStatus(p.id) ? "unseen" : "seen") : "");
+        if (isLivePerson(p.id)) { el.classList.add("is-live"); markedLive["person:" + p.id] = true; }
         el.addEventListener("click", (ev) => {
           ev.stopPropagation();
           if (isLivePerson(p.id)) openLive("person", p.id);
           else openSheetFriend(p);
         });
         state.markers.push(addMapMarker(el, p.lng, p.lat, "bottom"));
+      });
+    }
+    (typeof visibleMapCommunities === "function" ? visibleMapCommunities() : allCommunities()).forEach(function (c) {
+      const isParty = c.category === "party";
+      if (isParty && !state.showParties) return;
+      if (!isParty && !state.showComms) return;
+      if (c.live) markedLive["comm:" + c.id] = true;
+    });
+    if (typeof allLiveItems === "function") {
+      allLiveItems().forEach(function (it) {
+        if (!it || !isFinite(it.lat) || !isFinite(it.lng)) return;
+        const key = (it.kind && it.targetId) ? (it.kind + ":" + it.targetId) : it.id;
+        if (markedLive[key] || markedLive[it.id]) return;
+        markedLive[key] = true;
+        const el = makePlacePinEl({
+          kind: it.type === "party" ? "live-party" : "live-stream",
+          emoji: it.type === "party" ? "\uD83C\uDF89" : "\uD83D\uDCF9",
+          name: it.title,
+          sub: (it.type === "party" ? "Live party \u00b7 " : "LIVE \u00b7 ") + fmtCount(it.viewers || 0),
+          live: true
+        });
+        el.addEventListener("click", function (ev) { ev.stopPropagation(); openLiveItem(it); });
+        state.markers.push(addMapMarker(el, it.lng, it.lat, "bottom"));
       });
     }
   }
@@ -16460,7 +18002,7 @@
   function searchCommunities(q) {
     const query = q.trim().toLowerCase();
     if (!query) return [];
-    const list = allCommunities();
+    const list = (typeof visibleMapCommunities === "function") ? visibleMapCommunities() : allCommunities();
     if (isPartyQuery(query)) {
       return list.filter(c => c.category === "party")
         .map(c => ({ c, km: haversine(state.loc, c) }))
@@ -16475,14 +18017,23 @@
     const q = state.query, panel = $("#search-panel");
     if (!q.trim()) { panel.classList.remove("open"); panel.innerHTML = ""; return; }
     const results = searchCommunities(q);
+    const liveHits = (typeof searchLiveItems === "function") ? searchLiveItems(q) : [];
     const party = isPartyQuery(q);
-    let html = '<div class="search-head">'+(party ? "Parties near you" : results.length+" result"+(results.length===1?"":"s"))+"</div>";
-    if (!results.length) html += '<div class="hint">'+(party ? "No parties within "+NEARBY_KM+" km of your area." : "No matches.")+"</div>";
+    const liveQ = typeof isLiveQuery === "function" && isLiveQuery(q);
+    let html = '<div class="search-head">'+(liveQ ? "Live now" : (party ? "Parties near you" : (results.length + liveHits.length)+" result"+((results.length + liveHits.length)===1?"":"s")))+"</div>";
+    if (liveHits.length) {
+      liveHits.forEach(function (hit) {
+        const it = hit.live, km = hit.km;
+        html += '<button type="button" class="result-row" data-open-live="'+escapeHtml(it.id)+'">'+avHTML({skin:SKINS[2],hair:"short",hairColor:"#111",outfit:"hoodie",outfitColor:"#FF375F",acc:"none",bg:"#3B1020"},"sm")+'<div class="result-copy"><h4>'+escapeHtml(it.title)+"</h4><p>"+escapeHtml(it.host || it.place || "")+" \u00b7 "+fmtKm(km)+' away</p></div><span class="chip live-chip">'+(it.type==="party"?"Party":"LIVE")+"</span></button>";
+      });
+    }
+    if (!results.length && !liveHits.length) html += '<div class="hint">'+(party ? "No parties within "+NEARBY_KM+" km of your area." : "No matches.")+"</div>";
     else results.forEach(({c,km}) => {
-      html += '<button type="button" class="result-row" data-open-pin="'+c.id+'">'+avHTML({skin:SKINS[2],hair:"short",hairColor:"#111",outfit:"jersey",outfitColor:(catById[c.category]||{}).color,acc:"none",bg:"#111"},"sm")+'<div class="result-copy"><h4>'+escapeHtml(c.name)+"</h4><p>"+escapeHtml(c.place)+" \u00b7 "+fmtKm(km)+' away</p></div><span class="chip">'+escapeHtml((catById[c.category]||{}).label)+"</span></button>";
+      html += '<button type="button" class="result-row" data-open-pin="'+c.id+'">'+avHTML({skin:SKINS[2],hair:"short",hairColor:"#111",outfit:"jersey",outfitColor:(catById[c.category]||{}).color,acc:"none",bg:"#111"},"sm")+'<div class="result-copy"><h4>'+escapeHtml(c.name)+"</h4><p>"+escapeHtml(c.place)+" \u00b7 "+fmtKm(km)+' away</p></div><span class="chip'+(c.category==="party"?"":" comm-chip")+'">'+(c.category==="party"?escapeHtml((catById[c.category]||{}).label):"Community")+"</span></button>";
     });
     panel.innerHTML = html; panel.classList.add("open");
   }
+
   function runSearchFly(q) {
     const results = searchCommunities(q);
     if (!results.length || !state.map) return;
@@ -16948,7 +18499,8 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 10. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
+      '<div class="hint">About Gather \u00b7 Version 11. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -17169,6 +18721,7 @@
       '<div style="display:flex;justify-content:center;position:relative;width:108px;margin:0 auto">'+wrapStatusAvatar(p.id || "me", avHTML(p.avatar,"lg"))+(meta.live ? '<span style="position:absolute;left:50%;bottom:-4px;transform:translateX(-50%)">'+liveBadgeHtml(meta.liveViewers)+"</span>" : "")+"</div>"+
       '<div class="prof-name">'+escapeHtml(p.name)+(meta.verified ? verifiedBadge() : "")+"</div>"+
       '<p class="prof-bio">'+escapeHtml(meta.bio || "")+"</p>"+
+      (mine && typeof rankProfileBlock === "function" ? rankProfileBlock() : (!mine ? '<div style="text-align:center;margin:4px 0 8px">'+((typeof rankBadgeHtml==="function"&&typeof rankForSender==="function")?rankBadgeHtml(rankForSender(p.name,false)):"")+"</div>" : ""))+
       '<div class="prof-stats"><div><strong>'+fmtCount(meta.followers)+'</strong><span>Followers</span></div>'+
       '<div><strong>'+fmtCount(mine ? (store.following||[]).length : meta.following)+'</strong><span>Following</span></div>'+
       '<div><strong>'+fmtCount(meta.likes)+'</strong><span>Likes</span></div></div>'+
@@ -17222,6 +18775,10 @@
   }
 
   function openCreate() {
+    if (typeof openCommRequestForm === "function") { openCommRequestForm(); return; }
+    __openCreateLegacy();
+  }
+  function __openCreateLegacy() {
     state.draft.lat = state.loc.lat; state.draft.lng = state.loc.lng;
     $("#screen-create").innerHTML =
       '<div class="topbar"><button type="button" class="icon-round" data-close-ov="screen-create">\u2190</button><h1>New community</h1></div>'+
@@ -17332,7 +18889,7 @@
       return;
     }
     if (i === PAGE.community) {
-      ["screen-create", "screen-info", "screen-members"].forEach(function (id) {
+      ["screen-create", "screen-info", "screen-members", "screen-comm-hub", "screen-game", "screen-voice-room", "screen-comm-request", "screen-support", "screen-ranks"].forEach(function (id) {
         const el = document.getElementById(id);
         if (el) el.classList.remove("open");
       });
@@ -17384,6 +18941,14 @@
   $("#search-input").addEventListener("input", (e) => { state.query = e.target.value; renderSearch(); });
   $("#search-input").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); runSearchFly(state.query); } });
   $("#search-panel").addEventListener("click", (e) => {
+    const liveRow = e.target.closest("[data-open-live]");
+    if (liveRow) {
+      const id = liveRow.getAttribute("data-open-live");
+      const it = findLiveItem(id);
+      if (it && state.map && isFinite(it.lng) && isFinite(it.lat)) mapEaseTo({ center: [it.lng, it.lat], zoom: 15, duration: 800 });
+      openLiveItem(it || id);
+      return;
+    }
     const row = e.target.closest("[data-open-pin]");
     if (!row) return;
     const id = row.getAttribute("data-open-pin");
@@ -17518,7 +19083,7 @@
     const join = e.target.closest("[data-join]");
     if (join) { joinCommunity(join.getAttribute("data-join")); return; }
     const board = e.target.closest("[data-open-board]");
-    if (board) { openInfo(board.getAttribute("data-open-board")); closeSheet(); hideNav(true); return; }
+    if (board) { const bid = board.getAttribute("data-open-board"); closeSheet(); if (typeof openCommHub === "function") openCommHub(bid); else { openInfo(bid); hideNav(true); } return; }
     const open = e.target.closest("[data-open-chat]");
     if (open) openChat(open.getAttribute("data-open-chat"), true);
   });
@@ -17942,7 +19507,7 @@
     if (e.target.closest("#btn-explore-map")) { goPage(PAGE.map); return; }
     if (e.target.closest("#btn-create-comm-page")) { openCreate(); return; }
     const boardBtn = e.target.closest("[data-open-board]");
-    if (boardBtn) { openInfo(boardBtn.getAttribute("data-open-board")); hideNav(true); return; }
+    if (boardBtn) { const bid = boardBtn.getAttribute("data-open-board"); if (typeof openCommHub === "function") openCommHub(bid); else { openInfo(bid); hideNav(true); } return; }
     if (e.target.closest("#btn-create")) { createCommunity(); return; }
     if (e.target.closest("#btn-use-my-loc")) {
       useLocation((loc) => { state.draft.lat = loc.lat; state.draft.lng = loc.lng; state.draft.place = "My location"; toast("Using your location"); });

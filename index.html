@@ -2082,18 +2082,67 @@
       pointer-events: auto;
       display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
       color: #5C5C5E; padding: 0 0 6px; gap: 0; position: relative; top: -4px;
+      -webkit-user-select: none; user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: none;
     }
     #map-home-btn {
       width: 46px; height: 46px; border-radius: 50%;
       background: var(--yellow);
       box-shadow: 0 4px 12px var(--yellow-glow);
       display: grid; place-items: center; color: var(--yellow-ink);
+      position: relative;
+      transition: transform .16s ease, box-shadow .16s ease;
     }
     #map-home-btn svg { width: 22px; height: 22px; }
+    #map-home-btn::after {
+      content: "";
+      position: absolute; inset: -5px; border-radius: 50%;
+      border: 2px solid var(--yellow);
+      opacity: 0; pointer-events: none;
+      transform: scale(.86);
+    }
+    #nav-map-btn.is-holding #map-home-btn { transform: scale(1.08); }
+    #nav-map-btn.is-holding #map-home-btn::after {
+      animation: gather-hold-ring .45s ease-out forwards;
+    }
+    @keyframes gather-hold-ring {
+      0% { transform: scale(.86); opacity: .7; }
+      100% { transform: scale(1.28); opacity: 0; }
+    }
     .nav-center .nav-label { color: #5C5C5E; margin-top: 2px; }
     .nav-center.active { color: var(--text); }
     .nav-center.active .nav-label { color: var(--text); }
     .nav-center.active #map-home-btn { box-shadow: 0 4px 14px var(--yellow-glow); }
+    #gather-hold-hint {
+      display: none;
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      transform: translateX(-50%);
+      background: var(--text);
+      color: var(--bg);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.25;
+      padding: 7px 11px;
+      border-radius: 10px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 8;
+      box-shadow: 0 4px 16px rgba(0,0,0,.22);
+    }
+    #gather-hold-hint.show { display: block; }
+    #gather-hold-hint::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -5px;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--text);
+      border-bottom-width: 0;
+    }
     #cam-shutter {
       position: absolute; left: 50%; bottom: calc(var(--nav-h) + var(--safe-bot) + 8px);
       transform: translateX(-50%); z-index: 6; border: 0; cursor: pointer;
@@ -3853,7 +3902,8 @@
         <span class="nav-badge" id="nav-chat-badge"></span>
         <span class="nav-label">Chat</span>
       </button>
-      <button type="button" class="nav-center" aria-label="Gather" id="nav-map-btn">
+      <button type="button" class="nav-center" aria-label="Gather. Hold to start a meetup" id="nav-map-btn">
+        <div id="gather-hold-hint">Hold to start a meetup</div>
         <div id="map-home-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="8.2" cy="8" r="2.4"/>
@@ -5075,6 +5125,7 @@
       layers: { comms: true, parties: true, friends: false },
       meetups: [],
       placeFirstMap: true,
+      gatherHoldHintSeen: false,
       theme: "white",
       themeChosen: false,
       mapLayer: "streets",
@@ -5123,6 +5174,7 @@
       s.placeFirstMap = true;
     }
     if (!Array.isArray(s.meetups)) s.meetups = [];
+    s.gatherHoldHintSeen = s.gatherHoldHintSeen === true;
     s.messages = (s.messages && typeof s.messages === "object" && !Array.isArray(s.messages)) ? s.messages : {};
     ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports"].forEach(function (k) {
       if (!Array.isArray(s[k])) s[k] = Array.isArray(blank[k]) ? blank[k].slice() : [];
@@ -5684,7 +5736,7 @@
     $$("#nav .nav-btn, #nav .nav-center").forEach(b => b.classList.toggle("active", Number(b.dataset.go) === i));
     try { syncNavBadges(); } catch (e) {}
     $("#nav").classList.toggle("solid", i === PAGE.feeds || i === PAGE.chat || i === PAGE.community);
-    if (i === PAGE.map) { initMap(); setTimeout(() => { try { mapResize(); } catch (e) {} }, 80); }
+    if (i === PAGE.map) { initMap(); setTimeout(() => { try { mapResize(); } catch (e) {} }, 80); try { maybeShowGatherHint(); } catch (e) {} }
     if (i === PAGE.chat) { try { renderChatPage(); } catch (e) { console.warn("renderChatPage", e); } }
     if (i !== PAGE.map) { try { closeGatherSheet(); } catch (e) {} }
     if (i === PAGE.camera) startCamera();
@@ -15261,6 +15313,48 @@
     if (isGatherSheetOpen()) closeGatherSheet();
     else openGatherSheet();
   }
+  function goToMapHome() {
+    try { closeGatherSheet(); } catch (e) {}
+    try { closeSheet(); } catch (e) {}
+    try { hideNav(false); } catch (e) {}
+    if (state.page !== PAGE.map) {
+      goPage(PAGE.map);
+    } else {
+      try { initMap(); } catch (e) {}
+      try { mapResize(); } catch (e) {}
+      if (state.map && state.loc && typeof mapEaseTo === "function") {
+        try {
+          const z = (typeof FLAT_VIEW !== "undefined" && FLAT_VIEW.zoom) ? FLAT_VIEW.zoom : 12;
+          mapEaseTo({ center: [state.loc.lng, state.loc.lat], zoom: z, duration: 500 });
+        } catch (e) {}
+      }
+    }
+    try { maybeShowGatherHint(); } catch (e) {}
+  }
+  function dismissGatherHoldHint(remember) {
+    const el = document.getElementById("gather-hold-hint");
+    if (el) el.classList.remove("show");
+    try { clearTimeout(state.gatherHintTimer); } catch (e) {}
+    state.gatherHintTimer = null;
+    if (remember && !store.gatherHoldHintSeen) {
+      store.gatherHoldHintSeen = true;
+      try { saveStore(); } catch (e) {}
+    }
+  }
+  function maybeShowGatherHint() {
+    if (store.gatherHoldHintSeen) return;
+    if (!store.onboardingDone) return;
+    if (state.page !== PAGE.map) return;
+    const onboard = document.getElementById("onboarding");
+    const av = document.getElementById("avatar-builder");
+    if (onboard && onboard.classList.contains("open")) return;
+    if (av && av.classList.contains("open")) return;
+    const el = document.getElementById("gather-hold-hint");
+    if (!el) return;
+    el.classList.add("show");
+    try { clearTimeout(state.gatherHintTimer); } catch (e) {}
+    state.gatherHintTimer = setTimeout(function () { dismissGatherHoldHint(true); }, 4500);
+  }
   function resolveMeetupPlace() {
     const sel = document.getElementById("meetup-place");
     const typed = ((document.getElementById("meetup-place-text") || {}).value || "").trim();
@@ -16049,7 +16143,77 @@
   $("#tog-parties").addEventListener("click", () => { state.showParties = !state.showParties; store.layers.parties = state.showParties; saveStore(); $("#tog-parties").classList.toggle("on", state.showParties); renderMapMarkers(); });
   $("#tog-friends").addEventListener("click", () => { state.showFriends = !state.showFriends; store.layers.friends = state.showFriends; saveStore(); $("#tog-friends").classList.toggle("on", state.showFriends); renderMapMarkers(); });
   const gatherBtn = document.getElementById("nav-map-btn");
-  if (gatherBtn) gatherBtn.addEventListener("click", function (e) { e.preventDefault(); toggleGatherSheet(); });
+  const gatherHold = { timer: null, pressed: false, fired: false, cancelled: false, suppressClick: false, x: 0, y: 0 };
+  function cancelGatherHold(el) {
+    gatherHold.cancelled = true;
+    gatherHold.pressed = false;
+    clearTimeout(gatherHold.timer);
+    gatherHold.timer = null;
+    if (el) el.classList.remove("is-holding");
+  }
+  if (gatherBtn) {
+    gatherBtn.addEventListener("pointerdown", function (e) {
+      if (e.button != null && e.button !== 0) return;
+      gatherHold.pressed = true;
+      gatherHold.fired = false;
+      gatherHold.cancelled = false;
+      gatherHold.x = e.clientX;
+      gatherHold.y = e.clientY;
+      try { gatherBtn.setPointerCapture(e.pointerId); } catch (err) {}
+      gatherBtn.classList.add("is-holding");
+      clearTimeout(gatherHold.timer);
+      gatherHold.timer = setTimeout(function () {
+        if (!gatherHold.pressed || gatherHold.cancelled) return;
+        gatherHold.fired = true;
+        gatherBtn.classList.remove("is-holding");
+        try { if (navigator.vibrate) navigator.vibrate(15); } catch (err) {}
+        dismissGatherHoldHint(true);
+        openGatherSheet();
+      }, 450);
+    });
+    gatherBtn.addEventListener("pointermove", function (e) {
+      if (!gatherHold.pressed || gatherHold.cancelled) return;
+      const dx = e.clientX - gatherHold.x, dy = e.clientY - gatherHold.y;
+      if ((dx * dx + dy * dy) > 256) cancelGatherHold(gatherBtn);
+    });
+    function endGatherPointer(e) {
+      if (!gatherHold.pressed && !gatherHold.fired) {
+        gatherBtn.classList.remove("is-holding");
+        return;
+      }
+      const fired = gatherHold.fired;
+      const cancelled = gatherHold.cancelled;
+      clearTimeout(gatherHold.timer);
+      gatherHold.timer = null;
+      gatherHold.pressed = false;
+      gatherBtn.classList.remove("is-holding");
+      try { gatherBtn.releasePointerCapture(e.pointerId); } catch (err) {}
+      if (fired || cancelled) {
+        gatherHold.suppressClick = true;
+        if (e && e.cancelable) e.preventDefault();
+        return;
+      }
+      gatherHold.suppressClick = true;
+      goToMapHome();
+    }
+    gatherBtn.addEventListener("pointerup", endGatherPointer);
+    gatherBtn.addEventListener("pointercancel", function (e) { cancelGatherHold(gatherBtn); gatherHold.suppressClick = true; });
+    gatherBtn.addEventListener("lostpointercapture", function () {
+      if (gatherHold.pressed && !gatherHold.fired) cancelGatherHold(gatherBtn);
+    });
+    gatherBtn.addEventListener("click", function (e) {
+      if (gatherHold.suppressClick || gatherHold.fired) {
+        e.preventDefault();
+        e.stopPropagation();
+        gatherHold.suppressClick = false;
+        return;
+      }
+      e.preventDefault();
+      goToMapHome();
+    });
+    gatherBtn.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+    gatherBtn.addEventListener("dragstart", function (e) { e.preventDefault(); });
+  }
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && isGatherSheetOpen()) { e.preventDefault(); closeGatherSheet(); }
   });
@@ -16296,6 +16460,7 @@
     if (state.avatarFrom === "profile") openProfile();
     renderChatPage();
     toast("Avatar saved");
+    try { maybeShowGatherHint(); } catch (e) {}
   });
   $("#ab-opts").addEventListener("click", (e) => {
     const b = e.target.closest("[data-ak]"); if (!b) return;
@@ -16795,6 +16960,7 @@
     goPage(2, true);
     try { syncLayerChips(); } catch (e) {}
     maybeOnboard();
+    try { maybeShowGatherHint(); } catch (e) {}
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         state.loc = { lat: pos.coords.latitude, lng: pos.coords.longitude, source: "geo" };

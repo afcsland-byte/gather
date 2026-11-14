@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white">
+<html lang="en" data-theme="white" data-build="5">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
@@ -8,6 +8,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="mobile-web-app-capable" content="yes" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta name="gather-build" content="5" />
   <title>Gather</title>
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
@@ -1819,10 +1822,21 @@
       position: absolute; top: calc(18px + var(--safe-top)); left: 12px; right: 12px;
       display: flex; align-items: center; gap: 10px; z-index: 8; pointer-events: auto; text-shadow: 0 1px 6px #000;
     }
-    #story-close, #story-more { position: relative; z-index: 10; pointer-events: auto; }
+    #story-close { position: relative; z-index: 22; pointer-events: auto; }
+    .viewer-top { z-index: 20; }
     .viewer-top h3 { font-size: 15px; font-weight: 600; flex: 1; min-width: 0; }
-    #story-more { display: none; color: #fff; font-size: 20px; font-weight: 700; letter-spacing: 1px; }
+    #story-more {
+      display: none; width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(0,0,0,.45); color: #fff;
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,.14);
+      position: relative; z-index: 22; pointer-events: auto;
+      place-items: center; flex: none; padding: 0; touch-action: manipulation;
+    }
+    #story-more svg { width: 22px; height: 22px; display: block; }
     #story-viewer.is-own #story-more { display: grid; }
+    #story-viewer .tap-zones { top: 96px; z-index: 1; }
+    #story-viewer.sheet-open .tap-zones { pointer-events: none; }
     #story-owner-actions {
       display: none; position: absolute; left: 12px; right: 12px;
       bottom: calc(16px + var(--safe-bot)); z-index: 8;
@@ -1834,8 +1848,74 @@
       background: rgba(0,0,0,.5); color: #fff; font-weight: 600; font-size: 14px;
       border: 1px solid rgba(255,255,255,.28);
       display: inline-flex; align-items: center; gap: 6px;
+      touch-action: manipulation;
     }
-    #story-more-sheet, #story-delete-sheet { z-index: 95; }
+    #story-more-sheet, #story-delete-sheet {
+      display: none; position: absolute; inset: 0; z-index: 120;
+      background: rgba(0,0,0,.48);
+      -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+      align-items: flex-end; justify-content: center;
+      pointer-events: auto; touch-action: manipulation;
+    }
+    #story-more-sheet.open, #story-delete-sheet.open { display: flex; }
+    #story-delete-sheet { z-index: 130; align-items: center; padding: 24px; }
+    .story-action-card {
+      width: 100%; background: #1C1C1E; color: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 8px 12px calc(12px + var(--safe-bot));
+      box-shadow: 0 -8px 32px rgba(0,0,0,.35);
+    }
+    #story-more-sheet.open .story-action-card { animation: storySheetUp .2s ease both; }
+    @keyframes storySheetUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .story-grab {
+      width: 36px; height: 4px; border-radius: 999px;
+      background: rgba(255,255,255,.28); margin: 6px auto 12px;
+    }
+    .story-sheet-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 4px 8px 14px; border-bottom: 1px solid rgba(255,255,255,.08);
+      margin-bottom: 6px;
+    }
+    .story-sheet-head img, .story-sheet-ph {
+      width: 44px; height: 44px; border-radius: 10px; object-fit: cover;
+      background: #2C2C2E; flex: none;
+    }
+    .story-sheet-head img[hidden], .story-sheet-ph[hidden] { display: none !important; }
+    .story-sheet-ph { display: grid; place-items: center; color: rgba(255,255,255,.5); font-size: 18px; }
+    .story-sheet-head p { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+    .story-sheet-head span { display: block; font-size: 12px; font-weight: 500; color: rgba(255,255,255,.55); margin-top: 2px; }
+    .story-action-row {
+      display: flex; align-items: center; gap: 12px; width: 100%;
+      text-align: left; padding: 13px 10px; border-radius: 14px;
+      color: #fff; font-weight: 600; font-size: 16px; background: transparent;
+      border: 0; touch-action: manipulation;
+    }
+    .story-action-row svg { width: 22px; height: 22px; flex: none; }
+    .story-action-row:active { background: rgba(255,255,255,.08); }
+    .story-action-row.danger { color: #FF453A; }
+    .story-confirm-card {
+      width: min(320px, 100%); background: var(--bg); color: var(--text);
+      border-radius: 20px; padding: 22px 18px 16px; text-align: center;
+      box-shadow: 0 16px 48px rgba(0,0,0,.4);
+    }
+    #story-delete-sheet.open .story-confirm-card { animation: storyConfirmIn .2s ease both; }
+    @keyframes storyConfirmIn {
+      from { transform: scale(.94); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .story-confirm-card h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; padding: 0; margin: 0 0 8px; }
+    .story-confirm-card p { font-size: 14px; font-weight: 500; color: var(--muted); margin: 0 0 18px; padding: 0; line-height: 1.35; }
+    .story-confirm-actions { display: flex; flex-direction: column; gap: 8px; }
+    .story-confirm-actions button {
+      height: 48px; border-radius: 14px; font-weight: 700; font-size: 16px; border: 0;
+      touch-action: manipulation;
+    }
+    #story-delete-confirm { background: #FF3B30; color: #fff; }
+    #story-delete-confirm:active { background: #D70015; }
+    #story-delete-cancel { background: var(--card); color: var(--text); }
     .countdown {
       position: absolute; top: calc(62px + var(--safe-top)); right: 14px; z-index: 3;
       width: 42px; height: 42px; border-radius: 50%;
@@ -1876,7 +1956,7 @@
       position: absolute; left: 50%; bottom: calc(var(--nav-h) + 18px);
       transform: translateX(-50%) translateY(10px);
       background: #fff; color: #111; font-size: 13px; font-weight: 600;
-      padding: 10px 16px; border-radius: 999px; z-index: 100;
+      padding: 10px 16px; border-radius: 999px; z-index: 140;
       opacity: 0; pointer-events: none; transition: .2s ease; white-space: nowrap;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -4360,7 +4440,9 @@
       <div class="viewer-top">
         <div class="av sm" id="story-av"></div>
         <h3 id="story-who"></h3>
-        <button type="button" class="icon-round" id="story-more" aria-label="More">⋯</button>
+        <button type="button" class="icon-round" id="story-more" aria-label="More">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg>
+        </button>
         <button type="button" class="icon-round" id="story-close" aria-label="Close">✕</button>
       </div>
       <div class="tap-zones"><div class="left" id="story-prev"></div><div class="right" id="story-next"></div></div>
@@ -4384,19 +4466,38 @@
       </div>
       <div class="viewer-capture-note" id="story-capture-note" hidden></div>
     </div>
-    <div class="chat-sheet" id="story-more-sheet">
-      <div class="chat-sheet-card" role="dialog" aria-label="Story options">
-        <button type="button" class="sheet-action" id="story-more-delete" style="color:#FF3B30">Delete this story</button>
-        <button type="button" class="sheet-cancel" id="story-more-cancel">Cancel</button>
+    <div id="story-more-sheet">
+      <div class="story-action-card" role="dialog" aria-label="Story options">
+        <div class="story-grab" aria-hidden="true"></div>
+        <div class="story-sheet-head">
+          <img id="story-sheet-thumb" alt="" hidden />
+          <div class="story-sheet-ph" id="story-sheet-ph" hidden></div>
+          <div>
+            <p>Your story</p>
+            <span id="story-sheet-meta">Posted just now</span>
+          </div>
+        </div>
+        <button type="button" class="story-action-row" id="story-more-save">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>
+          Save to phone
+        </button>
+        <button type="button" class="story-action-row" id="story-more-add">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+          Add to story
+        </button>
+        <button type="button" class="story-action-row danger" id="story-more-delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14"/><path d="M10 7V5h4v2"/><path d="M7 7l1 13h8l1-13"/></svg>
+          Delete story
+        </button>
       </div>
     </div>
-    <div class="chat-sheet" id="story-delete-sheet">
-      <div class="chat-sheet-card" role="dialog" aria-label="Delete this story">
+    <div id="story-delete-sheet">
+      <div class="story-confirm-card" role="dialog" aria-label="Delete this story">
         <h3>Delete this story?</h3>
-        <p class="privacy-note" style="padding:4px 12px 12px">It will be removed for everyone.</p>
-        <div class="qv-actions">
-          <button type="button" class="qv-cancel" id="story-delete-cancel">Cancel</button>
-          <button type="button" class="qv-send danger" id="story-delete-confirm">Delete</button>
+        <p>This can't be undone.</p>
+        <div class="story-confirm-actions">
+          <button type="button" id="story-delete-confirm">Delete</button>
+          <button type="button" id="story-delete-cancel">Cancel</button>
         </div>
       </div>
     </div>
@@ -5278,6 +5379,12 @@
     ["userStories", "userPosts", "spotlightPosts"].forEach(function (k) {
       if (Array.isArray(s[k])) s[k].forEach(normalizeMediaSource);
     });
+    s.userStories = (s.userStories || []).filter(function (item) { return item && typeof item === "object"; }).map(function (item, i) {
+      if (!item.id) item.id = "st-me-mig-" + (item.at || Date.now()) + "-" + i;
+      if (!item.author) item.author = "me";
+      if (typeof item.at !== "number") item.at = Date.now();
+      return item;
+    });
     return s;
   }
   function saveStore() {
@@ -5884,7 +5991,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Prototype 0.8. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 5. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -10701,6 +10808,7 @@
   }
   function resumeStory() {
     if (!state.storyPaused) return;
+    if (isStorySheetOpen()) return;
     if (!$("#story-viewer") || !$("#story-viewer").classList.contains("open")) { state.storyPaused = false; return; }
     const inp = $("#story-reply-input");
     if (inp && document.activeElement === inp && (inp.value || "").trim()) return;
@@ -13444,7 +13552,7 @@
     if (viewer) {
       let x0 = 0, y0 = 0, tracking = false;
       viewer.addEventListener("pointerdown", function (e) {
-        if (e.target.closest("#story-reply, #story-close")) return;
+        if (e.target.closest("#story-reply, #story-close, #story-more, #story-owner-actions, #story-add-more, #story-more-sheet, #story-delete-sheet")) return;
         tracking = true; x0 = e.clientX; y0 = e.clientY;
       });
       viewer.addEventListener("pointermove", function (e) {
@@ -14184,6 +14292,31 @@
 
   /* ---------- stories ---------- */
   function storiesByAuthor(aid) { return seedStories().filter(s => s.author === aid); }
+  function isStorySheetOpen() {
+    const more = document.getElementById("story-more-sheet");
+    const del = document.getElementById("story-delete-sheet");
+    return !!(more && more.classList.contains("open")) || !!(del && del.classList.contains("open"));
+  }
+  function isOwnStoredStory(s) {
+    if (!s || s.author !== "me") return false;
+    const list = store.userStories || [];
+    if (s.id && list.some(function (x) { return x && x.id === s.id; })) return true;
+    if (s.src || s.video) {
+      return list.some(function (x) { return x && x.at === s.at && (x.src === s.src || x.video === s.video); });
+    }
+    return false;
+  }
+  function storyTimeAgo(ts) {
+    const d = Math.max(0, Date.now() - (Number(ts) || 0));
+    const m = Math.floor(d / 60000);
+    if (m < 1) return "just now";
+    if (m < 60) return m + "m ago";
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + "h ago";
+    const days = Math.floor(h / 24);
+    if (days === 1) return "1 day ago";
+    return days + " days ago";
+  }
   function openStories(author, startId) {
     if (author && author !== "me" && isBlocked(author)) {
       toast("Unblock " + chatTitle(author) + " to view their status", {
@@ -14224,7 +14357,7 @@
     state.storyStartedAt = Date.now();
     state.storyLeft = 5000;
     const canReply = !!(s.author && s.author !== "me" && personById[s.author] && !isBlocked(s.author));
-    const mine = s.author === "me";
+    const mine = isOwnStoredStory(s);
     const viewer = $("#story-viewer");
     if (viewer) {
       viewer.classList.toggle("has-reply", canReply);
@@ -14233,20 +14366,26 @@
     const replyInp = $("#story-reply-input");
     if (replyInp) replyInp.value = "";
     clearTimeout(state.storyTimer);
-    state.storyTimer = setTimeout(() => { state.storyIndex++; showStory(); }, 5000);
+    state.storyTimer = setTimeout(function () {
+      if (isStorySheetOpen() || state.storyPaused) return;
+      state.storyIndex++;
+      showStory();
+    }, 5000);
   }
   function closeStorySheets() {
     const more = document.getElementById("story-more-sheet");
     const del = document.getElementById("story-delete-sheet");
     if (more) more.classList.remove("open");
     if (del) del.classList.remove("open");
+    const sv = document.getElementById("story-viewer");
+    if (sv) sv.classList.remove("sheet-open");
   }
   function closeStories() {
     clearTimeout(state.storyTimer);
     state.storyPaused = false;
     try { closeStorySheets(); } catch (e) {}
     const sv = $("#story-viewer");
-    if (sv) { sv.classList.remove("open"); sv.classList.remove("has-reply"); sv.classList.remove("is-own"); }
+    if (sv) { sv.classList.remove("open"); sv.classList.remove("has-reply"); sv.classList.remove("is-own"); sv.classList.remove("sheet-open"); }
     const vidEl = $("#story-video");
     if (vidEl) { try { vidEl.pause(); vidEl.removeAttribute("src"); } catch (e) {} }
     fillCameraSourceEl($("#story-cam-source"), null);
@@ -14254,40 +14393,101 @@
     try { refreshStatusRings(); } catch (e) {}
     if (state.page === 3) renderStoriesPage();
   }
+  function fillStoryMoreSheet(s) {
+    const thumb = document.getElementById("story-sheet-thumb");
+    const ph = document.getElementById("story-sheet-ph");
+    const meta = document.getElementById("story-sheet-meta");
+    const img = s && s.src;
+    if (thumb && ph) {
+      if (img) {
+        thumb.src = img;
+        thumb.hidden = false;
+        ph.hidden = true;
+      } else {
+        thumb.removeAttribute("src");
+        thumb.hidden = true;
+        ph.hidden = false;
+        ph.textContent = (s && s.video) ? "▶" : "●";
+      }
+    }
+    if (meta) {
+      const views = s && (typeof s.views === "number") ? s.views : (typeof s.viewCount === "number" ? s.viewCount : null);
+      const when = "Posted " + storyTimeAgo(s && s.at);
+      meta.textContent = (views != null) ? (when + " · " + views + (views === 1 ? " view" : " views")) : when;
+    }
+  }
+  function hideToast() {
+    const el = document.getElementById("toast");
+    if (el) el.classList.remove("show");
+    try { clearTimeout(toast._t); } catch (e) {}
+  }
+  function markStorySheetOpen(on) {
+    const sv = document.getElementById("story-viewer");
+    if (sv) sv.classList.toggle("sheet-open", !!on);
+  }
   function openStoryMoreSheet() {
     const s = currentStory();
-    if (!s || s.author !== "me") return;
+    if (!isOwnStoredStory(s)) return;
     try { pauseStory(); } catch (e) {}
+    try { hideToast(); } catch (e) {}
+    try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {}
+    fillStoryMoreSheet(s);
     const sheet = document.getElementById("story-more-sheet");
     if (sheet) sheet.classList.add("open");
+    markStorySheetOpen(true);
   }
   function closeStoryMoreSheet(resume) {
     const sheet = document.getElementById("story-more-sheet");
     if (sheet) sheet.classList.remove("open");
+    if (!isStorySheetOpen()) markStorySheetOpen(false);
     if (resume) try { resumeStory(); } catch (e) {}
   }
   function openStoryDeleteSheet() {
     const s = currentStory();
-    if (!s || s.author !== "me") return;
+    if (!isOwnStoredStory(s)) return;
     try { pauseStory(); } catch (e) {}
+    try { hideToast(); } catch (e) {}
+    try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {}
     closeStoryMoreSheet(false);
+    markStorySheetOpen(true);
     const sheet = document.getElementById("story-delete-sheet");
     if (sheet) sheet.classList.add("open");
   }
   function closeStoryDeleteSheet(resume) {
     const sheet = document.getElementById("story-delete-sheet");
     if (sheet) sheet.classList.remove("open");
+    if (!isStorySheetOpen()) markStorySheetOpen(false);
     if (resume) try { resumeStory(); } catch (e) {}
+  }
+  function findUserStoryIndex(s) {
+    const list = store.userStories || [];
+    if (!s) return -1;
+    if (s.id) {
+      const byId = list.findIndex(function (x) { return x && x.id === s.id; });
+      if (byId >= 0) return byId;
+    }
+    return list.findIndex(function (x) {
+      return x && x.at === s.at && ((s.src && x.src === s.src) || (s.video && x.video === s.video) || x === s);
+    });
   }
   function deleteCurrentStory() {
     const s = currentStory();
-    if (!s || s.author !== "me") return;
-    store.userStories = (store.userStories || []).filter(function (x) { return x && x.id !== s.id; });
+    if (!isOwnStoredStory(s)) return;
+    const list = store.userStories || [];
+    const idx = findUserStoryIndex(s);
+    if (idx < 0) return;
+    const removed = list.splice(idx, 1)[0];
     try { saveStore(); } catch (e) {}
     closeStoryDeleteSheet(false);
     closeStoryMoreSheet(false);
+    markStorySheetOpen(false);
     const q = storiesByAuthor("me");
-    toast("Story deleted");
+    toast("Story deleted", {
+      action: {
+        label: "Undo",
+        onClick: function () { undoDeleteStory(removed, idx); }
+      }
+    });
     if (!q.length) {
       closeStories();
       try { renderChatPage(); } catch (e) {}
@@ -14299,7 +14499,42 @@
     try { renderChatPage(); } catch (e) {}
     showStory();
   }
+  function undoDeleteStory(item, index) {
+    if (!item) return;
+    if (!Array.isArray(store.userStories)) store.userStories = [];
+    if (item.id && store.userStories.some(function (x) { return x && x.id === item.id; })) return;
+    const i = Math.max(0, Math.min(index == null ? store.userStories.length : index, store.userStories.length));
+    store.userStories.splice(i, 0, item);
+    try { saveStore(); } catch (e) {}
+    try { renderChatPage(); } catch (e) {}
+    try { if (state.page === 3) renderStoriesPage(); } catch (e) {}
+    const sv = document.getElementById("story-viewer");
+    if (sv && sv.classList.contains("open")) {
+      state.storyQueue = storiesByAuthor("me");
+      state.storyIndex = Math.min(i, state.storyQueue.length - 1);
+      showStory();
+    }
+    toast("Story restored");
+  }
+  function saveStoryToPhone() {
+    const s = currentStory();
+    const url = s && (s.src || s.video);
+    if (!url) { toast("Can't save this story"); return; }
+    try {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "gather-story" + (s.video && !s.src ? ".mp4" : ".jpg");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast("Saved to phone");
+    } catch (e) {
+      toast("Can't save this story");
+    }
+    closeStoryMoreSheet(true);
+  }
   function addToOwnStory() {
+    closeStorySheets();
     closeStories();
     goPage(PAGE.camera);
   }
@@ -16029,7 +16264,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Prototype 0.8. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 5. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -16081,7 +16316,7 @@
               (meta.live ? '<button type="button" class="btn btn-ghost" data-live="'+p.id+'">LIVE</button>' : "")))+
       "</div></div>"+
       (highs.length ? '<div class="section-label">Highlights</div><div class="highlights">'+highs.map(h =>
-        '<button type="button" class="hl-item" data-highlight="'+escapeHtml(h.src||"")+'" data-hl-author="'+(mine?"me":p.id)+'" data-hl-source="'+(h.source||"")+'" data-hl-video="'+escapeHtml(h.video||"")+'"><div class="ring unseen" style="width:64px;height:64px"><div class="ring-inner"><img src="'+(h.src||h.video||"")+'" alt="" /></div></div><p>'+escapeHtml(h.title)+"</p></button>"
+        '<button type="button" class="hl-item" data-highlight="'+escapeHtml(h.src||"")+'" data-hl-id="'+escapeHtml(h.id||"")+'" data-hl-author="'+(mine?"me":p.id)+'" data-hl-source="'+(h.source||"")+'" data-hl-video="'+escapeHtml(h.video||"")+'"><div class="ring unseen" style="width:64px;height:64px"><div class="ring-inner"><img src="'+(h.src||h.video||"")+'" alt="" /></div></div><p>'+escapeHtml(h.title)+"</p></button>"
       ).join("")+"</div>" : '<p class="hint">'+(mine?"Post a story to start your highlights.":"No highlights yet.")+"</p>")+
       '<div class="section-label">Posts</div>'+
       (posts.length ? '<div class="post-grid">'+posts.map(pt => '<button type="button" class="cell" data-highlight="'+escapeHtml(pt.src||"")+'" data-hl-source="'+(pt.source||"")+'" data-hl-video="'+escapeHtml(pt.video||"")+'"><img src="'+(pt.src||pt.video||"")+'" alt="" />'+cameraSourceHtml(pt, { video: !!pt.video })+"</button>").join("")+"</div>"
@@ -16537,28 +16772,46 @@
   });
 
   $("#story-close").addEventListener("click", closeStories);
-  $("#story-next").addEventListener("click", () => { state.storyIndex++; showStory(); });
-  $("#story-prev").addEventListener("click", () => { state.storyIndex = Math.max(0, state.storyIndex-1); showStory(); });
-  const storyMore = document.getElementById("story-more");
-  if (storyMore) storyMore.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); openStoryMoreSheet(); });
-  const storyAddMore = document.getElementById("story-add-more");
-  if (storyAddMore) storyAddMore.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); addToOwnStory(); });
-  const storyMoreDel = document.getElementById("story-more-delete");
-  if (storyMoreDel) storyMoreDel.addEventListener("click", function (e) { e.preventDefault(); openStoryDeleteSheet(); });
-  const storyMoreCancel = document.getElementById("story-more-cancel");
-  if (storyMoreCancel) storyMoreCancel.addEventListener("click", function () { closeStoryMoreSheet(true); });
-  const storyDelCancel = document.getElementById("story-delete-cancel");
-  if (storyDelCancel) storyDelCancel.addEventListener("click", function () { closeStoryDeleteSheet(true); });
-  const storyDelConfirm = document.getElementById("story-delete-confirm");
-  if (storyDelConfirm) storyDelConfirm.addEventListener("click", function () { deleteCurrentStory(); });
+  $("#story-next").addEventListener("click", () => { if (isStorySheetOpen()) return; state.storyIndex++; showStory(); });
+  $("#story-prev").addEventListener("click", () => { if (isStorySheetOpen()) return; state.storyIndex = Math.max(0, state.storyIndex-1); showStory(); });
+  function bindStoryTap(el, fn) {
+    if (!el) return;
+    const go = function (e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      fn(e);
+    };
+    el.addEventListener("click", go);
+    el.addEventListener("touchend", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      go(e);
+    }, { passive: false });
+    el.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+    el.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
+  }
+  bindStoryTap(document.getElementById("story-more"), openStoryMoreSheet);
+  bindStoryTap(document.getElementById("story-add-more"), addToOwnStory);
+  bindStoryTap(document.getElementById("story-more-save"), saveStoryToPhone);
+  bindStoryTap(document.getElementById("story-more-add"), addToOwnStory);
+  bindStoryTap(document.getElementById("story-more-delete"), openStoryDeleteSheet);
+  bindStoryTap(document.getElementById("story-delete-cancel"), function () { closeStoryDeleteSheet(true); });
+  bindStoryTap(document.getElementById("story-delete-confirm"), deleteCurrentStory);
   const storyMoreSheet = document.getElementById("story-more-sheet");
-  if (storyMoreSheet) storyMoreSheet.addEventListener("click", function (e) {
-    if (e.target.id === "story-more-sheet") closeStoryMoreSheet(true);
-  });
+  if (storyMoreSheet) {
+    storyMoreSheet.addEventListener("click", function (e) {
+      if (e.target.id === "story-more-sheet") closeStoryMoreSheet(true);
+    });
+    storyMoreSheet.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+    storyMoreSheet.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
+  }
   const storyDelSheet = document.getElementById("story-delete-sheet");
-  if (storyDelSheet) storyDelSheet.addEventListener("click", function (e) {
-    if (e.target.id === "story-delete-sheet") closeStoryDeleteSheet(true);
-  });
+  if (storyDelSheet) {
+    storyDelSheet.addEventListener("click", function (e) {
+      if (e.target.id === "story-delete-sheet") closeStoryDeleteSheet(true);
+    });
+    storyDelSheet.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+    storyDelSheet.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
+  }
   $("#snap-close").addEventListener("click", () => {
     // closing early still counts as viewed
     const who = state.activeChat; 
@@ -16667,8 +16920,10 @@
     if (e.target.closest("[data-ed-sticker]")) { addEditorSticker(e.target.closest("[data-ed-sticker]").getAttribute("data-ed-sticker")); return; }
     if (e.target.closest("[data-highlight]")) {
       const btn = e.target.closest("[data-highlight]");
-      const src = btn.getAttribute("data-highlight");
       const author = btn.getAttribute("data-hl-author") || "me";
+      const hid = btn.getAttribute("data-hl-id");
+      if (hid) { openStories(author, hid); return; }
+      const src = btn.getAttribute("data-highlight");
       const item = { id: "hl-"+Date.now(), author: author, src: src, at: Date.now(), caption: "" };
       if (btn.getAttribute("data-hl-source") === "camera") item.source = "camera";
       const vid = btn.getAttribute("data-hl-video");
@@ -17964,6 +18219,15 @@
   }
   bindAllPullRefresh();
 
+  function registerGatherSW() {
+    if (!("serviceWorker" in navigator)) return;
+    var swUrl = "gather-sw.js";
+    try {
+      navigator.serviceWorker.register(swUrl, { updateViaCache: "none", scope: "./" }).then(function (reg) {
+        try { reg.update(); } catch (e) {}
+      }).catch(function () {});
+    } catch (e) {}
+  }
   function boot() {
     try { applyTheme(store.theme || "white"); syncLayerChips(); } catch (e) {}
     photos();
@@ -17986,6 +18250,7 @@
     runSplash(function () {
       if (isSignedIn()) { hideAuth(); hideNav(false); }
     });
+    try { registerGatherSW(); } catch (e) {}
   }
   boot();
 })();

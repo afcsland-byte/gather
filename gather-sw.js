@@ -1,0 +1,38 @@
+/* Gather service worker — Version 5
+   Network-first for the app document so a new deploy is seen on the next load. */
+const CACHE = "gather-v5";
+
+self.addEventListener("install", function (event) {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", function (event) {
+  event.waitUntil(
+    caches.keys().then(function (keys) {
+      return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
+    }).then(function () { return self.clients.claim(); })
+  );
+});
+
+self.addEventListener("fetch", function (event) {
+  const req = event.request;
+  if (req.method !== "GET") return;
+  let nav = false;
+  try {
+    const url = new URL(req.url);
+    nav = req.mode === "navigate" || req.destination === "document" ||
+      /(?:^|\/)(index\.html)?$/.test(url.pathname) || /Gather-v\d+\.html$/.test(url.pathname);
+  } catch (e) {}
+  if (!nav) return;
+  event.respondWith(
+    fetch(req, { cache: "no-store" }).then(function (res) {
+      if (res && res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then(function (c) { c.put(req, copy); }).catch(function () {});
+      }
+      return res;
+    }).catch(function () {
+      return caches.match(req).then(function (hit) { return hit || caches.match("./index.html"); });
+    })
+  );
+});

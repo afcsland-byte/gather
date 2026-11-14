@@ -6215,7 +6215,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 8. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 9. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -14829,7 +14829,54 @@
   }
 
   /* ---------- discover ---------- */
-  function renderDiscover() {
+  let feedPostOrder = null;
+  function shuffleInPlace(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function discoverPostPool() {
+    const pics = photos();
+    return [
+      { img: pics.green, title: "Barcelona Fans Accra", text: "Watch party this Saturday in Osu. Open the community and jump into the chat.", id: "barca-accra" },
+      { img: pics.sunset, title: "Labadi Beach Sunset Party", text: "Barefoot on the sand, sunset sets, and good vibes by the water.", id: "party-labadi" },
+      { img: pics.night, title: "East Legon Rooftop Session", text: "DJ set, skyline views, casual dress. Follow the pin.", id: "party-eastlegon" },
+      { img: pics.fun, title: "Meme Lords GH", text: "Ghana's meme drop zone. Share, laugh, repeat.", id: "meme-lords" },
+      { img: pics.beach, title: "Accra Lifestyle", text: "Food, fashion and hangouts around the city.", id: "accra-lifestyle" },
+      { img: pics.night, title: "Osu After Dark", text: "Oxford Street is live tonight. Stories, lights and late eats.", id: "party-osu-afterdark" },
+      { img: pics.fun, title: "eFootball Ghana", text: "Late-night fixtures and banter in the group chat.", id: "efootball-gh" },
+      { img: pics.sunset, title: "Jamestown Walking Tour", text: "Golden hour around the lighthouse. Meet at the harbour.", id: "jamestown-walk" },
+      { img: pics.beach, title: "Makola Market Morning", text: "Fresh produce, fabric and the usual Saturday rush.", id: "makola-morning" },
+      { img: pics.green, title: "Independence Square Meet", text: "Casual kickabout and photos by the arch this afternoon.", id: "independence-meet" }
+    ];
+  }
+  function pickFreshFeedCards() {
+    const pool = discoverPostPool();
+    const prevTop = (feedPostOrder || []).slice(0, 3);
+    const freshPool = pool.filter(function (c) { return prevTop.indexOf(c.id) === -1; });
+    shuffleInPlace(freshPool);
+    const fresh = freshPool.slice(0, 3);
+    const used = {};
+    fresh.forEach(function (c) { used[c.id] = true; });
+    const fillers = pool.filter(function (c) { return !used[c.id]; });
+    shuffleInPlace(fillers);
+    const cards = fresh.concat(fillers).slice(0, 5);
+    feedPostOrder = cards.map(function (c) { return c.id; });
+    return cards;
+  }
+  function currentFeedCards() {
+    const pool = discoverPostPool();
+    const byId = {};
+    pool.forEach(function (c) { byId[c.id] = c; });
+    if (!feedPostOrder || !feedPostOrder.length) {
+      feedPostOrder = pool.slice(0, 5).map(function (c) { return c.id; });
+    }
+    return feedPostOrder.map(function (id) { return byId[id]; }).filter(Boolean);
+  }
+  function renderDiscover(opts) {
+    opts = opts || {};
     const pics = photos();
     const trendComms = [
       { id: "barca-accra", img: pics.green, title: "Barcelona Fans Accra", meta: "12.4K talking" },
@@ -14846,13 +14893,7 @@
       { tag: "#AccraLive", count: "5.6K posts" }
     ];
     const creators = ["kwame", "ama", "yaw", "efua", "lydia"].map(id => personById[id]).filter(Boolean);
-    const cards = [
-      { img: pics.green, title: "Barcelona Fans Accra", text: "Watch party this Saturday in Osu. Open the community and jump into the chat.", id: "barca-accra" },
-      { img: pics.sunset, title: "Labadi Beach Sunset Party", text: "Barefoot on the sand, sunset sets, and good vibes by the water.", id: "party-labadi" },
-      { img: pics.night, title: "East Legon Rooftop Session", text: "DJ set, skyline views, casual dress. Follow the pin.", id: "party-eastlegon" },
-      { img: pics.fun, title: "Meme Lords GH", text: "Ghana's meme drop zone. Share, laugh, repeat.", id: "meme-lords" },
-      { img: pics.beach, title: "Accra Lifestyle", text: "Food, fashion and hangouts around the city.", id: "accra-lifestyle" }
-    ];
+    const cards = opts.refresh ? pickFreshFeedCards() : currentFeedCards();
     let html = '<button type="button" class="spot-cta" data-open-spotlight><img src="'+pics.night+'" alt="" /><span>Spotlight<em>Vertical feeds from creators around Accra</em></span></button>';
     html += '<div class="section-label">Trending communities</div><div class="trend-row">';
     trendComms.forEach(c => {
@@ -14867,7 +14908,7 @@
     });
     html += '</div><div class="section-label">For you</div>';
     html += cards.map(c =>
-      '<button type="button" class="feed-card" data-open-chat="'+c.id+'" style="text-align:left">'+
+      '<button type="button" class="feed-card" data-open-chat="'+c.id+'" data-feed-id="'+c.id+'" style="text-align:left">'+
       '<div class="hero"><img src="'+c.img+'" alt="" /></div>'+
       '<div class="body"><h3>'+escapeHtml(c.title)+"</h3><p>"+escapeHtml(c.text)+"</p></div></button>"
     ).join("");
@@ -14976,6 +15017,43 @@
     }
     box.innerHTML = html;
     syncFeedsNotifBadges();
+  }
+  const notifRefreshPool = [
+    { type: "like", actorId: "lydia", text: "Lydia Mensah liked your post" },
+    { type: "story_view", actorId: "efua", text: "Efua Adjei viewed your story" },
+    { type: "mention", actorId: "ama", text: "Ama Boateng mentioned you in a comment" },
+    { type: "follow", actorId: "yaw", text: "Yaw Darko started following you" },
+    { type: "comment", actorId: "kwame", text: "Kwame Mensah commented: This is fire." },
+    { type: "meetup_join", actorId: "fiifi", text: "Fiifi Hammond is going to your meetup" },
+    { type: "like", actorId: "kojo", text: "Kojo Owusu liked your story" },
+    { type: "story_view", actorId: "ama", text: "Ama Boateng viewed your story" }
+  ];
+  let notifRefreshCursor = 0;
+  function refreshNotificationsContent() {
+    seedNotificationsOnce();
+    let pics = {};
+    try { pics = photos() || {}; } catch (e) { pics = {}; }
+    const thumbs = [pics.beach, pics.green, pics.sunset, pics.night, pics.fun];
+    const nAdd = 1 + Math.floor(Math.random() * 2);
+    const now = Date.now();
+    for (let i = 0; i < nAdd; i++) {
+      const p = notifRefreshPool[notifRefreshCursor % notifRefreshPool.length];
+      notifRefreshCursor += 1;
+      const wantsThumb = (p.type === "like" || p.type === "comment" || p.type === "story_view");
+      pushNotification({
+        id: "nf-ref-" + now + "-" + i + "-" + p.actorId + "-" + p.type,
+        type: p.type,
+        actorId: p.actorId,
+        at: now - i * 800,
+        read: false,
+        thumb: wantsThumb ? (thumbs[(notifRefreshCursor + i) % thumbs.length] || "") : "",
+        text: p.text
+      });
+    }
+    if ((store.notifications || []).length > 24) store.notifications = store.notifications.slice(0, 24);
+    try { saveStore(); } catch (e) {}
+    try { renderNotifications(); } catch (e) {}
+    try { syncFeedsNotifBadges(); } catch (e) {}
   }
   function markAllNotificationsRead() {
     (store.notifications || []).forEach(function (n) { if (n) n.read = true; });
@@ -16814,7 +16892,7 @@
       "</div>"+
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
-      '<div class="hint">About Gather \u00b7 Version 8. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 9. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -17186,10 +17264,8 @@
     if (i === PAGE.feeds) {
       try { closeStories(); } catch (e) {}
       try { if (typeof closeSpotlight === "function") closeSpotlight(); } catch (e) {}
-      try { setFeedsTab("foryou"); } catch (e) {}
       try { showFeedsHead(); } catch (e) {}
-      const sc = document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll");
-      if (sc) sc.scrollTop = 0;
+      try { startFeedsIconRefresh(); } catch (e) {}
       return;
     }
     if (i === PAGE.camera) {
@@ -17215,6 +17291,9 @@
         return;
       }
       goPage(i);
+      if (i === PAGE.feeds) {
+        try { startFeedsIconRefresh(); } catch (err) {}
+      }
     });
   });
   // shutter press (camera page only)
@@ -18833,11 +18912,14 @@
       try { renderChatPage(); } catch (err) {}
       try { if (typeof syncNavBadges === "function") syncNavBadges(); } catch (err) {}
     } else if (kind === "feeds") {
-      try { if (typeof renderDiscover === "function") renderDiscover(); } catch (err) {}
+      try { if (typeof renderDiscover === "function") renderDiscover({ refresh: true }); } catch (err) {}
       try { if (typeof syncFeedsStories === "function") syncFeedsStories(); } catch (err) {}
       try { if (typeof renderStoriesPage === "function") renderStoriesPage(); } catch (err) {}
     } else if (kind === "notifications") {
-      try { if (typeof renderNotifications === "function") renderNotifications(); } catch (err) {}
+      try {
+        if (typeof refreshNotificationsContent === "function") refreshNotificationsContent();
+        else if (typeof renderNotifications === "function") renderNotifications();
+      } catch (err) {}
     } else if (kind === "archived") {
       try { if (typeof renderArchivedList === "function") renderArchivedList(); } catch (err) {}
     } else if (kind === "profile") {
@@ -18864,6 +18946,78 @@
     try { state.suppressChatClick = true; setTimeout(function () { state.suppressChatClick = false; }, 200); } catch (err) {}
   }
 
+  function feedsRefreshKind() {
+    return (typeof currentFeedsTab === "function" && currentFeedsTab() === "notifications") ? "notifications" : "feeds";
+  }
+  function isFeedsRefreshBusy() {
+    return !!(ptrActive && ptrActive.refreshing && (ptrActive.kind === "feeds" || ptrActive.kind === "notifications"));
+  }
+  function finishFeedsRefresh(session, kind) {
+    if (!session || session !== ptrActive) return;
+    try { runPullRefresh(kind); } catch (err) {}
+    try {
+      if (kind === "feeds") toast("New posts");
+      else if (kind === "notifications") toast("Notifications updated");
+    } catch (err) {}
+    const hold = Math.max(session.visual || 0, PTR_THRESHOLD);
+    try { ptrPaint(session, hold, { locked: true }); } catch (err) {}
+    let morphMs = 0;
+    try { morphMs = ptrBeginCount(session) || 0; } catch (err) {}
+    session._timer = setTimeout(function () { ptrFinishRefresh(session); }, Math.max(640, morphMs + 160));
+  }
+  function startProgrammaticRefresh(kind) {
+    kind = kind || "feeds";
+    if (ptrActive && ptrActive.refreshing) return;
+    if (ptrActive) cancelPullRefresh(true);
+    const target = kind === "notifications"
+      ? (function () { const s = document.getElementById("feeds-scroll-notes"); return { scroll: s, host: s && s.parentElement }; })()
+      : (function () { const s = document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll"); return { scroll: s, host: s && s.parentElement }; })();
+    if (!target || !target.scroll || !target.host) return;
+    bindPullRefresh(target.scroll, { kind: kind, host: target.host });
+    const indicator = ensurePtrIndicator(target.host, kind);
+    ptrActive = {
+      kind: kind,
+      scrollEl: target.scroll,
+      host: target.host,
+      indicator: indicator,
+      visual: 0,
+      rot: 0,
+      locked: false,
+      spinning: false,
+      refreshing: true
+    };
+    const start = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+    const dur = ptrReducedMotion() ? 80 : 220;
+    function tick(now) {
+      if (!ptrActive || ptrActive !== thisSession) return;
+      const t = Math.min(1, (now - start) / dur);
+      const ease = 1 - Math.pow(1 - t, 3);
+      const visual = PTR_THRESHOLD * ease;
+      ptrActive.visual = visual;
+      try { ptrPaint(ptrActive, visual); } catch (err) {}
+      if (t < 1) {
+        requestAnimationFrame(tick);
+        return;
+      }
+      try { ptrLockIn(ptrActive); } catch (err) {}
+      const holdMs = ptrReducedMotion() ? 400 : (800 + Math.floor(Math.random() * 400));
+      ptrActive._timer = setTimeout(function () { finishFeedsRefresh(ptrActive, kind); }, holdMs);
+    }
+    const thisSession = ptrActive;
+    requestAnimationFrame(function (ts) { tick(typeof ts === "number" ? ts : start); });
+  }
+  function startFeedsIconRefresh() {
+    const kind = feedsRefreshKind();
+    if (isFeedsRefreshBusy()) return;
+    try { showFeedsHead(); } catch (e) {}
+    const scroll = kind === "notifications"
+      ? document.getElementById("feeds-scroll-notes")
+      : (document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll"));
+    if (scroll) {
+      try { scroll.scrollTop = 0; } catch (e) {}
+    }
+    startProgrammaticRefresh(kind);
+  }
   function ptrRelease(session) {
     if (!session || session.refreshing) return;
     if (session.locked || session.visual >= PTR_THRESHOLD) {
@@ -18871,7 +19025,13 @@
       if (!session.locked) ptrLockIn(session);
       const hold = Math.max(session.visual, PTR_THRESHOLD);
       ptrPaint(session, hold, { locked: true });
-      try { runPullRefresh(session.kind); } catch (err) {}
+      const kind = session.kind;
+      if (kind === "feeds" || kind === "notifications") {
+        const holdMs = ptrReducedMotion() ? 400 : (800 + Math.floor(Math.random() * 400));
+        session._timer = setTimeout(function () { finishFeedsRefresh(session, kind); }, holdMs);
+        return;
+      }
+      try { runPullRefresh(kind); } catch (err) {}
       ptrPaint(session, hold, { locked: true });
       let morphMs = 0;
       try { morphMs = ptrBeginCount(session) || 0; } catch (err) {}
@@ -19069,7 +19229,7 @@
     if (arch) bindPullRefresh(arch, { kind: "archived", host: document.getElementById("screen-archived") });
   }
   try { bindAllPullRefresh(); } catch (e) { console.warn("bindAllPullRefresh", e); }
-  try { window.__gatherPtr = { set: setPullRefresh, get: getPullRefresh }; } catch (e) {}
+  try { window.__gatherPtr = { set: setPullRefresh, get: getPullRefresh, refresh: startFeedsIconRefresh }; } catch (e) {}
 
   function registerGatherSW() {
     if (!("serviceWorker" in navigator)) return;

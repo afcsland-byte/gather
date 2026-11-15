@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="20">
+<html lang="en" data-theme="white" data-build="21">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="20" />
+  <meta name="gather-build" content="21" />
   <title>Gather</title>
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
@@ -1946,6 +1946,30 @@
     .feeds-pane > .ptr-indicator {
       top: var(--feeds-head-h);
       z-index: 7;
+      height: 36px;
+      overflow: visible;
+    }
+    .feeds-pane > .ptr-indicator .ptr-dots {
+      display: none !important;
+      opacity: 0 !important;
+    }
+    .feeds-pane .ptr-spinner {
+      width: 24px;
+      height: 24px;
+    }
+    .feeds-pane .ptr-spinner svg {
+      width: 24px;
+      height: 24px;
+      filter: drop-shadow(0 1px 2.5px rgba(0, 0, 0, 0.45));
+    }
+    .feeds-pane .ptr-arc { stroke: #fff; }
+    .feeds-pane .ptr-dot { opacity: 0 !important; fill: #fff; }
+    .feeds-pane .ptr-spinner.spinning .ptr-rotor {
+      animation-duration: 0.5s;
+    }
+    #page-feeds.tab-notifications .ptr-arc { stroke: var(--text); }
+    #page-feeds.tab-notifications .ptr-spinner svg {
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
     }
     .notif-toolbar {
       display: flex; align-items: center; justify-content: space-between;
@@ -4305,10 +4329,11 @@
     }
     #page-feeds.tab-foryou #feeds-stories,
     #page-feeds.tab-following #feeds-stories { display: none !important; }
-    #page-feeds.tab-foryou .feeds-pane[data-feeds-pane="foryou"] > .ptr-indicator,
+    .feeds-pane[data-feeds-pane="foryou"] > .ptr-indicator,
     #page-feeds.tab-following .feeds-pane[data-feeds-pane="following"] > .ptr-indicator {
       top: var(--feeds-head-h);
       z-index: 9;
+      height: 36px;
     }
     #discover-feed.video-feed {
       padding: 0; gap: 0; display: block; background: #000;
@@ -8045,7 +8070,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 20. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 21. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -19926,7 +19951,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 20. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 21. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -21763,8 +21788,9 @@
     const ind = session && session.indicator;
     const spin = ind && ind.querySelector(".ptr-spinner");
     const cv = ptrEnsureCanvas(session);
-    const showDots = style === "dots" || !!(session && session.morphing) || !!opts.forceDots;
-    const showSpin = style === "spinner-number" && !session.morphing && !opts.forceDots && !opts.hideSpinner;
+    const feedsPtr = !!(session && (session.kind === "feeds" || session.kind === "notifications"));
+    const showDots = !feedsPtr && (style === "dots" || !!(session && session.morphing) || !!opts.forceDots);
+    const showSpin = feedsPtr ? !opts.hideSpinner : (style === "spinner-number" && !session.morphing && !opts.forceDots && !opts.hideSpinner);
     if (spin) {
       if (!showSpin) {
         if (opts.fadeSpin && spin.style.opacity !== "0") {
@@ -21820,10 +21846,17 @@
     const dot = spin && spin.querySelector(".ptr-dot");
     const locked = !!(opts.locked || session.locked || session.refreshing);
     const progress = Math.max(0, Math.min(1, visual / PTR_THRESHOLD));
-    if (ind) ind.style.height = Math.max(0, visual) + "px";
+    const feedsPtr = (session.kind === "feeds" || session.kind === "notifications");
+    if (ind) {
+      if (!feedsPtr) ind.style.height = Math.max(0, visual) + "px";
+    }
     if (session.scrollEl) {
-      if (!opts.animate) session.scrollEl.style.transition = "none";
-      session.scrollEl.style.transform = visual ? ("translateY(" + visual + "px)") : "translateY(0px)";
+      if (feedsPtr) {
+        session.scrollEl.style.transform = "";
+      } else {
+        if (!opts.animate) session.scrollEl.style.transition = "none";
+        session.scrollEl.style.transform = visual ? ("translateY(" + visual + "px)") : "translateY(0px)";
+      }
     }
     const chrome = ptrSyncChrome(session, visual, opts);
     if (chrome.showSpin && spin) {
@@ -21860,7 +21893,8 @@
     const spin = session.indicator && session.indicator.querySelector(".ptr-spinner");
     const rotor = spin && spin.querySelector(".ptr-rotor");
     const style = getPullRefreshStyle();
-    if (spin && style === "spinner-number") {
+    const feedsPtr = (session.kind === "feeds" || session.kind === "notifications");
+    if (spin && (feedsPtr || style === "spinner-number")) {
       spin.style.transform = "scale(1)";
       spin.style.opacity = "1";
       if (rotor) {
@@ -21883,6 +21917,8 @@
     const ind = session.indicator;
     const spin = ind && ind.querySelector(".ptr-spinner");
     const rotor = spin && spin.querySelector(".ptr-rotor");
+    const feedsPtr = (session.kind === "feeds" || session.kind === "notifications");
+    const fadeMs = feedsPtr ? 150 : 110;
     if (spin) {
       spin.classList.remove("spinning");
       if (rotor) {
@@ -21893,21 +21929,28 @@
         spin.style.opacity = "0";
         spin.style.transform = "scale(0.72)";
       } else {
-        spin.style.transition = "opacity 110ms ease, transform 110ms ease";
+        spin.style.transition = "opacity " + fadeMs + "ms ease, transform " + fadeMs + "ms ease";
         spin.style.opacity = "0";
         spin.style.transform = "scale(0.55)";
       }
     }
     if (ind) {
-      if (instant) ind.style.height = "0px";
+      if (feedsPtr) {
+        /* Feeds indicator stays a fixed overlay; do not collapse/slide the feed. */
+      } else if (instant) ind.style.height = "0px";
       else {
         ind.style.transition = "height 180ms cubic-bezier(.2,.85,.2,1)";
         ind.style.height = "0px";
       }
     }
     if (el) {
-      el.style.transition = instant ? "none" : "transform 180ms cubic-bezier(.2,.85,.2,1)";
-      el.style.transform = "translateY(0px)";
+      if (feedsPtr) {
+        el.style.transform = "";
+        el.style.transition = "";
+      } else {
+        el.style.transition = instant ? "none" : "transform 180ms cubic-bezier(.2,.85,.2,1)";
+        el.style.transform = "translateY(0px)";
+      }
       el.classList.remove("ptr-host-pulling");
       el.style.overflowY = "";
     }
@@ -21926,7 +21969,12 @@
       if (el) el.style.transition = "";
       if (rotor) rotor.style.transform = "";
       if (cv) { cv.style.transition = ""; ptrDotsClear(cv); }
-    }, instant ? 0 : 200);
+      try {
+        if (feedsPtr && window.__gatherFeedsRefreshClock && window.__gatherFeedsRefreshClock.done == null) {
+          window.__gatherFeedsRefreshClock.done = performance.now() - window.__gatherFeedsRefreshClock.t0;
+        }
+      } catch (err) {}
+    }, instant ? 0 : (feedsPtr ? fadeMs : 200));
   }
 
   function cancelPullRefresh(instant) {
@@ -22005,18 +22053,44 @@
   function isFeedsRefreshBusy() {
     return !!(ptrActive && ptrActive.refreshing && (ptrActive.kind === "feeds" || ptrActive.kind === "notifications"));
   }
+  function isFeedsPtrKind(kind) {
+    return kind === "feeds" || kind === "notifications";
+  }
+  const FEEDS_REFRESH_HOLD_MS = 520;
+  const FEEDS_REFRESH_FADE_MS = 150;
+  function beginFeedsRefresh(session, kind) {
+    if (!session) return;
+    kind = kind || session.kind;
+    session.refreshing = true;
+    session.spinning = true;
+    if (!session.locked) {
+      try { ptrLockIn(session); } catch (err) {}
+    }
+    const spin = session.indicator && session.indicator.querySelector(".ptr-spinner");
+    if (spin) {
+      spin.style.transition = "none";
+      spin.style.opacity = "1";
+      spin.style.transform = "scale(1)";
+      spin.classList.add("spinning");
+    }
+    try { ptrPaint(session, PTR_THRESHOLD, { locked: true }); } catch (err) {}
+    try { runPullRefresh(kind); } catch (err) {}
+    try { window.__gatherFeedsRefreshClock = { t0: performance.now(), done: null }; } catch (err) {}
+    if (session._timer) { try { clearTimeout(session._timer); } catch (err) {} }
+    const hold = ptrReducedMotion() ? 350 : FEEDS_REFRESH_HOLD_MS;
+    session._timer = setTimeout(function () { finishFeedsRefresh(session, kind); }, hold);
+  }
   function finishFeedsRefresh(session, kind) {
     if (!session || session !== ptrActive) return;
-    try { runPullRefresh(kind); } catch (err) {}
+    try { ptrFinishRefresh(session); } catch (err) {}
     try {
-      if (kind === "feeds") toast("New videos");
-      else if (kind === "notifications") toast("Notifications updated");
+      const clock = window.__gatherFeedsRefreshClock;
+      if (clock && clock.done == null) {
+        setTimeout(function () {
+          if (clock.done == null) clock.done = performance.now() - clock.t0;
+        }, FEEDS_REFRESH_FADE_MS);
+      }
     } catch (err) {}
-    const hold = Math.max(session.visual || 0, PTR_THRESHOLD);
-    try { ptrPaint(session, hold, { locked: true }); } catch (err) {}
-    let morphMs = 0;
-    try { morphMs = ptrBeginCount(session) || 0; } catch (err) {}
-    session._timer = setTimeout(function () { ptrFinishRefresh(session); }, Math.max(640, morphMs + 160));
   }
   function startProgrammaticRefresh(kind) {
     kind = kind || "feeds";
@@ -22033,31 +22107,13 @@
       scrollEl: target.scroll,
       host: target.host,
       indicator: indicator,
-      visual: 0,
+      visual: PTR_THRESHOLD,
       rot: 0,
       locked: false,
-      spinning: false,
+      spinning: true,
       refreshing: true
     };
-    const start = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
-    const dur = ptrReducedMotion() ? 80 : 220;
-    function tick(now) {
-      if (!ptrActive || ptrActive !== thisSession) return;
-      const t = Math.min(1, (now - start) / dur);
-      const ease = 1 - Math.pow(1 - t, 3);
-      const visual = PTR_THRESHOLD * ease;
-      ptrActive.visual = visual;
-      try { ptrPaint(ptrActive, visual); } catch (err) {}
-      if (t < 1) {
-        requestAnimationFrame(tick);
-        return;
-      }
-      try { ptrLockIn(ptrActive); } catch (err) {}
-      const holdMs = ptrReducedMotion() ? 400 : (800 + Math.floor(Math.random() * 400));
-      ptrActive._timer = setTimeout(function () { finishFeedsRefresh(ptrActive, kind); }, holdMs);
-    }
-    const thisSession = ptrActive;
-    requestAnimationFrame(function (ts) { tick(typeof ts === "number" ? ts : start); });
+    beginFeedsRefresh(ptrActive, kind);
   }
   function startFeedsIconRefresh() {
     const kind = feedsRefreshKind();
@@ -22080,8 +22136,7 @@
       ptrPaint(session, hold, { locked: true });
       const kind = session.kind;
       if (kind === "feeds" || kind === "notifications") {
-        const holdMs = ptrReducedMotion() ? 400 : (800 + Math.floor(Math.random() * 400));
-        session._timer = setTimeout(function () { finishFeedsRefresh(session, kind); }, holdMs);
+        beginFeedsRefresh(session, kind);
         return;
       }
       try { runPullRefresh(kind); } catch (err) {}

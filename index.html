@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="13">
+<html lang="en" data-theme="white" data-build="14">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -1895,16 +1895,16 @@
     }
     .nav-dot.show { display: block; }
     #feeds-pager {
-      flex: 1; min-height: 0; width: 200%;
+      flex: 1; min-height: 0; width: 300%;
       display: flex;
       transition: transform .32s cubic-bezier(.2,.8,.2,1);
       will-change: transform;
     }
     #feeds-pager.dragging { transition: none; }
-    #page-feeds.tab-foryou #feeds-pager,
-    #page-feeds.tab-following #feeds-pager { transform: translateX(0); }
-    #page-feeds.tab-notifications #feeds-pager { transform: translateX(-50%); }
-    .feeds-pane { flex: 0 0 50%; width: 50%; height: 100%; position: relative; overflow: hidden; }
+    #page-feeds.tab-foryou #feeds-pager { transform: translateX(0); }
+    #page-feeds.tab-following #feeds-pager { transform: translateX(-33.333%); }
+    #page-feeds.tab-notifications #feeds-pager { transform: translateX(-66.666%); }
+    .feeds-pane { flex: 0 0 33.333%; width: 33.333%; height: 100%; position: relative; overflow: hidden; }
     .feeds-pane > .scroll { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-top: var(--feeds-head-h); box-sizing: border-box; }
     .feeds-pane > .ptr-indicator {
       top: var(--feeds-head-h);
@@ -4260,7 +4260,7 @@
     #page-feeds.tab-foryou .feeds-search-btn,
     #page-feeds.tab-following .feeds-search-btn { color: #fff; filter: drop-shadow(0 1px 6px rgba(0,0,0,.55)); }
     #page-feeds.tab-foryou .feeds-pane[data-feeds-pane="foryou"] > .scroll,
-    #page-feeds.tab-following .feeds-pane[data-feeds-pane="foryou"] > .scroll {
+    #page-feeds.tab-following .feeds-pane[data-feeds-pane="following"] > .scroll {
       padding-top: 0;
       scroll-snap-type: y mandatory;
       scroll-snap-stop: always;
@@ -4269,7 +4269,7 @@
     #page-feeds.tab-foryou #feeds-stories,
     #page-feeds.tab-following #feeds-stories { display: none !important; }
     #page-feeds.tab-foryou .feeds-pane[data-feeds-pane="foryou"] > .ptr-indicator,
-    #page-feeds.tab-following .feeds-pane[data-feeds-pane="foryou"] > .ptr-indicator {
+    #page-feeds.tab-following .feeds-pane[data-feeds-pane="following"] > .ptr-indicator {
       top: var(--feeds-head-h);
       z-index: 9;
     }
@@ -4422,6 +4422,63 @@
     }
     .vf-empty p { font-size: 16px; font-weight: 600; line-height: 1.35; text-shadow: 0 1px 8px rgba(0,0,0,.5); }
     .vf-empty .btn { width: auto; margin-top: 16px; padding: 10px 18px; }
+    .fs-block { padding: 8px 16px 4px; }
+    .fs-label { font-size: 13px; font-weight: 700; color: #8E8E93; letter-spacing: .02em; margin: 8px 0 6px; }
+    .fs-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .fs-chip {
+      border: 0; background: #F2F2F7; color: #111; border-radius: 999px;
+      padding: 8px 12px; font-size: 14px; font-weight: 600;
+      width: auto !important; height: auto !important; display: inline-flex;
+      align-items: center; place-items: center;
+    }
+    .fs-suggest { padding: 0 0 8px; }
+    .fs-tabs {
+      display: flex; gap: 18px; padding: 4px 16px 0;
+      border-bottom: 0.5px solid rgba(0,0,0,.1);
+    }
+    .fs-tabs button {
+      border: 0; background: transparent; color: #8E8E93;
+      font-weight: 700; font-size: 15px; padding: 10px 0 8px;
+      position: relative; width: auto !important; height: auto !important;
+      display: inline-flex; border-radius: 0; place-items: unset;
+    }
+    .fs-tabs button.on { color: #111; }
+    .fs-tabs button.on::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+      height: 3px; border-radius: 3px 3px 0 0; background: #111;
+    }
+    .fs-video-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+      padding: 8px 2px 20px;
+    }
+    .fs-video-cell {
+      position: relative; display: block; width: 100% !important; height: auto !important;
+      padding: 0; border: 0; border-radius: 0; place-items: unset;
+      background: #111; aspect-ratio: 3/4; overflow: hidden; color: #fff; text-align: left;
+    }
+    .fs-video-cell img, .fs-video-cell video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .fs-video-cell .fs-video-meta {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 18px 8px 8px;
+      background: linear-gradient(transparent, rgba(0,0,0,.7));
+      font-size: 12px; font-weight: 700;
+    }
+    .fs-video-cell .fs-video-meta span { opacity: .9; font-weight: 600; }
+    #feeds-search-player {
+      display: none; position: absolute; inset: 0; z-index: 24; background: #000;
+      flex-direction: column;
+    }
+    #feeds-search-player.open { display: flex; }
+    #feeds-search-player-close {
+      position: absolute; top: calc(var(--safe-top) + 10px); left: 10px; z-index: 5;
+    }
+    #feeds-search-player .scroll {
+      flex: 1; height: 100%; overflow-y: auto; scroll-snap-type: y mandatory;
+      scroll-snap-stop: always; background: #000; padding: 0;
+    }
+    #feeds-search-player .vf-slide { height: 100%; }
     #feed-comments-sheet { z-index: 90; }
     #feed-comments-card { max-height: 62%; display: flex; flex-direction: column; padding: 8px 0 calc(10px + var(--safe-bot)); }
     #feed-comments-card h3 { padding: 10px 16px 8px; }
@@ -4534,6 +4591,11 @@
               <div class="feed" id="discover-feed"></div>
             </div>
           </div>
+          <div class="feeds-pane" data-feeds-pane="following">
+            <div class="scroll" id="feeds-scroll-following">
+              <div class="feed" id="following-feed"></div>
+            </div>
+          </div>
           <div class="feeds-pane" data-feeds-pane="notifications">
             <div class="scroll" id="feeds-scroll-notes"></div>
           </div>
@@ -4544,6 +4606,10 @@
             <input id="feeds-search-q" type="search" enterkeyhint="search" placeholder="Search names and videos" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </div>
           <div id="feeds-search-results"></div>
+        </div>
+        <div id="feeds-search-player">
+          <button type="button" class="icon-round" id="feeds-search-player-close" aria-label="Close">←</button>
+          <div class="scroll" id="feeds-search-player-scroll"></div>
         </div>
       </section>
 <section class="page" data-page="chat" id="page-chat">
@@ -5781,7 +5847,11 @@
     { id: "kofi", name: "Kofi Boateng", handle: "Cantonments", lat: 5.5760, lng: -0.1740, avatar: { skin: SKINS[2], hair: "short", hairColor: HAIR_COLORS[0], outfit: "tee", outfitColor: "#111111", acc: "none", bg: "#1A1A1A" }, friend: false, username: "kofib" },
     { id: "adwoa", name: "Adwoa Mensah", handle: "Adabraka", lat: 5.5600, lng: -0.2120, avatar: { skin: SKINS[1], hair: "braids", hairColor: HAIR_COLORS[0], outfit: "shirt", outfitColor: "#334155", acc: "earrings", bg: "#0F172A" }, friend: false, username: "adwoa" }
   ];
-  const personById = Object.fromEntries(PEOPLE.map(p => [p.id, p]));
+  const FEED_PEOPLE = [
+    { id: "ronaldo", name: "Ronaldo Mensah", handle: "Football", username: "ronaldo", avatar: { skin: SKINS[3], hair: "fade", hairColor: HAIR_COLORS[0], outfit: "jersey", outfitColor: "#FFFFFF", acc: "none", bg: "#102010" }, friend: false },
+    { id: "nana", name: "Nana Owusu", handle: "Ideas", username: "nanaideas", avatar: { skin: SKINS[1], hair: "bun", hairColor: HAIR_COLORS[1], outfit: "shirt", outfitColor: "#0F766E", acc: "glasses", bg: "#102820" }, friend: false }
+  ];
+  const personById = Object.fromEntries(PEOPLE.concat(FEED_PEOPLE).map(p => [p.id, p]));
 
   const CREATOR = {
     ama:   { bio: "Accra days, Labadi weekends. Sharing hangouts and good light.", verified: true, followers: 18420, following: 312, likes: 226400 },
@@ -6075,7 +6145,7 @@
     if (!Array.isArray(s.meetups)) s.meetups = [];
     s.gatherHoldHintSeen = s.gatherHoldHintSeen === true;
     s.messages = (s.messages && typeof s.messages === "object" && !Array.isArray(s.messages)) ? s.messages : {};
-    ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports","notifications","commRequests","supportTickets","likedFeed","savedFeed"].forEach(function (k) {
+    ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports","notifications","commRequests","supportTickets","likedFeed","savedFeed","recentFeedSearches"].forEach(function (k) {
       if (!Array.isArray(s[k])) s[k] = Array.isArray(blank[k]) ? blank[k].slice() : [];
     });
     if (!s.feedComments || typeof s.feedComments !== "object") s.feedComments = {};
@@ -7933,7 +8003,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 13. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 14. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -7948,7 +8018,7 @@
     const ignore = (t) => {
       const el = eventEl(t);
       if (!el) return true;
-      return !!el.closest(".stories-row, .lenses, .map-ui, #map, .thread, .overlay, .chat-sheet, #story-viewer, #snap-viewer, #qv-viewer, #sticker-crop, #attach-sheet, #qv-sheet, #thread-more-sheet, #wallpaper-sheet, #disappear-sheet, #msg-action-sheet, #delete-sheet, #block-chat-sheet, #delete-chat-sheet, #clear-chat-sheet, #report-sheet, #voice-overlay, #live-viewer, #live-party, #pin-pad, #chat-row-sheet, #screen-locked, #screen-blocked, #blocked-banner, #story-reply, #reply-bar, #thread-search, #mention-pop, #btn-new-chat, textarea, input, .scroll, .chat-row, button, a, #nav");
+      return !!el.closest(".stories-row, .lenses, .map-ui, #map, .thread, .overlay, .chat-sheet, #story-viewer, #snap-viewer, #qv-viewer, #sticker-crop, #attach-sheet, #qv-sheet, #thread-more-sheet, #wallpaper-sheet, #disappear-sheet, #msg-action-sheet, #delete-sheet, #block-chat-sheet, #delete-chat-sheet, #clear-chat-sheet, #report-sheet, #voice-overlay, #live-viewer, #live-party, #pin-pad, #chat-row-sheet, #screen-locked, #screen-blocked, #blocked-banner, #story-reply, #reply-bar, #thread-search, #mention-pop, #btn-new-chat, textarea, input, .scroll, .chat-row, button, a, #nav, #page-feeds, #feeds-pager");
     };
     pager.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
@@ -16617,14 +16687,22 @@
   let feedTapTimer = 0;
   let feedLastTap = 0;
   const SEED_FEED_VIDEOS = [
-    { id: "fv-osu", src: "https://assets.mixkit.co/videos/1230/1230-720.mp4", poster: "night", userId: "kwame", caption: "Osu after hours. The lights never really go off.", sound: "Night Drive \u2014 Accra Mix", likes: 2140, comments: [["Ama", "The energy though."], ["Fiifi", "I need to be there."], ["Nii", "Save me a spot."]] },
-    { id: "fv-labadi", src: "https://assets.mixkit.co/videos/3456/3456-720.mp4", poster: "beach", userId: "efua", caption: "Labadi at golden hour. Barefoot, always.", sound: "Golden Hour \u2014 Shoreline", likes: 1862, comments: [["Lydia", "This light is perfect."], ["Ama", "Which side of the beach?"]] },
-    { id: "fv-roof", src: "https://assets.mixkit.co/videos/30000/30000-720.mp4", poster: "fun", userId: "kojo", caption: "East Legon rooftop, late set, no rush.", sound: "Rooftop Session", likes: 974, comments: [["Abena", "What time does it start?"], ["Yaw", "Send it."]] },
-    { id: "fv-jamestown", src: "https://assets.mixkit.co/videos/1250/1250-720.mp4", poster: "sunset", userId: "ama", caption: "Jamestown walking, just before the light goes.", sound: "Harbour Walk", likes: 1320, comments: [["Kwame", "Classic Ama."], ["Efua", "Take me next time."]] },
-    { id: "fv-market", src: "https://assets.mixkit.co/videos/1192/1192-720.mp4", poster: "green", userId: "lydia", caption: "Saturday in the city. New spots, honest notes.", sound: "City Notes", likes: 808, comments: [["Abena", "Where is this?"]] },
-    { id: "fv-square", src: "https://assets.mixkit.co/videos/43000/43000-720.mp4", poster: "green", userId: "yaw", caption: "A quick loop around the arch this afternoon.", sound: "Original sound \u2014 Yaw", likes: 2410, comments: [["Sena", "The streak continues."], ["Kojo", "I'm coming through."]] },
-    { id: "fv-nightwalk", src: "https://assets.mixkit.co/videos/1600/1600-720.mp4", poster: "night", userId: "abena", caption: "Airport City after work. Soft lights, slow walk.", sound: "After Work", likes: 690, comments: [["Lydia", "Saving this."]] },
-    { id: "fv-cup", src: "https://videos.pexels.com/video-files/10871054/10871054-hd_1080_1920_30fps.mp4", poster: "fun", userId: "fiifi", caption: "Friday cup energy. Winner stays on.", sound: "Match Night", likes: 1544, comments: [["Kwame", "Who won?"], ["Nii", "Next fixture soon."]] }
+    { id: "fv-osu", src: "https://assets.mixkit.co/videos/1230/1230-720.mp4", poster: "night", userId: "kwame", caption: "Osu after hours. The lights never really go off. #music #Accra", sound: "Night Drive \u2014 Accra Mix", tags: ["music", "Accra"], likes: 2140, comments: [["Ama", "The energy though."], ["Fiifi", "I need to be there."], ["Nii", "Save me a spot."]] },
+    { id: "fv-labadi", src: "https://assets.mixkit.co/videos/3456/3456-720.mp4", poster: "beach", userId: "efua", caption: "Labadi at golden hour. Barefoot, always.", sound: "Golden Hour \u2014 Shoreline", tags: ["Accra"], likes: 1862, comments: [["Lydia", "This light is perfect."], ["Ama", "Which side of the beach?"]] },
+    { id: "fv-roof", src: "https://assets.mixkit.co/videos/30000/30000-720.mp4", poster: "fun", userId: "kojo", caption: "East Legon rooftop, late set, no rush. #music", sound: "Rooftop Session", tags: ["music", "Accra"], likes: 974, comments: [["Abena", "What time does it start?"], ["Yaw", "Send it."]] },
+    { id: "fv-jamestown", src: "https://assets.mixkit.co/videos/1250/1250-720.mp4", poster: "sunset", userId: "ama", caption: "Jamestown walking, just before the light goes.", sound: "Harbour Walk", tags: ["Accra"], likes: 1320, comments: [["Kwame", "Classic Ama."], ["Efua", "Take me next time."]] },
+    { id: "fv-market", src: "https://assets.mixkit.co/videos/1192/1192-720.mp4", poster: "green", userId: "lydia", caption: "Saturday in the city. New spots, honest notes. #food #Accra", sound: "City Notes", tags: ["food", "Accra"], likes: 808, comments: [["Abena", "Where is this?"]] },
+    { id: "fv-square", src: "https://assets.mixkit.co/videos/43000/43000-720.mp4", poster: "green", userId: "yaw", caption: "A quick loop around the arch this afternoon.", sound: "Original sound \u2014 Yaw", tags: ["Accra"], likes: 2410, comments: [["Sena", "The streak continues."], ["Kojo", "I'm coming through."]] },
+    { id: "fv-nightwalk", src: "https://assets.mixkit.co/videos/1600/1600-720.mp4", poster: "night", userId: "abena", caption: "Airport City after work. Soft lights, slow walk.", sound: "After Work", tags: ["Accra"], likes: 690, comments: [["Lydia", "Saving this."]] },
+    { id: "fv-cup", src: "https://videos.pexels.com/video-files/10871054/10871054-hd_1080_1920_30fps.mp4", poster: "beach", userId: "fiifi", caption: "Friday cup energy. Winner stays on. Channeling Ronaldo tonight. #football", sound: "Match Night", tags: ["football", "Accra"], likes: 1544, comments: [["Kwame", "Who won?"], ["Nii", "Next fixture soon."]] },
+    { id: "fv-ronaldo-1", src: "https://assets.mixkit.co/videos/1200/1200-720.mp4", poster: "fun", userId: "ronaldo", caption: "Training at the park. Stay sharp. #football", sound: "Match Day", tags: ["football", "Accra"], likes: 3200, comments: [["Kwame", "Clean finish."], ["Fiifi", "Respect."]] },
+    { id: "fv-ronaldo-2", src: "https://assets.mixkit.co/videos/1220/1220-720.mp4", poster: "sunset", userId: "ronaldo", caption: "Footwork before Sunday's kickabout. #football #Accra", sound: "Stadium Drums", tags: ["football"], likes: 2875, comments: [["Yaw", "That's the one."]] },
+    { id: "fv-kwame-foot", src: "https://assets.mixkit.co/videos/1232/1232-720.mp4", poster: "night", userId: "kwame", caption: "Ronaldo-level footwork on the Osu pitch today. #football", sound: "Crowd Pulse", tags: ["football", "Accra"], likes: 1104, comments: [["Ronaldo Mensah", "Nice touch."]] },
+    { id: "fv-yaw-ronaldo", src: "https://assets.mixkit.co/videos/1252/1252-720.mp4", poster: "green", userId: "yaw", caption: "The #Ronaldo challenge after the match. I tried. #comedy #football", sound: "Original sound \u2014 Yaw", tags: ["football", "comedy"], likes: 980, comments: [["Fiifi", "The attempt though."]] },
+    { id: "fv-kofi-music", src: "https://assets.mixkit.co/videos/1164/1164-720.mp4", poster: "night", userId: "kofi", caption: "A new music loop from the studio. Headphones on. #music", sound: "Kofi Beats \u2014 Night Bus", tags: ["music"], likes: 1640, comments: [["Kojo", "Send the file."]] },
+    { id: "fv-akosua-dance", src: "https://assets.mixkit.co/videos/3448/3448-720.mp4", poster: "sunset", userId: "akosua", caption: "Dance rehearsal, no cuts. #dance #music", sound: "Practice Mix", tags: ["dance", "music"], likes: 1422, comments: [["Ama", "The footwork!"]] },
+    { id: "fv-nana-ideas", src: "https://assets.mixkit.co/videos/1180/1180-720.mp4", poster: "green", userId: "nana", caption: "A few ideas for a better Sunday in Accra. #ideas", sound: "Quiet Notes", tags: ["ideas", "Accra"], likes: 760, comments: [["Lydia", "Saving these ideas."]] },
+    { id: "fv-lydia-food", src: "https://assets.mixkit.co/videos/42940/42940-720.mp4", poster: "fun", userId: "lydia", caption: "Street food in Accra, hot and fast. #food", sound: "Market Morning", tags: ["food", "Accra"], likes: 990, comments: [["Abena", "Where is this stall?"]] }
   ];
   function feedHandleOf(userId) {
     if (userId === "me") return (store.session && store.session.username) || (store.profile && store.profile.name) || "you";
@@ -16655,6 +16733,7 @@
         sound: "Original sound \u2014 " + ((store.profile && store.profile.name) || "You"),
         likes: item.likes || 0,
         comments: [],
+        tags: item.tags || [],
         isMine: true
       });
     }
@@ -16684,11 +16763,12 @@
   function visibleFeedVideos(opts) {
     opts = opts || {};
     var list = allFeedVideos(opts);
-    var focus = opts.focusUser || (state && state.feedFocusUser);
+    var tab = opts.tab || (typeof currentFeedsTab === "function" ? currentFeedsTab() : "foryou");
+    var focus = opts.focusUser || (tab === "foryou" && state && state.feedFocusUser);
     if (focus) {
       return list.filter(function (v) { return v && v.userId === focus; });
     }
-    if (typeof currentFeedsTab === "function" && currentFeedsTab() === "following") {
+    if (tab === "following") {
       return list.filter(function (v) { return v && v.userId && v.userId !== "me" && typeof isFollowing === "function" && isFollowing(v.userId); });
     }
     return list;
@@ -16754,23 +16834,68 @@
       '<div class="vf-progress"><i></i></div>'+
     "</article>";
   }
+  function videoFeedRoots() {
+    return ["discover-feed", "following-feed", "feeds-search-player-scroll"];
+  }
+  function feedRootForTab(tab) {
+    if (tab === "following") return document.getElementById("following-feed");
+    return document.getElementById("discover-feed");
+  }
+  function feedScrollForTab(tab) {
+    if (tab === "following") return document.getElementById("feeds-scroll-following");
+    if (tab === "notifications") return document.getElementById("feeds-scroll-notes");
+    return document.getElementById("feeds-scroll-foryou");
+  }
+  function currentFeedsScroll() {
+    return feedScrollForTab(typeof currentFeedsTab === "function" ? currentFeedsTab() : "foryou");
+  }
   function sizeVideoSlides() {
-    const sc = document.getElementById("feeds-scroll-foryou");
-    if (!sc) return;
-    const h = sc.clientHeight;
-    if (!h) return;
-    sc.querySelectorAll(".vf-slide, .vf-empty").forEach(function (el) { el.style.height = h + "px"; });
+    ["feeds-scroll-foryou", "feeds-scroll-following", "feeds-search-player-scroll"].forEach(function (id) {
+      const sc = document.getElementById(id);
+      if (!sc) return;
+      const h = sc.clientHeight;
+      if (!h) return;
+      sc.querySelectorAll(".vf-slide, .vf-empty").forEach(function (el) { el.style.height = h + "px"; });
+    });
   }
   function pauseAllFeedVideos(except) {
-    document.querySelectorAll("#discover-feed video").forEach(function (v) {
+    document.querySelectorAll("#discover-feed video, #following-feed video, #feeds-search-player-scroll video").forEach(function (v) {
       if (except && v === except) return;
       try { v.pause(); } catch (err) {}
       const slide = v.closest(".vf-slide");
       if (slide) slide.classList.remove("is-playing");
     });
   }
+  function pauseFeedPane(tab) {
+    const root = tab === "search" ? document.getElementById("feeds-search-player-scroll") : feedRootForTab(tab);
+    if (!root) return;
+    root.querySelectorAll("video").forEach(function (v) {
+      try { v.pause(); } catch (err) {}
+      const slide = v.closest(".vf-slide");
+      if (slide) slide.classList.remove("is-playing");
+    });
+  }
+  function resumeFeedPane(tab) {
+    const sc = feedScrollForTab(tab);
+    if (!sc) return;
+    const cr = sc.getBoundingClientRect();
+    let chosen = null, best = 0;
+    sc.querySelectorAll(".vf-slide").forEach(function (slide) {
+      const r = slide.getBoundingClientRect();
+      const vis = Math.min(r.bottom, cr.bottom) - Math.max(r.top, cr.top);
+      if (vis > best) { best = vis; chosen = slide.querySelector("video"); }
+    });
+    if (!chosen) chosen = sc.querySelector(".vf-slide video");
+    if (chosen && state.page === PAGE.feeds) playFeedVideo(chosen);
+  }
   function playFeedVideo(vid) {
     if (!vid) return;
+    const inPlayer = !!vid.closest("#feeds-search-player");
+    const pane = vid.closest("[data-feeds-pane]");
+    if (!inPlayer && pane) {
+      const paneTab = pane.getAttribute("data-feeds-pane");
+      if (paneTab && typeof currentFeedsTab === "function" && currentFeedsTab() !== paneTab) return;
+    }
     pauseAllFeedVideos(vid);
     vid.muted = !feedSoundOn;
     const slide = vid.closest(".vf-slide");
@@ -16842,10 +16967,14 @@
       if (slide.classList.contains("is-playing") === false) return;
     });
   }
-  function bindVideoFeedObserver() {
-    if (feedVideoIO) { try { feedVideoIO.disconnect(); } catch (err) {} }
-    const root = document.getElementById("feeds-scroll-foryou");
-    feedVideoIO = new IntersectionObserver(function (entries) {
+  var feedVideoIOs = {};
+  function bindVideoFeedObserver(scrollEl, feedEl) {
+    scrollEl = scrollEl || document.getElementById("feeds-scroll-foryou");
+    feedEl = feedEl || document.getElementById("discover-feed");
+    if (!scrollEl || !feedEl) return;
+    const key = scrollEl.id || "feed";
+    if (feedVideoIOs[key]) { try { feedVideoIOs[key].disconnect(); } catch (err) {} }
+    const io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         const vid = en.target.querySelector("video");
         if (!vid) return;
@@ -16855,10 +16984,10 @@
           en.target.classList.remove("is-playing");
         }
       });
-    }, { root: root, threshold: [0.6, 0.75, 0.9] });
-    document.querySelectorAll("#discover-feed .vf-slide").forEach(function (slide) {
-      feedVideoIO.observe(slide);
-    });
+    }, { root: scrollEl, threshold: [0.6, 0.75, 0.9] });
+    feedEl.querySelectorAll(".vf-slide").forEach(function (slide) { io.observe(slide); });
+    feedVideoIOs[key] = io;
+    feedVideoIO = io;
   }
   function findFeedVideo(id) {
     return allFeedVideos().find(function (v) { return v && v.id === id; }) || SEED_FEED_VIDEOS.find(function (v) { return v.id === id; }) || null;
@@ -16967,9 +17096,8 @@
   function bindVideoFeedClicks() {
     if (bindVideoFeedClicks._done) return;
     bindVideoFeedClicks._done = true;
-    const root = document.getElementById("discover-feed");
-    if (!root) return;
-    root.addEventListener("click", function (e) {
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest("#discover-feed, #following-feed, #feeds-search-player")) return;
       const follow = e.target.closest("[data-vf-follow]");
       if (follow) {
         e.preventDefault(); e.stopPropagation();
@@ -17026,40 +17154,65 @@
   function currentFeedCards() { return allFeedVideos(); }
   function renderDiscover(opts) {
     opts = opts || {};
-    const root = document.getElementById("discover-feed");
+    const tab = opts.tab || (typeof isVideoFeedsTab === "function" && isVideoFeedsTab() ? currentFeedsTab() : "foryou");
+    const root = feedRootForTab(tab) || document.getElementById("discover-feed");
+    const sc = feedScrollForTab(tab);
     if (!root) return;
     if (opts.refresh) state.feedFocusUser = null;
-    const videos = opts.refresh ? visibleFeedVideos({ refresh: true }) : visibleFeedVideos();
+    if (opts.refresh) {
+      const other = document.getElementById(tab === "following" ? "discover-feed" : "following-feed");
+      if (other) other.dataset.mounted = "";
+    }
+    const canReuse = opts.reuse && root.dataset.mounted === "1" && !opts.refresh && !(tab === "foryou" && state.feedFocusUser);
+    if (canReuse) {
+      sizeVideoSlides();
+      if (typeof currentFeedsTab === "function" && currentFeedsTab() === tab && state.page === PAGE.feeds) resumeFeedPane(tab);
+      return;
+    }
+    const videos = visibleFeedVideos({ refresh: !!opts.refresh, tab: tab, focusUser: opts.focusUser });
     root.className = "feed video-feed";
-    if (!videos.length && typeof currentFeedsTab === "function" && currentFeedsTab() === "following") {
+    if (!videos.length && tab === "following") {
       root.innerHTML = '<div class="vf-empty" id="following-empty"><p>Follow creators to see their videos here</p><button type="button" class="btn btn-primary" id="btn-following-to-foryou">For you</button></div>';
-      try { pauseAllFeedVideos(); } catch (err) {}
-      if (feedVideoIO) { try { feedVideoIO.disconnect(); } catch (err) {} }
+      root.dataset.mounted = "1";
+      try { pauseFeedPane("following"); } catch (err) {}
       sizeVideoSlides();
       return;
     }
     root.innerHTML = videos.map(videoSlideHtml).join("");
+    root.dataset.mounted = "1";
     videos.forEach(function (v) {
       const slide = root.querySelector('.vf-slide[data-feed-id="'+v.id+'"]');
       if (slide) bindFeedVideoMedia(slide, v);
     });
     sizeVideoSlides();
     bindVideoFeedClicks();
-    bindVideoFeedObserver();
-    const sc = document.getElementById("feeds-scroll-foryou");
+    bindVideoFeedObserver(sc, root);
     if (opts.refresh && sc) { try { sc.scrollTop = 0; } catch (err) {} }
     requestAnimationFrame(function () {
       sizeVideoSlides();
+      if (typeof currentFeedsTab === "function" && currentFeedsTab() !== tab) return;
+      if (state.page !== PAGE.feeds) return;
       const first = root.querySelector(".vf-slide video");
-      if (first && (currentFeedsTab() === "foryou" || currentFeedsTab() === "following") && state.page === PAGE.feeds) {
-        const visible = sc && sc.scrollTop < (sc.clientHeight * 0.5);
-        if (visible || opts.refresh || sc && sc.scrollTop === 0) playFeedVideo(first);
-      }
+      const visible = sc && sc.scrollTop < (sc.clientHeight * 0.5);
+      if (first && (visible || opts.refresh || (sc && sc.scrollTop === 0))) playFeedVideo(first);
     });
     try { window.addEventListener("resize", sizeVideoSlides); } catch (err) {}
   }
 
 
+  const TRENDING_SEARCHES = ["Ronaldo", "football", "music", "ideas", "Accra", "dance", "food", "comedy"];
+  function recentFeedSearches() {
+    if (!Array.isArray(store.recentFeedSearches)) store.recentFeedSearches = [];
+    return store.recentFeedSearches;
+  }
+  function rememberFeedSearch(q) {
+    q = (q || "").trim();
+    if (!q) return;
+    const list = recentFeedSearches();
+    const low = q.toLowerCase();
+    store.recentFeedSearches = [q].concat(list.filter(function (x) { return String(x).toLowerCase() !== low; })).slice(0, 8);
+    try { saveStore(); } catch (err) {}
+  }
   function openFeedsSearch() {
     const box = document.getElementById("feeds-search");
     if (!box) return;
@@ -17067,13 +17220,15 @@
     box.removeAttribute("hidden");
     box.setAttribute("aria-hidden", "false");
     const input = document.getElementById("feeds-search-q");
-    renderFeedsSearch("");
-    if (input) {
+    renderFeedsSearch(input && input.value ? input.value : "");
+    if (input && !input.value) {
       input.value = "";
-      setTimeout(function () { try { input.focus(); } catch (err) {} }, 50);
+      renderFeedsSearch("");
     }
+    if (input) setTimeout(function () { try { input.focus(); } catch (err) {} }, 50);
   }
   function closeFeedsSearch() {
+    try { closeSearchVideoPlayer(); } catch (err) {}
     const box = document.getElementById("feeds-search");
     if (!box) return;
     box.classList.remove("open");
@@ -17090,62 +17245,198 @@
         avatar: (store.profile && store.profile.avatar) || defaultAvatar()
       };
     }
-    const p = personById[userId];
+    const p = personById[userId] || ((typeof FEED_PEOPLE !== "undefined" ? FEED_PEOPLE : []).find(function (x) { return x && x.id === userId; }));
     if (p) return { id: p.id, name: p.name, handle: feedHandleOf(p.id), avatar: p.avatar };
     return { id: userId, name: userId, handle: userId, avatar: defaultAvatar() };
   }
-  function searchFeedCreators(q) {
-    const query = (q || "").trim().toLowerCase();
+  function allFeedPeople() {
     const byId = {};
-    const videos = allFeedVideos();
-    videos.forEach(function (v) {
-      if (!v || !v.userId) return;
-      const rec = feedCreatorRecord(v.userId);
-      const hay = ((rec.name || "") + " " + (rec.handle || "") + " " + (v.caption || "") + " " + (v.sound || "")).toLowerCase();
-      if (!query || hay.indexOf(query) !== -1) {
-        if (!byId[v.userId]) byId[v.userId] = rec;
-      }
+    (typeof PEOPLE !== "undefined" ? PEOPLE : []).forEach(function (p) {
+      if (p && p.id) byId[p.id] = feedCreatorRecord(p.id);
     });
-    if (query) {
-      (typeof PEOPLE !== "undefined" ? PEOPLE : []).forEach(function (p) {
-        if (!p || byId[p.id]) return;
-        const handle = feedHandleOf(p.id);
-        const hay = ((p.name || "") + " " + handle).toLowerCase();
-        if (hay.indexOf(query) !== -1) byId[p.id] = feedCreatorRecord(p.id);
-      });
-    }
+    (typeof FEED_PEOPLE !== "undefined" ? FEED_PEOPLE : []).forEach(function (p) {
+      if (p && p.id) byId[p.id] = feedCreatorRecord(p.id);
+    });
+    allFeedVideos().forEach(function (v) {
+      if (v && v.userId && !byId[v.userId]) byId[v.userId] = feedCreatorRecord(v.userId);
+    });
     return Object.keys(byId).map(function (id) { return byId[id]; });
   }
-  function renderFeedsSearch(q) {
+  function feedHandleNorm(h) {
+    return String(h || "").replace(/^@+/, "").trim().toLowerCase();
+  }
+  function rankPersonMatch(p, q) {
+    q = feedHandleNorm(q);
+    if (!q || !p) return 0;
+    const handle = feedHandleNorm(p.handle);
+    const name = (p.name || "").toLowerCase();
+    const first = name.split(/\s+/)[0] || "";
+    if (handle === q || name === q) return 300;
+    if (handle.indexOf(q) === 0) return 220 - Math.min(handle.length, 40);
+    if (first.indexOf(q) === 0) return 180;
+    if (name.indexOf(q) === 0) return 160;
+    if (handle.indexOf(q) !== -1) return 100;
+    if (name.indexOf(q) !== -1) return 80;
+    return 0;
+  }
+  function suggestFeedCreators(q) {
+    const query = (q || "").trim();
+    if (!query) return [];
+    return allFeedPeople().map(function (p) {
+      return { p: p, score: rankPersonMatch(p, query) };
+    }).filter(function (x) { return x.score > 0; })
+      .sort(function (a, b) { return b.score - a.score || String(a.p.name).localeCompare(String(b.p.name)); })
+      .map(function (x) { return x.p; });
+  }
+  function searchFeedCreators(q) { return suggestFeedCreators(q); }
+  function feedVideoText(v) {
+    const rec = feedCreatorRecord(v.userId);
+    const tags = (v.tags || []).join(" ");
+    const hashes = ((v.caption || "").match(/#\w+/g) || []).join(" ");
+    return [rec.name, rec.handle, v.caption || "", v.sound || "", tags, hashes, (v.hashtags || []).join(" ")].join(" ").toLowerCase();
+  }
+  function searchFeedVideos(q) {
+    const query = feedHandleNorm(q);
+    if (!query) return [];
+    const tokens = query.split(/\s+/).filter(Boolean);
+    return allFeedVideos().filter(function (v) {
+      if (!v) return false;
+      const hay = feedVideoText(v);
+      return tokens.every(function (tok) { return hay.indexOf(tok) !== -1; });
+    });
+  }
+  function feedsSearchPersonRow(p) {
+    const on = p.id !== "me" && typeof isFollowing === "function" && isFollowing(p.id);
+    const followBtn = (p.id === "me") ? "" : '<button type="button" class="btn '+(on ? "btn-ghost" : "btn-primary")+'" data-search-follow="'+escapeHtml(p.id)+'">'+(on ? "Following" : "Follow")+"</button>";
+    return '<div class="feeds-search-person" data-play-creator="'+escapeHtml(p.id)+'">'+
+      '<div class="av">'+avatarSVG(p.avatar, 48)+"</div>"+
+      '<div class="feeds-search-copy"><h4>'+escapeHtml(p.name)+"</h4><p>@"+escapeHtml(p.handle)+"</p></div>"+
+      followBtn+"</div>";
+  }
+  function feedsSearchVideoGrid(videos, query) {
+    if (!videos.length) return '<p class="feeds-search-hint">No videos for "'+escapeHtml(query)+'".</p>';
+    let pics = {};
+    try { pics = photos() || {}; } catch (err) { pics = {}; }
+    return '<div class="fs-video-grid">'+videos.map(function (v) {
+      const rec = feedCreatorRecord(v.userId);
+      const poster = v.posterSrc || pics[v.poster] || "";
+      const likeN = (v.likes || 0) + (likedFeedSet().indexOf(v.id) !== -1 ? 1 : 0);
+      return '<button type="button" class="fs-video-cell" data-search-video="'+escapeHtml(v.id)+'">'+
+        (poster ? '<img src="'+poster+'" alt="">' : '<video src="'+escapeHtml(v.src)+'" muted preload="metadata" playsinline></video>')+
+        '<div class="fs-video-meta">@'+escapeHtml(rec.handle)+' <span>\u2665 '+fmtCount(likeN)+"</span></div></button>";
+    }).join("")+"</div>";
+  }
+  function renderFeedsSearch(q, opts) {
+    opts = opts || {};
     const box = document.getElementById("feeds-search-results");
     if (!box) return;
     const query = (q || "").trim();
-    const people = searchFeedCreators(query);
+    const section = opts.section || box.dataset.section || "top";
+    if (query) box.dataset.section = section;
     if (!query) {
-      box.innerHTML = '<p class="feeds-search-hint">Search for a name, username or caption.</p>';
+      box.dataset.section = "top";
+      const recent = recentFeedSearches();
+      let html = "";
+      if (recent.length) {
+        html += '<div class="fs-block"><div class="fs-label">Recent</div><div class="fs-chips">'+
+          recent.map(function (s) { return '<button type="button" class="fs-chip" data-search-chip="'+escapeHtml(s)+'">'+escapeHtml(s)+"</button>"; }).join("")+
+          "</div></div>";
+      }
+      html += '<div class="fs-block"><div class="fs-label">Suggested</div><div class="fs-chips">'+
+        TRENDING_SEARCHES.map(function (s) { return '<button type="button" class="fs-chip" data-search-chip="'+escapeHtml(s)+'">'+escapeHtml(s)+"</button>"; }).join("")+
+        "</div></div>";
+      box.innerHTML = html;
       return;
     }
-    if (!people.length) {
+    const people = suggestFeedCreators(query);
+    const videos = searchFeedVideos(query);
+    if (!people.length && !videos.length) {
       box.innerHTML = '<p class="feeds-search-hint">No matches for "'+escapeHtml(query)+'".</p>';
       return;
     }
-    box.innerHTML = people.map(function (p) {
-      const on = p.id !== "me" && typeof isFollowing === "function" && isFollowing(p.id);
-      const followBtn = (p.id === "me") ? "" : '<button type="button" class="btn '+(on ? "btn-ghost" : "btn-primary")+'" data-search-follow="'+escapeHtml(p.id)+'">'+(on ? "Following" : "Follow")+"</button>";
-      return '<div class="feeds-search-person" data-play-creator="'+escapeHtml(p.id)+'">'+
-        '<div class="av">'+avatarSVG(p.avatar, 48)+"</div>"+
-        '<div class="feeds-search-copy"><h4>'+escapeHtml(p.name)+"</h4><p>@"+escapeHtml(p.handle)+"</p></div>"+
-        followBtn+"</div>";
-    }).join("");
+    function tabBtn(id, label) {
+      return '<button type="button" data-search-section="'+id+'" class="'+(section === id ? "on" : "")+'">'+label+"</button>";
+    }
+    let html = "";
+    if (people.length && section !== "videos") {
+      html += '<div class="fs-suggest">'+people.slice(0, 6).map(feedsSearchPersonRow).join("")+"</div>";
+    }
+    html += '<div class="fs-tabs">'+tabBtn("top", "Top")+tabBtn("videos", "Videos")+tabBtn("people", "People")+"</div>";
+    if (section === "people") {
+      html += people.length ? people.map(feedsSearchPersonRow).join("") : '<p class="feeds-search-hint">No people for "'+escapeHtml(query)+'".</p>';
+    } else if (section === "videos") {
+      html += feedsSearchVideoGrid(videos, query);
+    } else {
+      html += feedsSearchVideoGrid(videos, query);
+      if (people.length > 6) {
+        html += '<div class="fs-block"><div class="fs-label">People</div></div>'+people.slice(6).map(feedsSearchPersonRow).join("");
+      }
+    }
+    box.innerHTML = html;
   }
   function playCreatorFeed(id) {
     if (!id) return;
+    const q = document.getElementById("feeds-search-q");
+    if (q && q.value) rememberFeedSearch(q.value);
+    try { closeSearchVideoPlayer(); } catch (err) {}
     closeFeedsSearch();
     state.feedFocusUser = id;
     if (currentFeedsTab() !== "foryou") setFeedsTab("foryou", false, { keepFocus: true });
-    else renderDiscover();
-    const list = visibleFeedVideos({ focusUser: id });
+    else {
+      const root = document.getElementById("discover-feed");
+      if (root) root.dataset.mounted = "";
+      renderDiscover({ tab: "foryou", focusUser: id });
+    }
+    const list = visibleFeedVideos({ focusUser: id, tab: "foryou" });
     if (!list.length) toast("No videos from @" + feedHandleOf(id) + " yet");
+  }
+  function openSearchVideoPlayer(startId, videos) {
+    const wrap = document.getElementById("feeds-search-player");
+    const sc = document.getElementById("feeds-search-player-scroll");
+    if (!wrap || !sc) return;
+    videos = videos && videos.length ? videos : searchFeedVideos((document.getElementById("feeds-search-q") || {}).value);
+    if (!videos.length) return;
+    try { pauseAllFeedVideos(); } catch (err) {}
+    wrap.classList.add("open");
+    hideNav(true);
+    sc.innerHTML = videos.map(videoSlideHtml).join("");
+    videos.forEach(function (v) {
+      const slide = sc.querySelector('.vf-slide[data-feed-id="'+v.id+'"]');
+      if (slide) bindFeedVideoMedia(slide, v);
+    });
+    sizeVideoSlides();
+    bindVideoFeedClicks();
+    bindVideoFeedObserver(sc, sc);
+    const start = (startId && sc.querySelector('.vf-slide[data-feed-id="'+startId+'"]')) || sc.querySelector(".vf-slide");
+    if (start) { try { start.scrollIntoView(); } catch (err) {} }
+    requestAnimationFrame(function () {
+      sizeVideoSlides();
+      if (start) { try { start.scrollIntoView(); } catch (err) {} }
+      const vid = (start && start.querySelector("video")) || sc.querySelector("video");
+      if (vid) playFeedVideo(vid);
+    });
+  }
+  function closeSearchVideoPlayer() {
+    const wrap = document.getElementById("feeds-search-player");
+    const sc = document.getElementById("feeds-search-player-scroll");
+    if (sc) {
+      sc.querySelectorAll("video").forEach(function (v) {
+        try { v.pause(); v.removeAttribute("src"); v.load(); } catch (err) {}
+      });
+      sc.innerHTML = "";
+      if (feedVideoIOs && feedVideoIOs[sc.id]) {
+        try { feedVideoIOs[sc.id].disconnect(); } catch (err) {}
+        delete feedVideoIOs[sc.id];
+      }
+    }
+    if (wrap) wrap.classList.remove("open");
+    hideNav(false);
+  }
+  function applyFeedsSearchQuery(q, opts) {
+    const input = document.getElementById("feeds-search-q");
+    if (input) input.value = q;
+    if (opts && opts.remember) rememberFeedSearch(q);
+    renderFeedsSearch(q, opts);
   }
   function bindFeedsSearch() {
     if (bindFeedsSearch._done) return;
@@ -17154,11 +17445,44 @@
     if (btn) btn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); openFeedsSearch(); });
     const close = document.getElementById("feeds-search-close");
     if (close) close.addEventListener("click", function (e) { e.preventDefault(); closeFeedsSearch(); });
+    const pclose = document.getElementById("feeds-search-player-close");
+    if (pclose) pclose.addEventListener("click", function (e) { e.preventDefault(); closeSearchVideoPlayer(); });
     const input = document.getElementById("feeds-search-q");
-    if (input) input.addEventListener("input", function () { renderFeedsSearch(input.value); });
+    if (input) {
+      input.addEventListener("input", function () { renderFeedsSearch(input.value); });
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          rememberFeedSearch(input.value);
+          renderFeedsSearch(input.value);
+          try { input.blur(); } catch (err) {}
+        }
+      });
+    }
     const results = document.getElementById("feeds-search-results");
     if (results) {
       results.addEventListener("click", function (e) {
+        const chip = e.target.closest("[data-search-chip]");
+        if (chip) {
+          e.preventDefault(); e.stopPropagation();
+          applyFeedsSearchQuery(chip.getAttribute("data-search-chip") || "", { remember: true });
+          return;
+        }
+        const sec = e.target.closest("[data-search-section]");
+        if (sec) {
+          e.preventDefault(); e.stopPropagation();
+          results.dataset.section = sec.getAttribute("data-search-section") || "top";
+          renderFeedsSearch((input && input.value) || "", { section: results.dataset.section });
+          return;
+        }
+        const vid = e.target.closest("[data-search-video]");
+        if (vid) {
+          e.preventDefault(); e.stopPropagation();
+          const q = (input && input.value) || "";
+          rememberFeedSearch(q);
+          openSearchVideoPlayer(vid.getAttribute("data-search-video"), searchFeedVideos(q));
+          return;
+        }
         const fol = e.target.closest("[data-search-follow]");
         if (fol) {
           e.preventDefault(); e.stopPropagation();
@@ -17406,7 +17730,7 @@
       if (dy > 6) hideFeedsHead();
       else if (dy < -6) showFeedsHead();
     }
-    ["feeds-scroll-foryou", "feeds-scroll-notes"].forEach(function (id) {
+    ["feeds-scroll-foryou", "feeds-scroll-following", "feeds-scroll-notes"].forEach(function (id) {
       const el = document.getElementById(id);
       if (el) el.addEventListener("scroll", onScroll, { passive: true });
     });
@@ -17417,6 +17741,7 @@
     if (tab === "notifications") tab = "notifications";
     else if (tab === "following") tab = "following";
     else tab = "foryou";
+    const prev = typeof currentFeedsTab === "function" ? currentFeedsTab() : "foryou";
     if (tab === "foryou" && !opts.keepFocus) state.feedFocusUser = null;
     if (tab === "following") state.feedFocusUser = null;
     if (tab === "foryou" || tab === "following") state.lastVideoTab = tab;
@@ -17438,9 +17763,12 @@
       b.classList.toggle("on", on);
       b.setAttribute("aria-selected", on ? "true" : "false");
     });
+    if (prev !== tab) {
+      try { pauseFeedPane(prev); } catch (e) {}
+    }
     if (tab === "foryou" || tab === "following") {
-      try { renderDiscover(); } catch (e) {}
-      try { syncFeedsStories(); } catch (e) {}
+      try { renderDiscover({ tab: tab, reuse: prev !== tab || opts.reuse !== false, keepFocus: opts.keepFocus, focusUser: opts.keepFocus ? state.feedFocusUser : null }); } catch (e) {}
+      if (tab === "foryou") { try { syncFeedsStories(); } catch (e) {} }
     } else {
       try { pauseAllFeedVideos(); } catch (e) {}
       try { renderNotifications(); } catch (e) {}
@@ -17485,13 +17813,17 @@
     }
     const pager = document.getElementById("feeds-pager");
     if (!pager) return;
+    const FEEDS_TAB_ORDER = ["foryou", "following", "notifications"];
+    const FEEDS_PANE_PCT = 100 / 3;
     let x0 = 0, y0 = 0, tracking = false, horiz = null, start = 0;
-    function tabIndex() { return currentFeedsTab() === "notifications" ? 1 : 0; }
-    function videoTabName() { return state.lastVideoTab === "following" ? "following" : "foryou"; }
+    function tabIndex() {
+      const i = FEEDS_TAB_ORDER.indexOf(currentFeedsTab());
+      return i < 0 ? 0 : i;
+    }
     function ignoreSwipe(t) {
       const el = eventEl(t);
       if (!el) return true;
-      return !!el.closest(".stories-row, .trend-row, .hash-row, .creator-row, .feeds-tabs, input, textarea");
+      return !!el.closest(".stories-row, .trend-row, .hash-row, .creator-row, .feeds-tabs, #feeds-search, #feeds-search-player, input, textarea");
     }
     pager.addEventListener("pointerdown", function (e) {
       if (e.pointerType === "mouse" && e.button !== 0) return;
@@ -17506,8 +17838,8 @@
       e.preventDefault();
       pager.classList.add("dragging");
       const w = (pager.parentElement && pager.parentElement.clientWidth) || 390;
-      let x = (-start * 50) + (dx / w * 50);
-      x = Math.max(-50, Math.min(0, x));
+      let x = (-start * FEEDS_PANE_PCT) + (dx / w * FEEDS_PANE_PCT);
+      x = Math.max(-2 * FEEDS_PANE_PCT, Math.min(0, x));
       pager.style.transform = "translateX(" + x + "%)";
     }, { passive: false });
     function endSwipe(e) {
@@ -17519,9 +17851,9 @@
       const dx = (e && e.clientX != null ? e.clientX : x0) - x0;
       const w = (pager.parentElement && pager.parentElement.clientWidth) || 390;
       let next = start;
-      if (dx < -w * 0.18) next = 1;
-      if (dx > w * 0.18) next = 0;
-      setFeedsTab(next === 1 ? "notifications" : videoTabName());
+      if (dx < -w * 0.18) next = Math.min(2, start + 1);
+      if (dx > w * 0.18) next = Math.max(0, start - 1);
+      setFeedsTab(FEEDS_TAB_ORDER[next]);
       horiz = null;
     }
     window.addEventListener("pointerup", endSwipe);
@@ -19255,7 +19587,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 13. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 14. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -19454,6 +19786,10 @@
     const i = store.following.indexOf(id);
     if (i === -1) store.following.push(id); else store.following.splice(i, 1);
     saveStore();
+    try {
+      const ff = document.getElementById("following-feed");
+      if (ff) ff.dataset.mounted = "";
+    } catch (e) {}
     if (opts.silent) return;
     openCreatorProfile(id);
   }
@@ -21349,7 +21685,7 @@
     if (ptrActive) cancelPullRefresh(true);
     const target = kind === "notifications"
       ? (function () { const s = document.getElementById("feeds-scroll-notes"); return { scroll: s, host: s && s.parentElement }; })()
-      : (function () { const s = document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll"); return { scroll: s, host: s && s.parentElement }; })();
+      : (function () { const s = (typeof currentFeedsScroll === "function" && currentFeedsScroll()) || document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll"); return { scroll: s, host: s && s.parentElement }; })();
     if (!target || !target.scroll || !target.host) return;
     bindPullRefresh(target.scroll, { kind: kind, host: target.host });
     const indicator = ensurePtrIndicator(target.host, kind);
@@ -21390,7 +21726,7 @@
     try { showFeedsHead(); } catch (e) {}
     const scroll = kind === "notifications"
       ? document.getElementById("feeds-scroll-notes")
-      : (document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll"));
+      : ((typeof currentFeedsScroll === "function" && currentFeedsScroll()) || document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll"));
     if (scroll) {
       try { scroll.scrollTop = 0; } catch (e) {}
     }
@@ -21601,6 +21937,8 @@
     if (chat) bindPullRefresh(chat, { kind: "chat", host: document.getElementById("page-chat") });
     const feeds = document.getElementById("feeds-scroll-foryou") || document.querySelector("#page-feeds .scroll");
     if (feeds) bindPullRefresh(feeds, { kind: "feeds", host: feeds.parentElement });
+    const following = document.getElementById("feeds-scroll-following");
+    if (following) bindPullRefresh(following, { kind: "feeds", host: following.parentElement });
     const notes = document.getElementById("feeds-scroll-notes");
     if (notes) bindPullRefresh(notes, { kind: "notifications", host: notes.parentElement });
     const arch = document.getElementById("archived-list");
@@ -21608,6 +21946,7 @@
   }
   try { bindAllPullRefresh(); } catch (e) { console.warn("bindAllPullRefresh", e); }
   try { window.__gatherPtr = { set: setPullRefresh, get: getPullRefresh, refresh: startFeedsIconRefresh }; } catch (e) {}
+  try { window.__gatherFeed = { searchVideos: searchFeedVideos, suggest: suggestFeedCreators, all: allFeedVideos, collectUser: collectUserFeedVideos, store: function(){ return store; }, tab: currentFeedsTab, setTab: setFeedsTab }; } catch (e) {}
 
   function registerGatherSW() {
     if (!("serviceWorker" in navigator)) return;

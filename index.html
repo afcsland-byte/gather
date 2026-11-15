@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="12">
+<html lang="en" data-theme="white" data-build="13">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -1858,13 +1858,15 @@
     }
     .feeds-top-spacer { width: 36px; height: 36px; flex: none; }
     .feeds-tabs {
-      display: flex; align-items: stretch; gap: 22px;
-      margin: 0; padding: 0 16px;
+      display: flex; align-items: stretch; gap: 14px;
+      margin: 0; padding: 0 12px;
       background: transparent; border-radius: 0;
+      overflow-x: auto; scrollbar-width: none;
     }
+    .feeds-tabs::-webkit-scrollbar { display: none; }
     .feeds-tabs button {
       flex: none; height: 48px; padding: 0 1px 8px;
-      border-radius: 0; font-weight: 700; font-size: 18px;
+      border-radius: 0; font-weight: 700; font-size: 16px;
       letter-spacing: -0.03em; color: #8E8E93;
       background: transparent; position: relative;
       touch-action: manipulation;
@@ -1899,7 +1901,8 @@
       will-change: transform;
     }
     #feeds-pager.dragging { transition: none; }
-    #page-feeds.tab-foryou #feeds-pager { transform: translateX(0); }
+    #page-feeds.tab-foryou #feeds-pager,
+    #page-feeds.tab-following #feeds-pager { transform: translateX(0); }
     #page-feeds.tab-notifications #feeds-pager { transform: translateX(-50%); }
     .feeds-pane { flex: 0 0 50%; width: 50%; height: 100%; position: relative; overflow: hidden; }
     .feeds-pane > .scroll { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-top: var(--feeds-head-h); box-sizing: border-box; }
@@ -4209,46 +4212,64 @@
     }
 
     /* v12 For you — full-screen video feed */
-    #page-feeds.tab-foryou { background: #000; }
-    #page-feeds.tab-foryou .feeds-head {
+    #page-feeds.tab-foryou, #page-feeds.tab-following { background: #000; }
+    #page-feeds.tab-foryou .feeds-head,
+    #page-feeds.tab-following .feeds-head {
       background: transparent;
       border-bottom: 0;
       pointer-events: none;
     }
     #page-feeds.tab-foryou .feeds-head .feeds-avatar,
-    #page-feeds.tab-foryou .feeds-head .feeds-tabs button {
+    #page-feeds.tab-foryou .feeds-head .feeds-tabs button,
+    #page-feeds.tab-foryou .feeds-head .feeds-search-btn,
+    #page-feeds.tab-following .feeds-head .feeds-avatar,
+    #page-feeds.tab-following .feeds-head .feeds-tabs button,
+    #page-feeds.tab-following .feeds-head .feeds-search-btn {
       pointer-events: auto;
     }
     #page-feeds.tab-foryou .feeds-brand,
     #page-feeds.tab-foryou .feeds-brand-name,
-    #page-feeds.tab-foryou .feeds-brand-mark {
+    #page-feeds.tab-foryou .feeds-brand-mark,
+    #page-feeds.tab-following .feeds-brand,
+    #page-feeds.tab-following .feeds-brand-name,
+    #page-feeds.tab-following .feeds-brand-mark {
       color: #fff;
       filter: drop-shadow(0 1px 6px rgba(0,0,0,.55));
     }
-    #page-feeds.tab-foryou .feeds-tabs button {
+    #page-feeds.tab-foryou .feeds-tabs button,
+    #page-feeds.tab-following .feeds-tabs button {
       color: rgba(255,255,255,.72);
       text-shadow: 0 1px 8px rgba(0,0,0,.5);
     }
-    #page-feeds.tab-foryou .feeds-tabs button.on {
+    #page-feeds.tab-foryou .feeds-tabs button.on,
+    #page-feeds.tab-following .feeds-tabs button.on {
       color: #fff;
       font-weight: 800;
     }
-    #page-feeds.tab-foryou .feeds-tabs button.on::after {
+    #page-feeds.tab-foryou .feeds-tabs button.on::after,
+    #page-feeds.tab-following .feeds-tabs button.on::after {
       background: #fff;
       box-shadow: 0 1px 6px rgba(0,0,0,.4);
     }
-    #page-feeds.tab-foryou .feeds-avatar-face {
+    #page-feeds.tab-foryou .feeds-avatar-face,
+    #page-feeds.tab-following .feeds-avatar-face {
       box-shadow: 0 0 0 1.5px rgba(255,255,255,.9), 0 2px 8px rgba(0,0,0,.4);
     }
-    #page-feeds.tab-foryou .feeds-avatar-dot { box-shadow: 0 0 0 2px #000; }
-    #page-feeds.tab-foryou .feeds-pane[data-feeds-pane="foryou"] > .scroll {
+    #page-feeds.tab-foryou .feeds-avatar-dot,
+    #page-feeds.tab-following .feeds-avatar-dot { box-shadow: 0 0 0 2px #000; }
+    #page-feeds.tab-foryou .feeds-search-btn,
+    #page-feeds.tab-following .feeds-search-btn { color: #fff; filter: drop-shadow(0 1px 6px rgba(0,0,0,.55)); }
+    #page-feeds.tab-foryou .feeds-pane[data-feeds-pane="foryou"] > .scroll,
+    #page-feeds.tab-following .feeds-pane[data-feeds-pane="foryou"] > .scroll {
       padding-top: 0;
       scroll-snap-type: y mandatory;
       scroll-snap-stop: always;
       background: #000;
     }
-    #page-feeds.tab-foryou #feeds-stories { display: none !important; }
-    #page-feeds.tab-foryou .feeds-pane[data-feeds-pane="foryou"] > .ptr-indicator {
+    #page-feeds.tab-foryou #feeds-stories,
+    #page-feeds.tab-following #feeds-stories { display: none !important; }
+    #page-feeds.tab-foryou .feeds-pane[data-feeds-pane="foryou"] > .ptr-indicator,
+    #page-feeds.tab-following .feeds-pane[data-feeds-pane="foryou"] > .ptr-indicator {
       top: var(--feeds-head-h);
       z-index: 9;
     }
@@ -4291,21 +4312,21 @@
       pointer-events: none; z-index: 2;
     }
     .vf-actions {
-      position: absolute; right: 8px; bottom: 92px; z-index: 3;
-      display: flex; flex-direction: column; align-items: center; gap: 16px;
+      position: absolute; right: 6px; bottom: 22px; z-index: 3;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
       color: #fff;
     }
     .vf-actions button {
       background: transparent; border: 0; color: #fff;
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      font-size: 12px; font-weight: 700; text-shadow: 0 1px 6px rgba(0,0,0,.5);
-      padding: 0; width: 52px;
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+      font-size: 11px; font-weight: 700; text-shadow: 0 1px 6px rgba(0,0,0,.5);
+      padding: 0; width: 48px;
     }
-    .vf-actions svg { width: 32px; height: 32px; filter: drop-shadow(0 1px 4px rgba(0,0,0,.5)); }
+    .vf-actions svg { width: 26px; height: 26px; filter: drop-shadow(0 1px 4px rgba(0,0,0,.5)); }
     .vf-actions button.on .vf-heart { fill: #FF375F; stroke: #FF375F; }
     .vf-actions button.on.saved svg { fill: #fff; }
-    .vf-av-btn { position: relative; width: 48px; height: 48px; padding: 0; }
-    .vf-av-btn .av, .vf-av-btn svg:not(.vf-ico) { width: 48px; height: 48px; border-radius: 50%; display: block; box-shadow: 0 0 0 1.5px #fff; }
+    .vf-av-btn { position: relative; width: 42px; height: 42px; padding: 0; }
+    .vf-av-btn .av, .vf-av-btn svg:not(.vf-ico) { width: 42px; height: 42px; border-radius: 50%; display: block; box-shadow: 0 0 0 1.5px #fff; }
     .vf-follow {
       position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%);
       width: 20px; height: 20px; border-radius: 50%;
@@ -4315,7 +4336,7 @@
     }
     .vf-follow.is-on { background: #34C759; font-size: 12px; }
     .vf-disc {
-      width: 46px; height: 46px; border-radius: 50%; padding: 0;
+      width: 40px; height: 40px; border-radius: 50%; padding: 0;
       background:
         radial-gradient(circle at 50% 50%, #1a1a1a 0 7px, transparent 8px),
         repeating-radial-gradient(circle at 50% 50%, #3a3a3a 0 1px, #777 2px, #2a2a2a 3px);
@@ -4332,7 +4353,7 @@
     }
     @keyframes vf-spin { to { transform: rotate(360deg); } }
     .vf-meta {
-      position: absolute; left: 14px; right: 72px; bottom: 18px; z-index: 3;
+      position: absolute; left: 14px; right: 68px; bottom: 22px; z-index: 3;
       color: #fff;
       text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 2px 12px rgba(0,0,0,.7);
     }
@@ -4355,6 +4376,52 @@
       35% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
       100% { transform: translate(-50%,-70%) scale(1); opacity: 0; }
     }
+    .feeds-search-btn {
+      width: 36px; height: 36px; border-radius: 50%; padding: 0;
+      display: grid; place-items: center; flex: none;
+      background: transparent; color: var(--text); border: 0;
+    }
+    .feeds-search-btn svg { width: 20px; height: 20px; display: block; }
+    #feeds-search {
+      display: none; position: absolute; inset: 0; z-index: 22;
+      background: rgba(255,255,255,.96); color: #111;
+      padding-top: var(--safe-top);
+      flex-direction: column;
+      -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+    }
+    #feeds-search.open { display: flex; }
+    .feeds-search-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px 8px;
+    }
+    .feeds-search-row .icon-round { flex: none; background: rgba(0,0,0,.06); color: #111; }
+    #feeds-search-q {
+      flex: 1; height: 40px; border: 0; border-radius: 12px;
+      background: #F2F2F7; color: #111; padding: 0 14px;
+      font-size: 16px; outline: none;
+    }
+    #feeds-search-results { flex: 1; overflow-y: auto; padding: 4px 0 16px; }
+    .feeds-search-hint { padding: 24px 20px; color: #8E8E93; font-size: 14px; text-align: center; }
+    .feeds-search-person {
+      display: flex; align-items: center; gap: 12px; flex-wrap: nowrap;
+      width: 100%; padding: 10px 16px; border: 0; background: transparent;
+      color: #111; text-align: left; cursor: pointer;
+    }
+    .feeds-search-person .av { flex: none; width: 48px; height: 48px; }
+    .feeds-search-copy { flex: 1; min-width: 0; }
+    .feeds-search-copy h4 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+    .feeds-search-copy p { font-size: 13px; color: #8E8E93; margin-top: 1px; }
+    .feeds-search-person .btn,
+    .feeds-search-person .btn-primary,
+    .feeds-search-person .btn-ghost { width: auto !important; flex: 0 0 auto; padding: 8px 14px; font-size: 13px; height: 34px; min-width: 88px; }
+    .vf-empty {
+      height: 100%; min-height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: calc(var(--feeds-head-h) + 12px) 32px 24px; color: #fff;
+      scroll-snap-align: start; box-sizing: border-box;
+    }
+    .vf-empty p { font-size: 16px; font-weight: 600; line-height: 1.35; text-shadow: 0 1px 8px rgba(0,0,0,.5); }
+    .vf-empty .btn { width: auto; margin-top: 16px; padding: 10px 18px; }
     #feed-comments-sheet { z-index: 90; }
     #feed-comments-card { max-height: 62%; display: flex; flex-direction: column; padding: 8px 0 calc(10px + var(--safe-bot)); }
     #feed-comments-card h3 { padding: 10px 16px 8px; }
@@ -4450,10 +4517,13 @@
               <svg class="feeds-brand-mark" viewBox="7 5.5 18 21"><path fill="currentColor" d="M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z"/></svg>
               <span class="feeds-brand-name">Gather</span>
             </div>
-            <span class="feeds-top-spacer" aria-hidden="true"></span>
+            <button type="button" class="feeds-search-btn" id="feeds-search-btn" aria-label="Search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+            </button>
           </div>
           <div class="feeds-tabs" id="feeds-tabs" role="tablist" aria-label="Feeds">
             <button type="button" role="tab" data-feeds-tab="foryou" aria-selected="true" class="on">For you</button>
+            <button type="button" role="tab" data-feeds-tab="following" aria-selected="false">Following</button>
             <button type="button" role="tab" data-feeds-tab="notifications" aria-selected="false">Notifications<span class="feeds-tab-badge" id="feeds-notes-badge" hidden></span></button>
           </div>
         </div>
@@ -4467,6 +4537,13 @@
           <div class="feeds-pane" data-feeds-pane="notifications">
             <div class="scroll" id="feeds-scroll-notes"></div>
           </div>
+        </div>
+        <div id="feeds-search" aria-hidden="true">
+          <div class="feeds-search-row">
+            <button type="button" class="icon-round" id="feeds-search-close" aria-label="Close">←</button>
+            <input id="feeds-search-q" type="search" enterkeyhint="search" placeholder="Search names and videos" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </div>
+          <div id="feeds-search-results"></div>
         </div>
       </section>
 <section class="page" data-page="chat" id="page-chat">
@@ -7856,7 +7933,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 12. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 13. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -16604,6 +16681,18 @@
     }
     return feedPostOrder.map(function (id) { return byId[id]; }).filter(Boolean);
   }
+  function visibleFeedVideos(opts) {
+    opts = opts || {};
+    var list = allFeedVideos(opts);
+    var focus = opts.focusUser || (state && state.feedFocusUser);
+    if (focus) {
+      return list.filter(function (v) { return v && v.userId === focus; });
+    }
+    if (typeof currentFeedsTab === "function" && currentFeedsTab() === "following") {
+      return list.filter(function (v) { return v && v.userId && v.userId !== "me" && typeof isFollowing === "function" && isFollowing(v.userId); });
+    }
+    return list;
+  }
   function likedFeedSet() {
     if (!Array.isArray(store.likedFeed)) store.likedFeed = [];
     return store.likedFeed;
@@ -16670,7 +16759,7 @@
     if (!sc) return;
     const h = sc.clientHeight;
     if (!h) return;
-    sc.querySelectorAll(".vf-slide").forEach(function (el) { el.style.height = h + "px"; });
+    sc.querySelectorAll(".vf-slide, .vf-empty").forEach(function (el) { el.style.height = h + "px"; });
   }
   function pauseAllFeedVideos(except) {
     document.querySelectorAll("#discover-feed video").forEach(function (v) {
@@ -16885,7 +16974,7 @@
       if (follow) {
         e.preventDefault(); e.stopPropagation();
         const id = follow.getAttribute("data-vf-follow");
-        if (id && typeof toggleFollow === "function") toggleFollow(id);
+        if (id && typeof toggleFollow === "function") toggleFollow(id, { silent: true });
         const on = typeof isFollowing === "function" && isFollowing(id);
         document.querySelectorAll('[data-vf-follow="'+id+'"]').forEach(function (b) {
           b.classList.toggle("is-on", on);
@@ -16893,6 +16982,7 @@
         });
         return;
       }
+      if (e.target.closest("#btn-following-to-foryou")) { e.preventDefault(); e.stopPropagation(); setFeedsTab("foryou"); return; }
       if (e.target.closest("[data-vf-mute]")) { e.preventDefault(); e.stopPropagation(); toggleFeedSound(); return; }
       const like = e.target.closest("[data-vf-like]");
       if (like) { e.preventDefault(); e.stopPropagation(); likeFeedVideo(like.getAttribute("data-vf-like")); return; }
@@ -16938,8 +17028,16 @@
     opts = opts || {};
     const root = document.getElementById("discover-feed");
     if (!root) return;
-    const videos = opts.refresh ? pickFreshFeedCards() : currentFeedCards();
+    if (opts.refresh) state.feedFocusUser = null;
+    const videos = opts.refresh ? visibleFeedVideos({ refresh: true }) : visibleFeedVideos();
     root.className = "feed video-feed";
+    if (!videos.length && typeof currentFeedsTab === "function" && currentFeedsTab() === "following") {
+      root.innerHTML = '<div class="vf-empty" id="following-empty"><p>Follow creators to see their videos here</p><button type="button" class="btn btn-primary" id="btn-following-to-foryou">For you</button></div>';
+      try { pauseAllFeedVideos(); } catch (err) {}
+      if (feedVideoIO) { try { feedVideoIO.disconnect(); } catch (err) {} }
+      sizeVideoSlides();
+      return;
+    }
     root.innerHTML = videos.map(videoSlideHtml).join("");
     videos.forEach(function (v) {
       const slide = root.querySelector('.vf-slide[data-feed-id="'+v.id+'"]');
@@ -16953,7 +17051,7 @@
     requestAnimationFrame(function () {
       sizeVideoSlides();
       const first = root.querySelector(".vf-slide video");
-      if (first && currentFeedsTab() === "foryou" && state.page === PAGE.feeds) {
+      if (first && (currentFeedsTab() === "foryou" || currentFeedsTab() === "following") && state.page === PAGE.feeds) {
         const visible = sc && sc.scrollTop < (sc.clientHeight * 0.5);
         if (visible || opts.refresh || sc && sc.scrollTop === 0) playFeedVideo(first);
       }
@@ -16962,8 +17060,133 @@
   }
 
 
+  function openFeedsSearch() {
+    const box = document.getElementById("feeds-search");
+    if (!box) return;
+    box.classList.add("open");
+    box.removeAttribute("hidden");
+    box.setAttribute("aria-hidden", "false");
+    const input = document.getElementById("feeds-search-q");
+    renderFeedsSearch("");
+    if (input) {
+      input.value = "";
+      setTimeout(function () { try { input.focus(); } catch (err) {} }, 50);
+    }
+  }
+  function closeFeedsSearch() {
+    const box = document.getElementById("feeds-search");
+    if (!box) return;
+    box.classList.remove("open");
+    box.setAttribute("aria-hidden", "true");
+    const input = document.getElementById("feeds-search-q");
+    if (input) input.blur();
+  }
+  function feedCreatorRecord(userId) {
+    if (userId === "me") {
+      return {
+        id: "me",
+        name: (store.profile && store.profile.name) || "You",
+        handle: feedHandleOf("me"),
+        avatar: (store.profile && store.profile.avatar) || defaultAvatar()
+      };
+    }
+    const p = personById[userId];
+    if (p) return { id: p.id, name: p.name, handle: feedHandleOf(p.id), avatar: p.avatar };
+    return { id: userId, name: userId, handle: userId, avatar: defaultAvatar() };
+  }
+  function searchFeedCreators(q) {
+    const query = (q || "").trim().toLowerCase();
+    const byId = {};
+    const videos = allFeedVideos();
+    videos.forEach(function (v) {
+      if (!v || !v.userId) return;
+      const rec = feedCreatorRecord(v.userId);
+      const hay = ((rec.name || "") + " " + (rec.handle || "") + " " + (v.caption || "") + " " + (v.sound || "")).toLowerCase();
+      if (!query || hay.indexOf(query) !== -1) {
+        if (!byId[v.userId]) byId[v.userId] = rec;
+      }
+    });
+    if (query) {
+      (typeof PEOPLE !== "undefined" ? PEOPLE : []).forEach(function (p) {
+        if (!p || byId[p.id]) return;
+        const handle = feedHandleOf(p.id);
+        const hay = ((p.name || "") + " " + handle).toLowerCase();
+        if (hay.indexOf(query) !== -1) byId[p.id] = feedCreatorRecord(p.id);
+      });
+    }
+    return Object.keys(byId).map(function (id) { return byId[id]; });
+  }
+  function renderFeedsSearch(q) {
+    const box = document.getElementById("feeds-search-results");
+    if (!box) return;
+    const query = (q || "").trim();
+    const people = searchFeedCreators(query);
+    if (!query) {
+      box.innerHTML = '<p class="feeds-search-hint">Search for a name, username or caption.</p>';
+      return;
+    }
+    if (!people.length) {
+      box.innerHTML = '<p class="feeds-search-hint">No matches for "'+escapeHtml(query)+'".</p>';
+      return;
+    }
+    box.innerHTML = people.map(function (p) {
+      const on = p.id !== "me" && typeof isFollowing === "function" && isFollowing(p.id);
+      const followBtn = (p.id === "me") ? "" : '<button type="button" class="btn '+(on ? "btn-ghost" : "btn-primary")+'" data-search-follow="'+escapeHtml(p.id)+'">'+(on ? "Following" : "Follow")+"</button>";
+      return '<div class="feeds-search-person" data-play-creator="'+escapeHtml(p.id)+'">'+
+        '<div class="av">'+avatarSVG(p.avatar, 48)+"</div>"+
+        '<div class="feeds-search-copy"><h4>'+escapeHtml(p.name)+"</h4><p>@"+escapeHtml(p.handle)+"</p></div>"+
+        followBtn+"</div>";
+    }).join("");
+  }
+  function playCreatorFeed(id) {
+    if (!id) return;
+    closeFeedsSearch();
+    state.feedFocusUser = id;
+    if (currentFeedsTab() !== "foryou") setFeedsTab("foryou", false, { keepFocus: true });
+    else renderDiscover();
+    const list = visibleFeedVideos({ focusUser: id });
+    if (!list.length) toast("No videos from @" + feedHandleOf(id) + " yet");
+  }
+  function bindFeedsSearch() {
+    if (bindFeedsSearch._done) return;
+    bindFeedsSearch._done = true;
+    const btn = document.getElementById("feeds-search-btn");
+    if (btn) btn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); openFeedsSearch(); });
+    const close = document.getElementById("feeds-search-close");
+    if (close) close.addEventListener("click", function (e) { e.preventDefault(); closeFeedsSearch(); });
+    const input = document.getElementById("feeds-search-q");
+    if (input) input.addEventListener("input", function () { renderFeedsSearch(input.value); });
+    const results = document.getElementById("feeds-search-results");
+    if (results) {
+      results.addEventListener("click", function (e) {
+        const fol = e.target.closest("[data-search-follow]");
+        if (fol) {
+          e.preventDefault(); e.stopPropagation();
+          const id = fol.getAttribute("data-search-follow");
+          if (id && typeof toggleFollow === "function") toggleFollow(id, { silent: true });
+          const on = typeof isFollowing === "function" && isFollowing(id);
+          fol.textContent = on ? "Following" : "Follow";
+          fol.className = "btn " + (on ? "btn-ghost" : "btn-primary");
+          return;
+        }
+        const row = e.target.closest("[data-play-creator]");
+        if (row) {
+          e.preventDefault();
+          playCreatorFeed(row.getAttribute("data-play-creator"));
+        }
+      });
+    }
+  }
+
   function currentFeedsTab() {
-    return (store && store.feedsTab === "notifications") ? "notifications" : "foryou";
+    const tab = store && store.feedsTab;
+    if (tab === "notifications") return "notifications";
+    if (tab === "following") return "following";
+    return "foryou";
+  }
+  function isVideoFeedsTab(tab) {
+    tab = tab || currentFeedsTab();
+    return tab === "foryou" || tab === "following";
   }
   function unreadNotificationCount() {
     return (store.notifications || []).filter(function (n) { return n && !n.read; }).length;
@@ -17156,7 +17379,7 @@
     if (page) page.classList.remove("feeds-head-hidden");
   }
   function hideFeedsHead() {
-    if (typeof currentFeedsTab === "function" && currentFeedsTab() === "foryou") {
+    if (typeof isVideoFeedsTab === "function" && isVideoFeedsTab()) {
       showFeedsHead();
       return;
     }
@@ -17189,13 +17412,20 @@
     });
     try { window.addEventListener("resize", measureFeedsHead); } catch (e) {}
   }
-  function setFeedsTab(tab, instant) {
-    tab = (tab === "notifications") ? "notifications" : "foryou";
+  function setFeedsTab(tab, instant, opts) {
+    opts = opts || {};
+    if (tab === "notifications") tab = "notifications";
+    else if (tab === "following") tab = "following";
+    else tab = "foryou";
+    if (tab === "foryou" && !opts.keepFocus) state.feedFocusUser = null;
+    if (tab === "following") state.feedFocusUser = null;
+    if (tab === "foryou" || tab === "following") state.lastVideoTab = tab;
     store.feedsTab = tab;
     try { saveStore(); } catch (e) {}
     const page = document.getElementById("page-feeds");
     if (page) {
       page.classList.toggle("tab-foryou", tab === "foryou");
+      page.classList.toggle("tab-following", tab === "following");
       page.classList.toggle("tab-notifications", tab === "notifications");
     }
     const pager = document.getElementById("feeds-pager");
@@ -17208,7 +17438,7 @@
       b.classList.toggle("on", on);
       b.setAttribute("aria-selected", on ? "true" : "false");
     });
-    if (tab === "foryou") {
+    if (tab === "foryou" || tab === "following") {
       try { renderDiscover(); } catch (e) {}
       try { syncFeedsStories(); } catch (e) {}
     } else {
@@ -17223,6 +17453,7 @@
     try { paintFeedsAvatar(); } catch (e) {}
     try { measureFeedsHead(); } catch (e) {}
     setFeedsTab(currentFeedsTab(), true);
+    try { bindFeedsSearch(); } catch (e) {}
     try { bindFeedsHeadScroll(); } catch (e) {}
     requestAnimationFrame(function () { try { measureFeedsHead(); } catch (e) {} });
     if (initFeedsTabs._bound) return;
@@ -17256,6 +17487,7 @@
     if (!pager) return;
     let x0 = 0, y0 = 0, tracking = false, horiz = null, start = 0;
     function tabIndex() { return currentFeedsTab() === "notifications" ? 1 : 0; }
+    function videoTabName() { return state.lastVideoTab === "following" ? "following" : "foryou"; }
     function ignoreSwipe(t) {
       const el = eventEl(t);
       if (!el) return true;
@@ -17289,7 +17521,7 @@
       let next = start;
       if (dx < -w * 0.18) next = 1;
       if (dx > w * 0.18) next = 0;
-      setFeedsTab(next === 1 ? "notifications" : "foryou");
+      setFeedsTab(next === 1 ? "notifications" : videoTabName());
       horiz = null;
     }
     window.addEventListener("pointerup", endSwipe);
@@ -19023,7 +19255,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 12. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 13. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -19215,12 +19447,14 @@
 
     function openProfile() { openCreatorProfile("me"); }
   function isFollowing(id) { return (store.following || []).indexOf(id) !== -1; }
-  function toggleFollow(id) {
+  function toggleFollow(id, opts) {
     if (!id || id === "me") return;
+    opts = opts || {};
     if (!store.following) store.following = [];
     const i = store.following.indexOf(id);
     if (i === -1) store.following.push(id); else store.following.splice(i, 1);
     saveStore();
+    if (opts.silent) return;
     openCreatorProfile(id);
   }
   function openCreatorProfile(id) {
@@ -20484,7 +20718,7 @@
         if (!prof || !prof.classList.contains("open")) return false;
         try { if (typeof isPostSheetOpen === "function" && isPostSheetOpen()) return false; } catch (err) {}
       }
-      if (kind === "feeds" && typeof currentFeedsTab === "function" && currentFeedsTab() !== "foryou") return false;
+      if (kind === "feeds" && typeof isVideoFeedsTab === "function" && !isVideoFeedsTab()) return false;
       if (kind === "notifications" && typeof currentFeedsTab === "function" && currentFeedsTab() !== "notifications") return false;
       const thread = document.getElementById("thread");
       if (thread && thread.classList.contains("open")) return false;

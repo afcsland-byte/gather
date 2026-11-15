@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="22">
+<html lang="en" data-theme="white" data-build="23">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="22" />
+  <meta name="gather-build" content="23" />
   <title>Gather</title>
   <link rel="preconnect" href="https://assets.mixkit.co" crossorigin>
   <link rel="dns-prefetch" href="https://assets.mixkit.co">
@@ -1296,7 +1296,7 @@
     .thread {
       position: absolute; inset: 0; z-index: 50; display: flex; flex-direction: column;
       background: #000; transform: translateX(100%); overflow: hidden;
-      transition: transform .28s cubic-bezier(.2,.8,.2,1); pointer-events: none;
+      transition: none; pointer-events: none;
       min-height: 0;
     }
     .thread.open { transform: translateX(0); pointer-events: auto; }
@@ -1678,7 +1678,7 @@
       position: absolute; inset: 0; z-index: 60; background: var(--overlay);
       display: flex; flex-direction: column;
       transform: translateX(100%);
-      transition: transform .28s cubic-bezier(.2,.8,.2,1);
+      transition: none;
       pointer-events: none;
     }
     .overlay.open { transform: translateX(0); pointer-events: auto; }
@@ -6207,7 +6207,8 @@
       themeChosen: false,
       mapLayer: "streets",
       view3d: false,
-      following: [],
+      following: ["kwame","efua","kojo","ama","lydia","yaw"],
+      followingSeeded: true,
       likedPosts: [],
       spotlightPosts: [],
       userPosts: [],
@@ -6263,6 +6264,10 @@
     ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports","notifications","commRequests","supportTickets","likedFeed","savedFeed","recentFeedSearches"].forEach(function (k) {
       if (!Array.isArray(s[k])) s[k] = Array.isArray(blank[k]) ? blank[k].slice() : [];
     });
+    if (!s.followingSeeded) {
+      if (!s.following.length) s.following = ["kwame","efua","kojo","ama","lydia","yaw"];
+      s.followingSeeded = true;
+    }
     if (!s.feedComments || typeof s.feedComments !== "object") s.feedComments = {};
     if (!s.rank || typeof s.rank !== "object" || Array.isArray(s.rank)) s.rank = { xp: 0, messages: 0, games: 0, roomsJoined: 0, roomsHosted: 0, lastDay: "", streak: 0 };
     if (!s.gameVotes || typeof s.gameVotes !== "object" || Array.isArray(s.gameVotes)) s.gameVotes = {};
@@ -6847,6 +6852,7 @@
   /* ---------- pager / swipe ---------- */
   function goPage(i, instant) {
     i = Math.max(0, Math.min(PAGES.length-1, i));
+    if (instant == null) instant = true;
     if (i === PAGE.camera && state.page !== PAGE.camera) state.pageBeforeCamera = state.page;
     state.page = i;
     const pager = $("#pager");
@@ -8123,7 +8129,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 22. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 23. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -8424,9 +8430,10 @@
     try { scheduleReadReceipts(id); } catch (e) {}
     const th = $("#thread");
     if (th) {
-      th.classList.remove("settled");
-      th.classList.add("open");
-      setTimeout(settleOpenThread, 300);
+      th.classList.remove("dragging", "swiping-back");
+      th.classList.add("open", "settled");
+      th.style.transition = "none";
+      th.style.transform = "";
     }
     try { hideNav(true); } catch (e) {}
     try { closeSheet(); } catch (e) {}
@@ -17300,26 +17307,35 @@
   function currentFeedCards() { return allFeedVideos(); }
   function ensureFeedsWarmPreload() {
     try {
-      const first = visibleFeedVideos({ tab: "foryou" })[0];
-      if (!first || !first.src) return;
-      let el = document.getElementById("feeds-warm-video");
-      if (!el) {
-        el = document.createElement("video");
-        el.id = "feeds-warm-video";
-        el.muted = true;
-        el.playsInline = true;
-        el.preload = "auto";
-        el.setAttribute("playsinline", "");
-        el.setAttribute("webkit-playsinline", "");
-        el.style.cssText = "position:fixed;left:-120px;top:-120px;width:2px;height:2px;opacity:0;pointer-events:none;";
-        document.body.appendChild(el);
-      }
-      if (el.getAttribute("src") !== first.src) {
-        el.setAttribute("preload", "auto");
-        el.src = first.src;
-        try { el.load(); } catch (e) {}
-      }
+      [["foryou", "feeds-warm-video"], ["following", "feeds-warm-following"]].forEach(function (pair) {
+        const first = visibleFeedVideos({ tab: pair[0] })[0];
+        if (!first || !first.src) return;
+        let el = document.getElementById(pair[1]);
+        if (!el) {
+          el = document.createElement("video");
+          el.id = pair[1];
+          el.muted = true;
+          el.playsInline = true;
+          el.preload = "auto";
+          el.setAttribute("playsinline", "");
+          el.setAttribute("webkit-playsinline", "");
+          el.style.cssText = "position:fixed;left:-120px;top:-120px;width:2px;height:2px;opacity:0;pointer-events:none;";
+          document.body.appendChild(el);
+        }
+        if (el.getAttribute("src") !== first.src) {
+          el.setAttribute("preload", "auto");
+          el.src = first.src;
+          try { el.load(); } catch (e) {}
+        }
+      });
     } catch (e) {}
+  }
+  function mountSideFeeds() {
+    try {
+      const follow = document.getElementById("following-feed");
+      if (follow && follow.dataset.mounted !== "1") renderDiscover({ tab: "following" });
+    } catch (e) { console.warn("mountSideFeeds following", e); }
+    try { renderNotifications(); } catch (e) { console.warn("mountSideFeeds notes", e); }
   }
   function adoptPreparedVideo(root, prepared, first) {
     if (!root || !prepared || !first) return;
@@ -18198,7 +18214,7 @@
         e.preventDefault();
         e.stopPropagation();
         const id = b.getAttribute("data-feeds-tab");
-        if (id) setFeedsTab(id);
+        if (id) setFeedsTab(id, true);
       }
       tabs.addEventListener("pointerdown", pickTab);
       tabs.addEventListener("click", function (e) {
@@ -19764,7 +19780,21 @@
     img.src = photos().sunset;
     img.style.display = "block";
   }
-  async function startCamera() {
+  function cameraStreamLive(stream) {
+    if (!stream) return false;
+    try {
+      return stream.getVideoTracks().some(function (tr) { return tr && tr.readyState === "live"; });
+    } catch (e) { return false; }
+  }
+  function cameraStreamFacing(stream) {
+    try {
+      const tr = stream && stream.getVideoTracks()[0];
+      const s = tr && tr.getSettings ? tr.getSettings() : {};
+      return (s && s.facingMode) || null;
+    } catch (e) { return null; }
+  }
+  async function startCamera(opts) {
+    opts = opts || {};
     renderLenses();
     paintFallbackScene();
     const video = $("#cam-video");
@@ -19773,7 +19803,20 @@
       return;
     }
     try {
-      if (state.camStream) state.camStream.getTracks().forEach(t => t.stop());
+      const existing = state.camStream;
+      const live = !opts.force && cameraStreamLive(existing);
+      const face = live ? cameraStreamFacing(existing) : null;
+      const sameFace = !face || face === state.facing;
+      if (live && sameFace) {
+        if (video.srcObject !== existing) video.srcObject = existing;
+        video.style.display = "block";
+        $("#fallback-scene").style.display = "none";
+        applyLensVisual();
+        try { await video.play(); } catch (e) {}
+        return;
+      }
+      if (existing) existing.getTracks().forEach(function (tr) { try { tr.stop(); } catch (e) {} });
+      state.camStream = null;
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: state.facing, width: { ideal: 1080 }, height: { ideal: 1920 } },
         audio: false
@@ -19789,8 +19832,17 @@
     }
   }
   function stopCameraPreview() {
-    // keep stream if user may swipe back quickly? stop to free camera
+    // Keep the granted stream warm so returning to Camera is instant.
     if (state.recording) return;
+  }
+  function maybeWarmCamera() {
+    try {
+      if (state.camStream && cameraStreamLive(state.camStream)) return;
+      if (!navigator.permissions || !navigator.permissions.query) return;
+      navigator.permissions.query({ name: "camera" }).then(function (s) {
+        if (s && s.state === "granted") startCamera();
+      }).catch(function () {});
+    } catch (e) {}
   }
   function captureToCanvas() {
     const video = $("#cam-video");
@@ -20155,7 +20207,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 22. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 23. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -20564,7 +20616,7 @@
         resetTabToRoot(i);
         return;
       }
-      goPage(i, i === PAGE.feeds);
+      goPage(i, true);
     });
   });
   // shutter press (camera page only)
@@ -22584,6 +22636,8 @@
       paintFallbackScene();
       try { renderChatPage(); } catch (e) { console.warn("renderChatPage", e); }
       try { renderDiscover({ reuse: true }); } catch (e) { console.warn("renderDiscover", e); }
+      try { mountSideFeeds(); } catch (e) { console.warn("mountSideFeeds", e); }
+      try { renderCommunityPage(); } catch (e) { console.warn("renderCommunityPage", e); }
       try { renderStoriesPage(); } catch (e) { console.warn("renderStoriesPage", e); }
       try { seedNotificationsOnce(); syncFeedsNotifBadges(); } catch (e) {}
       bindAuthEvents();
@@ -22599,7 +22653,9 @@
       try { registerGatherSW(); } catch (e) {}
       afterFirstPaint(function () {
         try { if (typeof window.__gatherStartMapLibs === "function") window.__gatherStartMapLibs(); } catch (e) {}
-        try { if (state.page !== PAGE.feeds) ensureFeedsWarmPreload(); } catch (e) {}
+        try { ensureFeedsWarmPreload(); } catch (e) {}
+        try { if (state.page !== PAGE.map && typeof initMap === "function") initMap(); } catch (e) {}
+        try { maybeWarmCamera(); } catch (e) {}
       });
     }
     if (typeof requestAnimationFrame === "function") requestAnimationFrame(continueBoot);

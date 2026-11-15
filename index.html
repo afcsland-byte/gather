@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="11">
+<html lang="en" data-theme="white" data-build="12">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -4208,6 +4208,169 @@
       background: rgba(255,55,95,.16); color: #FF375F; font-weight: 700;
     }
 
+    /* v12 For you — full-screen video feed */
+    #page-feeds.tab-foryou { background: #000; }
+    #page-feeds.tab-foryou .feeds-head {
+      background: transparent;
+      border-bottom: 0;
+      pointer-events: none;
+    }
+    #page-feeds.tab-foryou .feeds-head .feeds-avatar,
+    #page-feeds.tab-foryou .feeds-head .feeds-tabs button {
+      pointer-events: auto;
+    }
+    #page-feeds.tab-foryou .feeds-brand,
+    #page-feeds.tab-foryou .feeds-brand-name,
+    #page-feeds.tab-foryou .feeds-brand-mark {
+      color: #fff;
+      filter: drop-shadow(0 1px 6px rgba(0,0,0,.55));
+    }
+    #page-feeds.tab-foryou .feeds-tabs button {
+      color: rgba(255,255,255,.72);
+      text-shadow: 0 1px 8px rgba(0,0,0,.5);
+    }
+    #page-feeds.tab-foryou .feeds-tabs button.on {
+      color: #fff;
+      font-weight: 800;
+    }
+    #page-feeds.tab-foryou .feeds-tabs button.on::after {
+      background: #fff;
+      box-shadow: 0 1px 6px rgba(0,0,0,.4);
+    }
+    #page-feeds.tab-foryou .feeds-avatar-face {
+      box-shadow: 0 0 0 1.5px rgba(255,255,255,.9), 0 2px 8px rgba(0,0,0,.4);
+    }
+    #page-feeds.tab-foryou .feeds-avatar-dot { box-shadow: 0 0 0 2px #000; }
+    #page-feeds.tab-foryou .feeds-pane[data-feeds-pane="foryou"] > .scroll {
+      padding-top: 0;
+      scroll-snap-type: y mandatory;
+      scroll-snap-stop: always;
+      background: #000;
+    }
+    #page-feeds.tab-foryou #feeds-stories { display: none !important; }
+    #page-feeds.tab-foryou .feeds-pane[data-feeds-pane="foryou"] > .ptr-indicator {
+      top: var(--feeds-head-h);
+      z-index: 9;
+    }
+    #discover-feed.video-feed {
+      padding: 0; gap: 0; display: block; background: #000;
+    }
+    .vf-slide {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      background: #000;
+      overflow: hidden;
+      color: #fff;
+    }
+    .vf-slide video,
+    .vf-slide .vf-poster {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; background: #000;
+    }
+    .vf-slide .vf-poster { display: none; }
+    .vf-slide.is-failed video { display: none; }
+    .vf-slide.is-failed .vf-poster { display: block; }
+    .vf-pause {
+      position: absolute; inset: 0; display: none; place-items: center;
+      pointer-events: none; z-index: 2;
+    }
+    .vf-slide.is-paused .vf-pause { display: grid; }
+    .vf-pause span {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(0,0,0,.4); display: grid; place-items: center;
+      font-size: 34px; padding-left: 4px;
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    }
+    .vf-slide::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 240px;
+      background: linear-gradient(transparent, rgba(0,0,0,.62));
+      pointer-events: none; z-index: 2;
+    }
+    .vf-actions {
+      position: absolute; right: 8px; bottom: 92px; z-index: 3;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+      color: #fff;
+    }
+    .vf-actions button {
+      background: transparent; border: 0; color: #fff;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 12px; font-weight: 700; text-shadow: 0 1px 6px rgba(0,0,0,.5);
+      padding: 0; width: 52px;
+    }
+    .vf-actions svg { width: 32px; height: 32px; filter: drop-shadow(0 1px 4px rgba(0,0,0,.5)); }
+    .vf-actions button.on .vf-heart { fill: #FF375F; stroke: #FF375F; }
+    .vf-actions button.on.saved svg { fill: #fff; }
+    .vf-av-btn { position: relative; width: 48px; height: 48px; padding: 0; }
+    .vf-av-btn .av, .vf-av-btn svg:not(.vf-ico) { width: 48px; height: 48px; border-radius: 50%; display: block; box-shadow: 0 0 0 1.5px #fff; }
+    .vf-follow {
+      position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%);
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #FF375F; color: #fff; font-size: 16px; font-weight: 800;
+      display: grid; place-items: center; line-height: 1;
+      box-shadow: 0 1px 4px rgba(0,0,0,.4);
+    }
+    .vf-follow.is-on { background: #34C759; font-size: 12px; }
+    .vf-disc {
+      width: 46px; height: 46px; border-radius: 50%; padding: 0;
+      background:
+        radial-gradient(circle at 50% 50%, #1a1a1a 0 7px, transparent 8px),
+        repeating-radial-gradient(circle at 50% 50%, #3a3a3a 0 1px, #777 2px, #2a2a2a 3px);
+      box-shadow: 0 0 0 2px #f2f2f2, 0 2px 8px rgba(0,0,0,.45);
+      position: relative;
+      animation: vf-spin 3.2s linear infinite;
+      animation-play-state: paused;
+    }
+    .vf-slide.is-playing .vf-disc { animation-play-state: running; }
+    .vf-disc.is-muted { animation-play-state: paused; opacity: .7; }
+    .vf-disc::after {
+      content: ""; position: absolute; inset: 15px; border-radius: 50%;
+      background: #111; box-shadow: inset 0 0 0 1.5px #c8c8c8;
+    }
+    @keyframes vf-spin { to { transform: rotate(360deg); } }
+    .vf-meta {
+      position: absolute; left: 14px; right: 72px; bottom: 18px; z-index: 3;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 2px 12px rgba(0,0,0,.7);
+    }
+    .vf-user { font-weight: 800; font-size: 16px; letter-spacing: -0.02em; }
+    .vf-caption { font-size: 14px; font-weight: 500; margin-top: 6px; line-height: 1.3;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .vf-sound { font-size: 13px; font-weight: 600; margin-top: 8px; opacity: .95; }
+    .vf-progress {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+      background: rgba(255,255,255,.28); z-index: 4;
+    }
+    .vf-progress > i { display: block; height: 100%; width: 0; background: #fff; }
+    .vf-burst {
+      position: absolute; left: 50%; top: 46%; transform: translate(-50%,-50%) scale(.6);
+      font-size: 92px; color: #FF375F; pointer-events: none; z-index: 6;
+      animation: vf-burst .7s ease forwards; text-shadow: 0 2px 12px rgba(0,0,0,.35);
+    }
+    @keyframes vf-burst {
+      0% { transform: translate(-50%,-50%) scale(.4); opacity: 0; }
+      35% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+      100% { transform: translate(-50%,-70%) scale(1); opacity: 0; }
+    }
+    #feed-comments-sheet { z-index: 90; }
+    #feed-comments-card { max-height: 62%; display: flex; flex-direction: column; padding: 8px 0 calc(10px + var(--safe-bot)); }
+    #feed-comments-card h3 { padding: 10px 16px 8px; }
+    #feed-comments-list { flex: 1; overflow-y: auto; padding: 0 16px 8px; }
+    .vf-comment { padding: 10px 0; border-bottom: 0.5px solid var(--line); }
+    .vf-comment strong { display: block; font-size: 13px; margin-bottom: 2px; }
+    .vf-comment p { font-size: 14px; margin: 0; font-weight: 400; }
+    #feed-comments-form {
+      display: flex; gap: 8px; padding: 8px 16px 0; align-items: center;
+    }
+    #feed-comments-input {
+      flex: 1; height: 40px; border-radius: 20px; border: 1px solid var(--line);
+      padding: 0 14px; background: var(--card); color: var(--text); font-size: 15px;
+    }
+    #feed-comments-form .btn { width: auto; padding: 0 14px; height: 40px; flex: none; font-size: 14px; }
+
     </style>
   <script>
   window.__gatherLibsReady = (function () {
@@ -5035,6 +5198,9 @@
       </form>
     </div>
     <div id="live-party"></div>
+    <div class="chat-sheet" id="feed-comments-sheet" aria-hidden="true">
+      <div class="chat-sheet-card" id="feed-comments-card"></div>
+    </div>
     <div id="stories-page" hidden></div>
 
     <div id="onboarding">
@@ -5832,9 +5998,10 @@
     if (!Array.isArray(s.meetups)) s.meetups = [];
     s.gatherHoldHintSeen = s.gatherHoldHintSeen === true;
     s.messages = (s.messages && typeof s.messages === "object" && !Array.isArray(s.messages)) ? s.messages : {};
-    ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports","notifications","commRequests","supportTickets"].forEach(function (k) {
+    ["created","left","muted","notifOff","joined","friends","added","dismissedReq","acceptedReq","sentReq","seenStories","userStories","following","likedPosts","spotlightPosts","userPosts","myStickers","pinnedChats","lockedChats","blockedContacts","deletedChats","reports","notifications","commRequests","supportTickets","likedFeed","savedFeed"].forEach(function (k) {
       if (!Array.isArray(s[k])) s[k] = Array.isArray(blank[k]) ? blank[k].slice() : [];
     });
+    if (!s.feedComments || typeof s.feedComments !== "object") s.feedComments = {};
     if (!s.rank || typeof s.rank !== "object" || Array.isArray(s.rank)) s.rank = { xp: 0, messages: 0, games: 0, roomsJoined: 0, roomsHosted: 0, lastDay: "", streak: 0 };
     if (!s.gameVotes || typeof s.gameVotes !== "object" || Array.isArray(s.gameVotes)) s.gameVotes = {};
     if (!s.gameClears || typeof s.gameClears !== "object" || Array.isArray(s.gameClears)) s.gameClears = {};
@@ -6434,6 +6601,7 @@
     if (i === PAGE.camera) startCamera();
     else stopCameraPreview();
     if (i === PAGE.feeds) { renderChatPage(); renderDiscover(); syncFeedsStories(); try { initFeedsTabs(); } catch (e) {} }
+    else { try { pauseAllFeedVideos(); closeFeedComments(); } catch (e) {} }
     if (i === PAGE.community) renderCommunityPage();
   }
   function syncFeedsStories() {
@@ -7688,7 +7856,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 11. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 12. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -16358,6 +16526,7 @@
   }
 
   /* ---------- discover ---------- */
+  /* ---------- discover: vertical video feed ---------- */
   let feedPostOrder = null;
   function shuffleInPlace(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -16366,83 +16535,432 @@
     }
     return arr;
   }
-  function discoverPostPool() {
-    const pics = photos();
-    return [
-      { img: pics.green, title: "Barcelona Fans Accra", text: "Watch party this Saturday in Osu. Open the community and jump into the chat.", id: "barca-accra" },
-      { img: pics.sunset, title: "Labadi Beach Sunset Party", text: "Barefoot on the sand, sunset sets, and good vibes by the water.", id: "party-labadi" },
-      { img: pics.night, title: "East Legon Rooftop Session", text: "DJ set, skyline views, casual dress. Follow the pin.", id: "party-eastlegon" },
-      { img: pics.fun, title: "Meme Lords GH", text: "Ghana's meme drop zone. Share, laugh, repeat.", id: "meme-lords" },
-      { img: pics.beach, title: "Accra Lifestyle", text: "Food, fashion and hangouts around the city.", id: "accra-lifestyle" },
-      { img: pics.night, title: "Osu After Dark", text: "Oxford Street is live tonight. Stories, lights and late eats.", id: "party-osu-afterdark" },
-      { img: pics.fun, title: "eFootball Ghana", text: "Late-night fixtures and banter in the group chat.", id: "efootball-gh" },
-      { img: pics.sunset, title: "Jamestown Walking Tour", text: "Golden hour around the lighthouse. Meet at the harbour.", id: "jamestown-walk" },
-      { img: pics.beach, title: "Makola Market Morning", text: "Fresh produce, fabric and the usual Saturday rush.", id: "makola-morning" },
-      { img: pics.green, title: "Independence Square Meet", text: "Casual kickabout and photos by the arch this afternoon.", id: "independence-meet" }
-    ];
+  let feedVideoIO = null;
+  let feedSoundOn = false;
+  let feedTapTimer = 0;
+  let feedLastTap = 0;
+  const SEED_FEED_VIDEOS = [
+    { id: "fv-osu", src: "https://assets.mixkit.co/videos/1230/1230-720.mp4", poster: "night", userId: "kwame", caption: "Osu after hours. The lights never really go off.", sound: "Night Drive \u2014 Accra Mix", likes: 2140, comments: [["Ama", "The energy though."], ["Fiifi", "I need to be there."], ["Nii", "Save me a spot."]] },
+    { id: "fv-labadi", src: "https://assets.mixkit.co/videos/3456/3456-720.mp4", poster: "beach", userId: "efua", caption: "Labadi at golden hour. Barefoot, always.", sound: "Golden Hour \u2014 Shoreline", likes: 1862, comments: [["Lydia", "This light is perfect."], ["Ama", "Which side of the beach?"]] },
+    { id: "fv-roof", src: "https://assets.mixkit.co/videos/30000/30000-720.mp4", poster: "fun", userId: "kojo", caption: "East Legon rooftop, late set, no rush.", sound: "Rooftop Session", likes: 974, comments: [["Abena", "What time does it start?"], ["Yaw", "Send it."]] },
+    { id: "fv-jamestown", src: "https://assets.mixkit.co/videos/1250/1250-720.mp4", poster: "sunset", userId: "ama", caption: "Jamestown walking, just before the light goes.", sound: "Harbour Walk", likes: 1320, comments: [["Kwame", "Classic Ama."], ["Efua", "Take me next time."]] },
+    { id: "fv-market", src: "https://assets.mixkit.co/videos/1192/1192-720.mp4", poster: "green", userId: "lydia", caption: "Saturday in the city. New spots, honest notes.", sound: "City Notes", likes: 808, comments: [["Abena", "Where is this?"]] },
+    { id: "fv-square", src: "https://assets.mixkit.co/videos/43000/43000-720.mp4", poster: "green", userId: "yaw", caption: "A quick loop around the arch this afternoon.", sound: "Original sound \u2014 Yaw", likes: 2410, comments: [["Sena", "The streak continues."], ["Kojo", "I'm coming through."]] },
+    { id: "fv-nightwalk", src: "https://assets.mixkit.co/videos/1600/1600-720.mp4", poster: "night", userId: "abena", caption: "Airport City after work. Soft lights, slow walk.", sound: "After Work", likes: 690, comments: [["Lydia", "Saving this."]] },
+    { id: "fv-cup", src: "https://videos.pexels.com/video-files/10871054/10871054-hd_1080_1920_30fps.mp4", poster: "fun", userId: "fiifi", caption: "Friday cup energy. Winner stays on.", sound: "Match Night", likes: 1544, comments: [["Kwame", "Who won?"], ["Nii", "Next fixture soon."]] }
+  ];
+  function feedHandleOf(userId) {
+    if (userId === "me") return (store.session && store.session.username) || (store.profile && store.profile.name) || "you";
+    const p = personById[userId];
+    if (p && p.username) return p.username;
+    if (p && p.name) return p.name.split(" ")[0].toLowerCase();
+    return userId || "gather";
   }
-  function pickFreshFeedCards() {
-    const pool = discoverPostPool();
-    const prevTop = (feedPostOrder || []).slice(0, 3);
-    const freshPool = pool.filter(function (c) { return prevTop.indexOf(c.id) === -1; });
-    shuffleInPlace(freshPool);
-    const fresh = freshPool.slice(0, 3);
-    const used = {};
-    fresh.forEach(function (c) { used[c.id] = true; });
-    const fillers = pool.filter(function (c) { return !used[c.id]; });
-    shuffleInPlace(fillers);
-    const cards = fresh.concat(fillers).slice(0, 5);
-    feedPostOrder = cards.map(function (c) { return c.id; });
-    return cards;
+  function feedAvatarOf(userId) {
+    if (userId === "me") return (store.profile && store.profile.avatar) || defaultAvatar();
+    const p = personById[userId];
+    return (p && p.avatar) || defaultAvatar();
   }
-  function currentFeedCards() {
-    const pool = discoverPostPool();
+  function collectUserFeedVideos() {
+    const out = [];
+    const seen = {};
+    function push(src, item, kind) {
+      if (!src || seen[item.id || src]) return;
+      const id = item.id || (kind + "-" + (item.at || src.length));
+      seen[id] = true;
+      out.push({
+        id: id,
+        src: src,
+        posterSrc: (!item.video || (item.src && item.src !== src)) ? (item.src || "") : "",
+        poster: "night",
+        userId: "me",
+        caption: item.caption || "",
+        sound: "Original sound \u2014 " + ((store.profile && store.profile.name) || "You"),
+        likes: item.likes || 0,
+        comments: [],
+        isMine: true
+      });
+    }
+    (store.userPosts || []).forEach(function (p) { if (p && p.video) push(p.video, p, "up"); });
+    (store.userStories || []).forEach(function (s) { if (s && s.video) push(s.video, s, "us"); });
+    (store.spotlightPosts || []).forEach(function (p) { if (p && p.video) push(p.video, p, "sp"); });
+    return out;
+  }
+  function allFeedVideos(opts) {
+    opts = opts || {};
+    const user = collectUserFeedVideos();
+    const seed = SEED_FEED_VIDEOS.slice();
     const byId = {};
-    pool.forEach(function (c) { byId[c.id] = c; });
-    if (!feedPostOrder || !feedPostOrder.length) {
-      feedPostOrder = pool.slice(0, 5).map(function (c) { return c.id; });
+    user.concat(seed).forEach(function (v) { byId[v.id] = v; });
+    if (opts.refresh || !feedPostOrder || !feedPostOrder.length) {
+      if (opts.refresh) shuffleInPlace(seed);
+      feedPostOrder = user.map(function (v) { return v.id; }).concat(seed.map(function (v) { return v.id; }));
+    } else {
+      const have = {};
+      feedPostOrder.forEach(function (id) { have[id] = true; });
+      user.slice().reverse().forEach(function (v) {
+        if (!have[v.id]) { feedPostOrder.unshift(v.id); have[v.id] = true; }
+      });
     }
     return feedPostOrder.map(function (id) { return byId[id]; }).filter(Boolean);
   }
+  function likedFeedSet() {
+    if (!Array.isArray(store.likedFeed)) store.likedFeed = [];
+    return store.likedFeed;
+  }
+  function savedFeedSet() {
+    if (!Array.isArray(store.savedFeed)) store.savedFeed = [];
+    return store.savedFeed;
+  }
+  function feedCommentsFor(id, seed) {
+    if (!store.feedComments || typeof store.feedComments !== "object") store.feedComments = {};
+    const extra = store.feedComments[id] || [];
+    return (seed || []).concat(extra);
+  }
+  function vfIconHeart() {
+    return '<svg class="vf-heart" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 27s-9.2-6.4-12.2-11.2C1.8 12.6 2.6 8 6.5 6.8c2.4-.8 4.6.3 5.8 2.2C13.5 7.1 15.7 6 18.1 6.8c3.9 1.2 4.7 5.8 2.7 9C25.2 20.6 16 27 16 27z"/></svg>';
+  }
+  function vfIconComment() {
+    return '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 24.5l-3 3V9.5A3.5 3.5 0 0 1 8.5 6h15A3.5 3.5 0 0 1 27 9.5v11A3.5 3.5 0 0 1 23.5 24H8z"/></svg>';
+  }
+  function vfIconShare() {
+    return '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V6"/><path d="M10 11l6-6 6 6"/><path d="M7 18v6.5A1.5 1.5 0 0 0 8.5 26h15a1.5 1.5 0 0 0 1.5-1.5V18"/></svg>';
+  }
+  function vfIconSave() {
+    return '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6.5h14A1.5 1.5 0 0 1 24.5 8v18L16 21.2 7.5 26V8A1.5 1.5 0 0 1 9 6.5z"/></svg>';
+  }
+  function vfIconMute(on) {
+    if (on) return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16 9.5a4 4 0 0 1 0 5"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg>';
+    return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M19 9l-6 6M13 9l6 6"/></svg>';
+  }
+  function videoSlideHtml(v) {
+    const pics = photos();
+    const poster = v.posterSrc || pics[v.poster] || pics.night;
+    const handle = feedHandleOf(v.userId);
+    const liked = likedFeedSet().indexOf(v.id) !== -1;
+    const saved = savedFeedSet().indexOf(v.id) !== -1;
+    const following = v.userId !== "me" && typeof isFollowing === "function" && isFollowing(v.userId);
+    const comments = feedCommentsFor(v.id, v.comments);
+    const likeN = (v.likes || 0) + (liked ? 1 : 0);
+    return '<article class="vf-slide" data-feed-id="'+escapeHtml(v.id)+'" data-feed-user="'+escapeHtml(v.userId || "")+'">'+
+      '<img class="vf-poster" alt="" src="'+poster+'" />'+
+      '<video playsinline webkit-playsinline loop muted preload="metadata" poster="'+poster+'" src="'+escapeHtml(v.src)+'"></video>'+
+      '<div class="vf-pause" aria-hidden="true"><span>&#9654;</span></div>'+
+      '<div class="vf-actions">'+
+        '<button type="button" class="vf-av-btn" data-profile="'+escapeHtml(v.userId)+'" aria-label="Profile">'+
+          '<span class="av">'+avatarSVG(feedAvatarOf(v.userId), 48)+"</span>"+
+          (v.isMine || v.userId === "me" ? "" : '<span class="vf-follow'+(following ? " is-on" : "")+'" data-vf-follow="'+escapeHtml(v.userId)+'">'+(following ? "\u2713" : "+")+"</span>")+
+        "</button>"+
+        '<button type="button" data-vf-like="'+escapeHtml(v.id)+'" class="'+(liked ? "on" : "")+'" aria-label="Like">'+vfIconHeart()+'<span>'+fmtCount(likeN)+"</span></button>"+
+        '<button type="button" data-vf-comments="'+escapeHtml(v.id)+'" aria-label="Comments">'+vfIconComment()+'<span>'+fmtCount(comments.length)+"</span></button>"+
+        '<button type="button" data-vf-share="'+escapeHtml(v.id)+'" aria-label="Share">'+vfIconShare()+'<span>Share</span></button>'+
+        '<button type="button" data-vf-save="'+escapeHtml(v.id)+'" class="'+(saved ? "on saved" : "")+'" aria-label="Save">'+vfIconSave()+'<span>'+(saved ? "Saved" : "Save")+"</span></button>"+
+        '<button type="button" class="vf-disc" data-vf-mute aria-label="Sound"></button>'+
+      "</div>"+
+      '<div class="vf-meta">'+
+        '<div class="vf-user">@'+escapeHtml(handle)+"</div>"+
+        (v.caption ? '<div class="vf-caption">'+escapeHtml(v.caption)+"</div>" : "")+
+        '<div class="vf-sound">\u266A '+escapeHtml(v.sound || "Original sound")+"</div>"+
+      "</div>"+
+      '<div class="vf-progress"><i></i></div>'+
+    "</article>";
+  }
+  function sizeVideoSlides() {
+    const sc = document.getElementById("feeds-scroll-foryou");
+    if (!sc) return;
+    const h = sc.clientHeight;
+    if (!h) return;
+    sc.querySelectorAll(".vf-slide").forEach(function (el) { el.style.height = h + "px"; });
+  }
+  function pauseAllFeedVideos(except) {
+    document.querySelectorAll("#discover-feed video").forEach(function (v) {
+      if (except && v === except) return;
+      try { v.pause(); } catch (err) {}
+      const slide = v.closest(".vf-slide");
+      if (slide) slide.classList.remove("is-playing");
+    });
+  }
+  function playFeedVideo(vid) {
+    if (!vid) return;
+    pauseAllFeedVideos(vid);
+    vid.muted = !feedSoundOn;
+    const slide = vid.closest(".vf-slide");
+    if (slide) {
+      slide.classList.remove("is-paused");
+      slide.classList.add("is-playing");
+    }
+    const p = vid.play();
+    if (p && p.catch) p.catch(function () {
+      vid.muted = true;
+      feedSoundOn = false;
+      syncFeedMuteButtons();
+      vid.play().catch(function () {});
+    });
+    preloadNextFeedVideo(vid);
+  }
+  function preloadNextFeedVideo(vid) {
+    const slide = vid && vid.closest(".vf-slide");
+    const next = slide && slide.nextElementSibling;
+    const nv = next && next.querySelector("video");
+    if (nv) {
+      try { nv.preload = "auto"; } catch (err) {}
+    }
+  }
+  function syncFeedMuteButtons() {
+    document.querySelectorAll(".vf-disc").forEach(function (btn) {
+      btn.classList.toggle("is-muted", !feedSoundOn);
+      btn.setAttribute("aria-label", feedSoundOn ? "Mute" : "Sound on");
+    });
+    document.querySelectorAll("#discover-feed video").forEach(function (v) { v.muted = !feedSoundOn; });
+  }
+  function toggleFeedSound() {
+    feedSoundOn = !feedSoundOn;
+    syncFeedMuteButtons();
+    const cur = document.querySelector("#discover-feed .vf-slide.is-playing video");
+    if (cur) playFeedVideo(cur);
+  }
+  function toggleFeedPlay(vid) {
+    if (!vid) return;
+    const slide = vid.closest(".vf-slide");
+    if (vid.paused) {
+      playFeedVideo(vid);
+    } else {
+      vid.pause();
+      if (slide) { slide.classList.remove("is-playing"); slide.classList.add("is-paused"); }
+    }
+  }
+  function bindFeedVideoMedia(slide, v) {
+    const vid = slide.querySelector("video");
+    if (!vid) return;
+    vid.muted = !feedSoundOn;
+    vid.loop = true;
+    vid.playsInline = true;
+    vid.addEventListener("timeupdate", function () {
+      const bar = slide.querySelector(".vf-progress > i");
+      if (!bar || !vid.duration) return;
+      bar.style.width = Math.max(0, Math.min(100, (vid.currentTime / vid.duration) * 100)) + "%";
+    });
+    vid.addEventListener("error", function () {
+      slide.classList.add("is-failed");
+      const poster = slide.querySelector(".vf-poster");
+      if (poster) poster.style.display = "block";
+    });
+    vid.addEventListener("playing", function () {
+      slide.classList.add("is-playing");
+      slide.classList.remove("is-paused");
+    });
+    vid.addEventListener("pause", function () {
+      if (slide.classList.contains("is-playing") === false) return;
+    });
+  }
+  function bindVideoFeedObserver() {
+    if (feedVideoIO) { try { feedVideoIO.disconnect(); } catch (err) {} }
+    const root = document.getElementById("feeds-scroll-foryou");
+    feedVideoIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        const vid = en.target.querySelector("video");
+        if (!vid) return;
+        if (en.isIntersecting && en.intersectionRatio >= 0.6) playFeedVideo(vid);
+        else {
+          try { vid.pause(); } catch (err) {}
+          en.target.classList.remove("is-playing");
+        }
+      });
+    }, { root: root, threshold: [0.6, 0.75, 0.9] });
+    document.querySelectorAll("#discover-feed .vf-slide").forEach(function (slide) {
+      feedVideoIO.observe(slide);
+    });
+  }
+  function findFeedVideo(id) {
+    return allFeedVideos().find(function (v) { return v && v.id === id; }) || SEED_FEED_VIDEOS.find(function (v) { return v.id === id; }) || null;
+  }
+  function likeFeedVideo(id, fromDouble) {
+    const set = likedFeedSet();
+    const i = set.indexOf(id);
+    const slide = document.querySelector('.vf-slide[data-feed-id="'+id+'"]');
+    if (fromDouble && i !== -1) {
+      burstFeedHeart(slide);
+      return;
+    }
+    if (i === -1) set.push(id); else set.splice(i, 1);
+    try { saveStore(); } catch (err) {}
+    const v = findFeedVideo(id);
+    const liked = set.indexOf(id) !== -1;
+    if (slide) {
+      const btn = slide.querySelector("[data-vf-like]");
+      if (btn) {
+        btn.classList.toggle("on", liked);
+        const n = (v && v.likes || 0) + (liked ? 1 : 0);
+        const span = btn.querySelector("span");
+        if (span) span.textContent = fmtCount(n);
+      }
+      if (liked) burstFeedHeart(slide);
+    }
+  }
+  function burstFeedHeart(slide) {
+    if (!slide) return;
+    const b = document.createElement("div");
+    b.className = "vf-burst";
+    b.textContent = "\u2665";
+    slide.appendChild(b);
+    setTimeout(function () { b.remove(); }, 700);
+  }
+  function saveFeedVideo(id) {
+    const set = savedFeedSet();
+    const i = set.indexOf(id);
+    if (i === -1) { set.push(id); toast("Saved"); } else { set.splice(i, 1); toast("Removed from saved"); }
+    try { saveStore(); } catch (err) {}
+    const slide = document.querySelector('.vf-slide[data-feed-id="'+id+'"]');
+    const btn = slide && slide.querySelector("[data-vf-save]");
+    const on = set.indexOf(id) !== -1;
+    if (btn) {
+      btn.classList.toggle("on", on);
+      btn.classList.toggle("saved", on);
+      const span = btn.querySelector("span");
+      if (span) span.textContent = on ? "Saved" : "Save";
+    }
+  }
+  function shareFeedVideo(id) {
+    const v = findFeedVideo(id);
+    const title = (v && v.caption) || "Watch on Gather";
+    if (navigator.share) {
+      navigator.share({ title: "Gather", text: title }).catch(function () { toast("Shared"); });
+      return;
+    }
+    toast("Link copied");
+  }
+  function openFeedComments(id) {
+    const v = findFeedVideo(id);
+    const sheet = document.getElementById("feed-comments-sheet");
+    const card = document.getElementById("feed-comments-card");
+    if (!sheet || !card) return;
+    const list = feedCommentsFor(id, v && v.comments);
+    let html = "<h3>Comments</h3><div id=\"feed-comments-list\">";
+    if (!list.length) html += '<p class="hint">Be the first to comment.</p>';
+    list.forEach(function (c) {
+      html += '<div class="vf-comment"><strong>'+escapeHtml(c[0])+"</strong><p>"+escapeHtml(c[1])+"</p></div>";
+    });
+    html += "</div>";
+    html += '<form id="feed-comments-form" autocomplete="off" data-feed-comment="'+escapeHtml(id)+'">';
+    html += '<input id="feed-comments-input" maxlength="160" placeholder="Add a comment" />';
+    html += '<button type="submit" class="btn btn-primary">Send</button></form>';
+    card.innerHTML = html;
+    sheet.classList.add("open");
+    sheet.setAttribute("data-feed-id", id);
+  }
+  function closeFeedComments() {
+    const sheet = document.getElementById("feed-comments-sheet");
+    if (sheet) sheet.classList.remove("open");
+  }
+  function submitFeedComment(id, text) {
+    text = (text || "").trim();
+    if (!text || !id) return;
+    if (!store.feedComments || typeof store.feedComments !== "object") store.feedComments = {};
+    if (!Array.isArray(store.feedComments[id])) store.feedComments[id] = [];
+    const name = (store.profile && store.profile.name) || "You";
+    store.feedComments[id].push([name, text]);
+    try { saveStore(); } catch (err) {}
+    const list = document.getElementById("feed-comments-list");
+    if (list) {
+      const empty = list.querySelector(".hint");
+      if (empty) empty.remove();
+      const el = document.createElement("div");
+      el.className = "vf-comment";
+      el.innerHTML = "<strong>"+escapeHtml(name)+"</strong><p>"+escapeHtml(text)+"</p>";
+      list.appendChild(el);
+      list.scrollTop = list.scrollHeight;
+    }
+    const slide = document.querySelector('.vf-slide[data-feed-id="'+id+'"]');
+    const btn = slide && slide.querySelector("[data-vf-comments] span");
+    const v = findFeedVideo(id);
+    if (btn) btn.textContent = fmtCount(feedCommentsFor(id, v && v.comments).length);
+  }
+  function bindVideoFeedClicks() {
+    if (bindVideoFeedClicks._done) return;
+    bindVideoFeedClicks._done = true;
+    const root = document.getElementById("discover-feed");
+    if (!root) return;
+    root.addEventListener("click", function (e) {
+      const follow = e.target.closest("[data-vf-follow]");
+      if (follow) {
+        e.preventDefault(); e.stopPropagation();
+        const id = follow.getAttribute("data-vf-follow");
+        if (id && typeof toggleFollow === "function") toggleFollow(id);
+        const on = typeof isFollowing === "function" && isFollowing(id);
+        document.querySelectorAll('[data-vf-follow="'+id+'"]').forEach(function (b) {
+          b.classList.toggle("is-on", on);
+          b.textContent = on ? "\u2713" : "+";
+        });
+        return;
+      }
+      if (e.target.closest("[data-vf-mute]")) { e.preventDefault(); e.stopPropagation(); toggleFeedSound(); return; }
+      const like = e.target.closest("[data-vf-like]");
+      if (like) { e.preventDefault(); e.stopPropagation(); likeFeedVideo(like.getAttribute("data-vf-like")); return; }
+      const com = e.target.closest("[data-vf-comments]");
+      if (com) { e.preventDefault(); e.stopPropagation(); openFeedComments(com.getAttribute("data-vf-comments")); return; }
+      const share = e.target.closest("[data-vf-share]");
+      if (share) { e.preventDefault(); e.stopPropagation(); shareFeedVideo(share.getAttribute("data-vf-share")); return; }
+      const save = e.target.closest("[data-vf-save]");
+      if (save) { e.preventDefault(); e.stopPropagation(); saveFeedVideo(save.getAttribute("data-vf-save")); return; }
+      if (e.target.closest("[data-profile], .vf-actions, .vf-mute, .vf-meta")) return;
+      const slide = e.target.closest(".vf-slide");
+      if (!slide) return;
+      const now = Date.now();
+      if (now - feedLastTap < 280) {
+        if (feedTapTimer) { clearTimeout(feedTapTimer); feedTapTimer = 0; }
+        likeFeedVideo(slide.getAttribute("data-feed-id"), true);
+        feedLastTap = 0;
+        return;
+      }
+      feedLastTap = now;
+      const vid = slide.querySelector("video");
+      feedTapTimer = setTimeout(function () { feedTapTimer = 0; toggleFeedPlay(vid); }, 280);
+    }, true);
+    const sheet = document.getElementById("feed-comments-sheet");
+    if (sheet) {
+      sheet.addEventListener("click", function (e) {
+        if (e.target.id === "feed-comments-sheet") closeFeedComments();
+      });
+    }
+    document.addEventListener("submit", function (e) {
+      const form = e.target && e.target.id === "feed-comments-form" ? e.target : null;
+      if (!form) return;
+      e.preventDefault();
+      const id = form.getAttribute("data-feed-comment");
+      const input = document.getElementById("feed-comments-input");
+      submitFeedComment(id, input && input.value);
+      if (input) input.value = "";
+    });
+  }
+  function pickFreshFeedCards() { return allFeedVideos({ refresh: true }); }
+  function currentFeedCards() { return allFeedVideos(); }
   function renderDiscover(opts) {
     opts = opts || {};
-    const pics = photos();
-    const trendComms = [
-      { id: "barca-accra", img: pics.green, title: "Barcelona Fans Accra", meta: "12.4K talking" },
-      { id: "party-osu-afterdark", img: pics.night, title: "Osu After Dark", meta: "LIVE · 386 watching", live: true },
-      { id: "party-labadi", img: pics.sunset, title: "Labadi Beach Sunset Party", meta: "9.8K talking" },
-      { id: "efootball-gh", img: pics.fun, title: "eFootball Ghana", meta: "7.1K talking" },
-      { id: "meme-lords", img: pics.fun, title: "Meme Lords GH", meta: "5.2K talking" }
-    ];
-    const hashes = [
-      { tag: "#OsuNights", count: "18.2K posts" },
-      { tag: "#BarcaAccra", count: "12.4K posts" },
-      { tag: "#Labadi", count: "9.8K posts" },
-      { tag: "#eFootballGH", count: "7.1K posts" },
-      { tag: "#AccraLive", count: "5.6K posts" }
-    ];
-    const creators = ["kwame", "ama", "yaw", "efua", "lydia"].map(id => personById[id]).filter(Boolean);
-    const cards = opts.refresh ? pickFreshFeedCards() : currentFeedCards();
-    let html = '<button type="button" class="spot-cta" data-open-spotlight><img src="'+pics.night+'" alt="" /><span>Spotlight<em>Vertical feeds from creators around Accra</em></span></button>';
-    html += '<div class="section-label">Trending communities</div><div class="trend-row">';
-    trendComms.forEach(c => {
-      html += '<button type="button" class="trend-card" '+(c.live ? 'data-live-comm="'+c.id+'"' : 'data-open-chat="'+c.id+'"')+'><div class="hero"><img src="'+c.img+'" alt="" />'+(c.live ? '<span class="live-badge" style="position:absolute;left:8px;top:8px">LIVE</span>' : "")+'</div><div class="body"><h4>'+escapeHtml(c.title)+"</h4><p>"+escapeHtml(c.meta)+"</p></div></button>";
+    const root = document.getElementById("discover-feed");
+    if (!root) return;
+    const videos = opts.refresh ? pickFreshFeedCards() : currentFeedCards();
+    root.className = "feed video-feed";
+    root.innerHTML = videos.map(videoSlideHtml).join("");
+    videos.forEach(function (v) {
+      const slide = root.querySelector('.vf-slide[data-feed-id="'+v.id+'"]');
+      if (slide) bindFeedVideoMedia(slide, v);
     });
-    html += '</div><div class="section-label">Trending hashtags</div><div class="hash-row">';
-    hashes.forEach(h => { html += '<button type="button" class="hash-chip" data-hash="'+escapeHtml(h.tag)+'"><h4>'+escapeHtml(h.tag)+"</h4><p>"+escapeHtml(h.count)+"</p></button>"; });
-    html += '</div><div class="section-label">Top creators</div><div class="creator-row">';
-    creators.forEach(p => {
-      const m = creatorMeta(p.id);
-      html += '<button type="button" class="creator-chip" data-profile="'+p.id+'"><div class="av-wrap ' + (statusRingClass(p.id) || "") + '"' + (hasActiveStatus(p.id) ? ' data-open-status="'+p.id+'"' : "") + '><div class="av">'+avatarSVG(p.avatar,64)+"</div>"+(m.live ? liveBadgeHtml(m.liveViewers) : "")+"</div><p>"+escapeHtml(p.name.split(" ")[0])+(m.verified ? " ✓" : "")+"</p></button>";
+    sizeVideoSlides();
+    bindVideoFeedClicks();
+    bindVideoFeedObserver();
+    const sc = document.getElementById("feeds-scroll-foryou");
+    if (opts.refresh && sc) { try { sc.scrollTop = 0; } catch (err) {} }
+    requestAnimationFrame(function () {
+      sizeVideoSlides();
+      const first = root.querySelector(".vf-slide video");
+      if (first && currentFeedsTab() === "foryou" && state.page === PAGE.feeds) {
+        const visible = sc && sc.scrollTop < (sc.clientHeight * 0.5);
+        if (visible || opts.refresh || sc && sc.scrollTop === 0) playFeedVideo(first);
+      }
     });
-    html += '</div><div class="section-label">For you</div>';
-    html += cards.map(c =>
-      '<button type="button" class="feed-card" data-open-chat="'+c.id+'" data-feed-id="'+c.id+'" style="text-align:left">'+
-      '<div class="hero"><img src="'+c.img+'" alt="" /></div>'+
-      '<div class="body"><h3>'+escapeHtml(c.title)+"</h3><p>"+escapeHtml(c.text)+"</p></div></button>"
-    ).join("");
-    $("#discover-feed").innerHTML = html;
+    try { window.addEventListener("resize", sizeVideoSlides); } catch (err) {}
   }
+
 
   function currentFeedsTab() {
     return (store && store.feedsTab === "notifications") ? "notifications" : "foryou";
@@ -16638,6 +17156,10 @@
     if (page) page.classList.remove("feeds-head-hidden");
   }
   function hideFeedsHead() {
+    if (typeof currentFeedsTab === "function" && currentFeedsTab() === "foryou") {
+      showFeedsHead();
+      return;
+    }
     const page = document.getElementById("page-feeds");
     if (page) page.classList.add("feeds-head-hidden");
   }
@@ -16690,6 +17212,7 @@
       try { renderDiscover(); } catch (e) {}
       try { syncFeedsStories(); } catch (e) {}
     } else {
+      try { pauseAllFeedVideos(); } catch (e) {}
       try { renderNotifications(); } catch (e) {}
     }
     try { syncFeedsNotifBadges(); } catch (e) {}
@@ -18500,7 +19023,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 11. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 12. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -20577,7 +21100,7 @@
     if (!session || session !== ptrActive) return;
     try { runPullRefresh(kind); } catch (err) {}
     try {
-      if (kind === "feeds") toast("New posts");
+      if (kind === "feeds") toast("New videos");
       else if (kind === "notifications") toast("Notifications updated");
     } catch (err) {}
     const hold = Math.max(session.visual || 0, PTR_THRESHOLD);

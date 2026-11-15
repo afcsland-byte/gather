@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="17">
+<html lang="en" data-theme="white" data-build="18">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -1894,24 +1894,28 @@
       box-shadow: 0 0 0 2px var(--nav-solid, var(--bg));
     }
     .nav-dot.show { display: block; }
-    #feeds-pager {
+    #feeds-pager-viewport {
       flex: 1; min-height: 0; width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    #feeds-pager {
+      width: 300%; height: 100%;
       display: flex;
-      overflow-x: auto; overflow-y: hidden;
-      scroll-snap-type: x mandatory;
-      scroll-snap-stop: always;
-      overscroll-behavior-x: contain;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
+      transform: translate3d(0,0,0);
+      will-change: transform;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
     }
-    #feeds-pager::-webkit-scrollbar { display: none; }
-    .feeds-pane {
-      flex: 0 0 100%; width: 100%; height: 100%;
-      position: relative; overflow: hidden;
-      scroll-snap-align: start; scroll-snap-stop: always;
-      contain: layout paint;
+    .feeds-pane { flex: 0 0 33.333%; width: 33.333%; height: 100%; position: relative; overflow: hidden; contain: layout paint; transform: translateZ(0); -webkit-transform: translateZ(0); }
+    #feeds-swipe-debug {
+      display: none; position: absolute; left: 8px; right: 8px;
+      bottom: calc(var(--nav-h) + var(--safe-bot) + 8px);
+      z-index: 30; pointer-events: none;
+      background: rgba(0,0,0,.72); color: #fff;
+      font: 11px/1.4 ui-monospace, Menlo, monospace;
+      padding: 8px 10px; border-radius: 10px; white-space: pre-wrap;
     }
+    #feeds-swipe-debug.on { display: block; }
     #feeds-tabs { position: relative; touch-action: manipulation; }
     #feeds-tabs button.on::after { display: none !important; }
     #feeds-ink {
@@ -4601,6 +4605,7 @@
             <span id="feeds-ink" aria-hidden="true"></span>
           </div>
         </div>
+        <div id="feeds-pager-viewport">
         <div class="feeds-pager" id="feeds-pager">
           <div class="feeds-pane" data-feeds-pane="foryou">
             <div class="scroll" id="feeds-scroll-foryou">
@@ -4616,6 +4621,8 @@
           <div class="feeds-pane" data-feeds-pane="notifications">
             <div class="scroll" id="feeds-scroll-notes"></div>
           </div>
+        </div>
+        <div id="feeds-swipe-debug" hidden></div>
         </div>
         <div id="feeds-search" aria-hidden="true">
           <div class="feeds-search-row">
@@ -8020,7 +8027,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 17. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 18. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -17753,18 +17760,17 @@
     });
     try { window.addEventListener("resize", measureFeedsHead); } catch (e) {}
   }
+  var feedsTrackX = 0;
   var feedsPaneW = 390;
   var feedsInkCache = null;
   var feedsPagerEl = null;
   var feedsInkEl = null;
-  var feedsVisualTab = "foryou";
-  var feedsHScrolling = false;
-  var feedsInkRaf = 0;
-  var feedsScrollEndT = 0;
+  var feedsAnimRaf = 0;
+  var feedsDebugOn = false;
   var FEEDS_TAB_ORDER = ["foryou", "following", "notifications"];
   function feedsCacheW() {
-    const pager = feedsPagerEl || document.getElementById("feeds-pager");
-    const w = (pager && pager.clientWidth) || window.innerWidth || feedsPaneW;
+    const vp = document.getElementById("feeds-pager-viewport") || document.getElementById("page-feeds");
+    const w = (vp && vp.clientWidth) || window.innerWidth || feedsPaneW;
     if (w) feedsPaneW = w;
     return feedsPaneW;
   }
@@ -17779,36 +17785,70 @@
     ];
     return feedsInkCache;
   }
-  function feedsTabFromScroll() {
-    const pager = feedsPagerEl || document.getElementById("feeds-pager");
-    const w = feedsPaneW || feedsCacheW();
-    if (!pager || !w) return "foryou";
-    const i = Math.round(pager.scrollLeft / w);
-    return FEEDS_TAB_ORDER[Math.max(0, Math.min(2, i))] || "foryou";
-  }
-  function feedsPaintInkFromScroll() {
+  function feedsWrite(x) {
     const pager = feedsPagerEl || document.getElementById("feeds-pager");
     const ink = feedsInkEl || document.getElementById("feeds-ink");
+    feedsPagerEl = pager;
+    feedsInkEl = ink;
+    feedsTrackX = x;
+    if (pager) {
+      pager.style.transition = "none";
+      pager.style.transform = "translate3d(" + x + "px,0,0)";
+    }
     const c = feedsInkCache;
     const w = feedsPaneW || 1;
-    if (!pager || !ink || !c || !c[0] || !c[0].w) return;
-    let pos = pager.scrollLeft / w;
-    if (pos < 0) pos = 0;
-    else if (pos > 2) pos = 2;
-    const i = pos < 1 ? 0 : 1, f = pos - i;
-    const l = c[i].l + (c[i + 1].l - c[i].l) * f;
-    const wd = c[i].w + (c[i + 1].w - c[i].w) * f;
-    ink.style.transition = "none";
-    ink.style.transform = "translate3d(" + l + "px,0,0) scaleX(" + wd + ")";
+    if (ink && c && c[0] && c[0].w) {
+      let pos = -x / w;
+      if (pos < 0) pos = 0;
+      else if (pos > 2) pos = 2;
+      const i = pos < 1 ? 0 : 1, f = pos - i;
+      const l = c[i].l + (c[i + 1].l - c[i].l) * f;
+      const wd = c[i].w + (c[i + 1].w - c[i].w) * f;
+      ink.style.transition = "none";
+      ink.style.transform = "translate3d(" + l + "px,0,0) scaleX(" + wd + ")";
+    }
   }
-  function feedsScrollTo(tab, instant) {
-    const pager = feedsPagerEl || document.getElementById("feeds-pager");
-    if (!pager) return;
-    const idx = Math.max(0, FEEDS_TAB_ORDER.indexOf(tab));
-    const left = idx * feedsCacheW();
-    if (instant || !pager.scrollTo) pager.scrollLeft = left;
-    else pager.scrollTo({ left: left, behavior: "smooth" });
+  function feedsRubber(x, w) {
+    const min = -2 * w;
+    if (x > 0) return x * 0.35;
+    if (x < min) return min + (x - min) * 0.35;
+    return x;
   }
+  function feedsStopAnim() {
+    if (feedsAnimRaf) { cancelAnimationFrame(feedsAnimRaf); feedsAnimRaf = 0; }
+  }
+  function feedsAnimateTo(target, vPxPerMs) {
+    feedsStopAnim();
+    const x0 = feedsTrackX;
+    let v0 = (vPxPerMs || 0) * 1000;
+    if (v0 > 3500) v0 = 3500;
+    else if (v0 < -3500) v0 = -3500;
+    const omega = 13.5;
+    const A = x0 - target;
+    const B = v0 + omega * A;
+    if (Math.abs(A) < 0.5 && Math.abs(v0) < 30) {
+      feedsWrite(target);
+      return 0;
+    }
+    const t0 = performance.now();
+    function step(now) {
+      const t = Math.max(0, (now - t0) / 1000);
+      const e = Math.exp(-omega * t);
+      const x = target + (A + B * t) * e;
+      const vel = (B - omega * (A + B * t)) * e;
+      feedsWrite(x);
+      if ((Math.abs(x - target) < 0.6 && Math.abs(vel) < 30) || t > 0.85) {
+        feedsAnimRaf = 0;
+        feedsWrite(target);
+        if (typeof feedsAfterAnim === "function") feedsAfterAnim();
+        return;
+      }
+      feedsAnimRaf = requestAnimationFrame(step);
+    }
+    feedsAnimRaf = requestAnimationFrame(step);
+    return 280;
+  }
+  var feedsAfterAnim = null;
   function feedsCommitTabs(tab) {
     const page = document.getElementById("page-feeds");
     if (page) {
@@ -17828,7 +17868,6 @@
       if (on) { b.classList.add("on"); b.setAttribute("aria-selected", "true"); }
       else { b.classList.remove("on"); b.setAttribute("aria-selected", "false"); }
     }
-    feedsVisualTab = tab;
   }
   function setFeedsTab(tab, instant, opts) {
     opts = opts || {};
@@ -17841,58 +17880,22 @@
     if (tab === "foryou" || tab === "following") state.lastVideoTab = tab;
     store.feedsTab = tab;
     feedsCommitTabs(tab);
-    const pager = feedsPagerEl || document.getElementById("feeds-pager");
-    const left = Math.max(0, FEEDS_TAB_ORDER.indexOf(tab)) * (feedsPaneW || feedsCacheW());
-    const already = !pager || Math.abs(pager.scrollLeft - left) < 4;
-    if (pager && !already && !opts.noScroll) {
-      try { pauseAllFeedVideos(); } catch (e) {}
-      feedsHScrolling = true;
-      feedsScrollTo(tab, !!instant);
-    }
+    const target = -Math.max(0, FEEDS_TAB_ORDER.indexOf(tab)) * (feedsPaneW || feedsCacheW());
     clearTimeout(setFeedsTab._t);
-    if (!instant && !already && !opts.now) {
-      setFeedsTab._pending = { tab: tab, prev: prev, opts: opts };
-      clearTimeout(feedsScrollEndT);
-      feedsScrollEndT = setTimeout(feedsOnScrollEnd, 280);
+    feedsAfterAnim = function () {
+      feedsAfterAnim = null;
+      feedsTabSettle(tab, prev, opts);
+    };
+    if (instant || opts.now || Math.abs(feedsTrackX - target) < 0.5) {
+      feedsStopAnim();
+      feedsWrite(target);
+      feedsAfterAnim();
       return;
     }
-    setFeedsTab._pending = null;
-    if (!already && instant && pager) pager.scrollLeft = left;
-    feedsPaintInkFromScroll();
-    feedsTabSettle(tab, prev, opts);
-  }
-  function feedsOnScrollEnd() {
-    clearTimeout(feedsScrollEndT);
-    feedsScrollEndT = 0;
-    feedsHScrolling = false;
-    const tab = feedsTabFromScroll();
-    const pending = setFeedsTab._pending;
-    setFeedsTab._pending = null;
-    const prev = (pending && pending.prev != null) ? pending.prev : (typeof currentFeedsTab === "function" ? currentFeedsTab() : "foryou");
-    const opts = (pending && pending.opts) || {};
-    if (tab === "foryou" && !opts.keepFocus) state.feedFocusUser = null;
-    if (tab === "following") state.feedFocusUser = null;
-    if (tab === "foryou" || tab === "following") state.lastVideoTab = tab;
-    store.feedsTab = tab;
-    feedsCommitTabs(tab);
-    feedsPaintInkFromScroll();
-    feedsTabSettle(tab, prev, opts);
-  }
-  function feedsNoteHorizScroll() {
-    if (!feedsHScrolling) {
-      feedsHScrolling = true;
-      try { pauseAllFeedVideos(); } catch (e) {}
-    }
-    if (!feedsInkRaf) {
-      feedsInkRaf = requestAnimationFrame(function () {
-        feedsInkRaf = 0;
-        feedsPaintInkFromScroll();
-        const vis = feedsTabFromScroll();
-        if (vis !== feedsVisualTab) feedsCommitTabs(vis);
-      });
-    }
-    clearTimeout(feedsScrollEndT);
-    feedsScrollEndT = setTimeout(feedsOnScrollEnd, 140);
+    const ms = feedsAnimateTo(target, opts.velocity || 0);
+    setFeedsTab._t = setTimeout(function () {
+      if (feedsAfterAnim) feedsAfterAnim();
+    }, (ms || 280) + 80);
   }
   function feedsTabSettle(tab, prev, opts) {
     if (currentFeedsTab() !== tab) return;
@@ -17910,6 +17913,14 @@
     try { syncFeedsNotifBadges(); } catch (e) {}
     try { showFeedsHead(); } catch (e) {}
   }
+  function feedsDebugPaint(line) {
+    if (!feedsDebugOn) return;
+    const el = document.getElementById("feeds-swipe-debug");
+    if (!el) return;
+    el.hidden = false;
+    el.classList.add("on");
+    el.textContent = line;
+  }
   function initFeedsTabs() {
     seedNotificationsOnce();
     try { paintFeedsAvatar(); } catch (e) {}
@@ -17918,14 +17929,7 @@
     feedsInkEl = document.getElementById("feeds-ink");
     feedsCacheW();
     setFeedsTab(currentFeedsTab(), true);
-    requestAnimationFrame(function () {
-      feedsCacheW();
-      feedsMeasureInk();
-      feedsScrollTo(currentFeedsTab(), true);
-      feedsPaintInkFromScroll();
-    });
-    try { renderDiscover({ tab: "foryou" === currentFeedsTab() ? "following" : "foryou" }); } catch (e) {}
-    try { renderNotifications(); } catch (e) {}
+    requestAnimationFrame(function () { feedsCacheW(); feedsMeasureInk(); feedsWrite(-Math.max(0, FEEDS_TAB_ORDER.indexOf(currentFeedsTab())) * feedsPaneW); });
     try { bindFeedsSearch(); } catch (e) {}
     try { bindFeedsHeadScroll(); } catch (e) {}
     requestAnimationFrame(function () { try { measureFeedsHead(); } catch (e) {} });
@@ -17967,18 +17971,125 @@
       });
     }
     const pager = document.getElementById("feeds-pager");
-    if (!pager) return;
+    const root = document.getElementById("feeds-pager-viewport") || pager;
+    if (!pager || !root) return;
     feedsPagerEl = pager;
-    pager.addEventListener("scroll", feedsNoteHorizScroll, { passive: true });
-    pager.addEventListener("scrollend", function () {
-      clearTimeout(feedsScrollEndT);
-      feedsOnScrollEnd();
+    feedsInkEl = document.getElementById("feeds-ink");
+    try { feedsDebugOn = /(?:\?|&)debug=1(?:&|$)/.test(location.search || ""); } catch (e) { feedsDebugOn = false; }
+    if (feedsDebugOn) feedsDebugPaint("swipe debug on\nlock: —\ncancelable: —");
+
+    let tracking = false, horiz = null, x0 = 0, y0 = 0, base = 0, usingTouch = false, samples = [];
+    function ignoreSwipe(tgt) {
+      const el = eventEl(tgt);
+      if (!el) return true;
+      return !!el.closest(".stories-row, .trend-row, .hash-row, .creator-row, .feeds-tabs, #feeds-search, #feeds-search-player, input, textarea");
+    }
+    function startDrag(x, y, time) {
+      feedsStopAnim();
+      tracking = true;
+      horiz = null;
+      x0 = x;
+      y0 = y;
+      base = feedsTrackX;
+      samples = [{ x: x, t: performance.now() }];
+    }
+    function moveDrag(x, y, time, ev) {
+      if (!tracking) return;
+      const dx = x - x0, dy = y - y0;
+      if (horiz == null) {
+        if (dx === 0 && dy === 0) return;
+        horiz = (dx < 0 ? -dx : dx) >= (dy < 0 ? -dy : dy);
+        if (!horiz) {
+          tracking = false;
+          if (feedsDebugOn) feedsDebugPaint("lock: vertical (released)\ncancelable: " + (ev ? String(!!ev.cancelable) : "—") + "\ndx=" + dx.toFixed(1) + " dy=" + dy.toFixed(1));
+          return;
+        }
+      }
+      let prevented = false;
+      if (ev) {
+        if (ev.cancelable) { ev.preventDefault(); prevented = true; }
+        if (feedsDebugOn) {
+          feedsDebugPaint(
+            "lock: horizontal\n" +
+            "cancelable: " + String(!!ev.cancelable) + "  prevented: " + prevented + "\n" +
+            "dx=" + dx.toFixed(1) + " dy=" + dy.toFixed(1) + "  x=" + (base + dx).toFixed(1)
+          );
+        }
+      }
+      const now = performance.now();
+      samples.push({ x: x, t: now });
+      if (samples.length > 8) samples.shift();
+      feedsWrite(feedsRubber(base + dx, feedsPaneW || feedsCacheW()));
+    }
+    function endDrag() {
+      if (!tracking) { usingTouch = false; return; }
+      tracking = false;
+      if (!horiz) { horiz = null; usingTouch = false; return; }
+      const w = feedsPaneW || feedsCacheW();
+      let v = 0;
+      if (samples.length > 1) {
+        const last = samples[samples.length - 1];
+        const cut = last.t - 80;
+        let first = samples[0];
+        for (let i = 0; i < samples.length; i++) {
+          if (samples[i].t >= cut) { first = samples[i]; break; }
+        }
+        const dt = last.t - first.t;
+        if (dt >= 8) v = (last.x - first.x) / dt;
+        if (v > 3.5) v = 3.5;
+        else if (v < -3.5) v = -3.5;
+      }
+      let startIdx = Math.round(-base / w);
+      if (startIdx < 0) startIdx = 0;
+      else if (startIdx > 2) startIdx = 2;
+      const displaced = (feedsTrackX - (-startIdx * w)) / w;
+      let next = startIdx;
+      if (v > 0.25) next = startIdx - 1;
+      else if (v < -0.25) next = startIdx + 1;
+      else if (displaced > 0.25) next = startIdx - 1;
+      else if (displaced < -0.25) next = startIdx + 1;
+      if (next < 0) next = 0;
+      else if (next > 2) next = 2;
+      if (feedsDebugOn) feedsDebugPaint("lock: release\nv=" + v.toFixed(3) + " px/ms  disp=" + displaced.toFixed(2) + "\nnext=" + FEEDS_TAB_ORDER[next]);
+      const tab = FEEDS_TAB_ORDER[next];
+      horiz = null;
+      usingTouch = false;
+      setFeedsTab(tab, false, { velocity: v });
+    }
+    const touchOpts = { passive: false, capture: true };
+    root.addEventListener("touchstart", function (e) {
+      if (e.touches.length !== 1) return;
+      if (ignoreSwipe(e.target)) return;
+      usingTouch = true;
+      const tch = e.touches[0];
+      startDrag(tch.clientX, tch.clientY, e.timeStamp);
+      if (feedsDebugOn) feedsDebugPaint("lock: pending\ncancelable: " + String(!!e.cancelable) + " (touchstart, not prevented)");
+    }, touchOpts);
+    root.addEventListener("touchmove", function (e) {
+      if (!usingTouch || !tracking) return;
+      const tch = e.touches[0];
+      if (!tch) return;
+      moveDrag(tch.clientX, tch.clientY, e.timeStamp, e);
+    }, touchOpts);
+    root.addEventListener("touchend", function () { if (usingTouch) endDrag(); }, touchOpts);
+    root.addEventListener("touchcancel", function () { if (usingTouch) endDrag(); }, touchOpts);
+    root.addEventListener("pointerdown", function (e) {
+      if (usingTouch) return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (ignoreSwipe(e.target)) return;
+      startDrag(e.clientX, e.clientY, e.timeStamp);
     }, { passive: true });
+    window.addEventListener("pointermove", function (e) {
+      if (usingTouch || !tracking) return;
+      moveDrag(e.clientX, e.clientY, e.timeStamp, e);
+    }, { passive: false });
+    window.addEventListener("pointerup", function () { if (!usingTouch) endDrag(); }, { passive: true });
+    window.addEventListener("pointercancel", function () { if (!usingTouch) endDrag(); }, { passive: true });
     window.addEventListener("resize", function () {
       feedsCacheW();
       feedsMeasureInk();
-      feedsScrollTo(currentFeedsTab(), true);
-      feedsPaintInkFromScroll();
+      feedsStopAnim();
+      feedsWrite(-Math.max(0, FEEDS_TAB_ORDER.indexOf(currentFeedsTab())) * feedsPaneW);
     });
   }
 
@@ -19709,7 +19820,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 17. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 18. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";

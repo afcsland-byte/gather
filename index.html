@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="19">
+<html lang="en" data-theme="white" data-build="20">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="19" />
+  <meta name="gather-build" content="20" />
   <title>Gather</title>
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
@@ -931,7 +931,7 @@
       width: auto;
       height: auto;
       z-index: 1;
-      background: #F4DCB8;
+      background: var(--map-bg);
     }
     #map.is-globe {
       background: transparent;
@@ -942,9 +942,12 @@
       inset: 0 !important;
       width: 100% !important;
       height: 100% !important;
+      background: var(--map-bg);
+    }
+    #map.is-globe .maplibregl-map {
       background: transparent;
     }
-    #map canvas:not(#map-space) {
+    #map canvas {
       display: block;
       width: 100% !important;
       height: 100% !important;
@@ -8042,7 +8045,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 19. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 20. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -18338,8 +18341,6 @@
   };
   const DARK_STYLE = "https://tiles.openfreemap.org/styles/dark";
   const POSITRON_STYLE = "https://tiles.openfreemap.org/styles/positron";
-  const LIBERTY_STYLE = "https://tiles.openfreemap.org/styles/liberty";
-  const BRIGHT_STYLE = "https://tiles.openfreemap.org/styles/bright";
   const SAT_STYLE = {
     version: 8,
     sources: {
@@ -18384,102 +18385,7 @@
   ];
   function styleFor(layer) {
     if (mapKind(layer) === "satellite") return SAT_STYLE;
-    return LIBERTY_STYLE;
-  }
-  function paintIf(map, id, prop, val) {
-    try { if (map.getLayer(id)) map.setPaintProperty(id, prop, val); } catch (e) {}
-  }
-  function applyColorfulMap(map) {
-    if (!map || isLeaflet() || typeof map.getStyle !== "function") return;
-    if (mapKind() === "satellite") return;
-    let style;
-    try { style = map.getStyle(); } catch (e) { return; }
-    if (!style || !style.layers) return;
-    const land = "#F4DCB8";
-    const water = "#32C4E0";
-    const waterway = "#4ECDE8";
-    const park = "#8FCB6A";
-    const grass = "#A6D97A";
-    const wood = "#6FB55A";
-    const sand = "#F3E4A0";
-    const building = "#F0D4C8";
-    const buildingOut = "rgba(210,170,155,0.45)";
-    const motorway = "#FFB347";
-    const motorwayCase = "#E08A28";
-    const primary = "#FFD36A";
-    const primaryCase = "#E0A030";
-    const secondary = "#FFE38A";
-    const secondaryCase = "#E8B85A";
-    const minor = "#FFFFFF";
-    const minorCase = "#E8D5B5";
-    const label = "#2A2926";
-    const halo = "#FFF8EE";
-    const waterLabel = "#1A6A8A";
-    const poi = "#5C5954";
-    style.layers.forEach(function (ly) {
-      const id = ly.id;
-      const low = String(id || "").toLowerCase();
-      const typ = ly.type;
-      if (typ === "background") {
-        paintIf(map, id, "background-color", land);
-        return;
-      }
-      if (typ === "raster" && (low.indexOf("natural") !== -1 || low.indexOf("ne2") !== -1)) {
-        paintIf(map, id, "raster-opacity", ["interpolate", ["exponential", 1.5], ["zoom"], 0, 0.28, 4, 0.1, 6, 0]);
-        return;
-      }
-      if (typ === "fill") {
-        if (low === "water" || /^water($|_)/.test(low) || /ocean|sea/.test(low)) {
-          paintIf(map, id, "fill-color", water);
-        } else if (low.indexOf("park") !== -1) {
-          paintIf(map, id, "fill-color", park);
-          paintIf(map, id, "fill-opacity", 0.75);
-        } else if (low.indexOf("grass") !== -1) {
-          paintIf(map, id, "fill-color", grass);
-        } else if (low.indexOf("wood") !== -1) {
-          paintIf(map, id, "fill-color", wood);
-        } else if (low.indexOf("sand") !== -1) {
-          paintIf(map, id, "fill-color", sand);
-        } else if (low.indexOf("residential") !== -1) {
-          paintIf(map, id, "fill-color", ["interpolate", ["linear"], ["zoom"], 9, "hsla(28,45%,88%,0.7)", 12, "hsla(28,50%,88%,0.4)"]);
-        } else if (low === "building" || low.indexOf("building") === 0) {
-          paintIf(map, id, "fill-color", building);
-          paintIf(map, id, "fill-outline-color", buildingOut);
-        }
-        return;
-      }
-      if (typ === "fill-extrusion" && low.indexOf("building") !== -1) {
-        paintIf(map, id, "fill-extrusion-color", building);
-        return;
-      }
-      if (typ === "line") {
-        const isCase = low.indexOf("casing") !== -1;
-        if (low.indexOf("water") !== -1) {
-          paintIf(map, id, "line-color", waterway);
-        } else if (low.indexOf("motorway") !== -1) {
-          paintIf(map, id, "line-color", isCase ? motorwayCase : motorway);
-        } else if (low.indexOf("trunk") !== -1 || low.indexOf("primary") !== -1) {
-          paintIf(map, id, "line-color", isCase ? primaryCase : primary);
-        } else if (low.indexOf("secondary") !== -1 || low.indexOf("tertiary") !== -1 || (low.indexOf("link") !== -1 && low.indexOf("motorway") === -1)) {
-          paintIf(map, id, "line-color", isCase ? secondaryCase : secondary);
-        } else if (low.indexOf("minor") !== -1 || low.indexOf("street") !== -1 || low.indexOf("service") !== -1 || low.indexOf("track") !== -1 || low.indexOf("path") !== -1 || low.indexOf("pedestrian") !== -1) {
-          paintIf(map, id, "line-color", isCase ? minorCase : minor);
-        }
-        return;
-      }
-      if (typ === "symbol") {
-        if (low.indexOf("water") !== -1) {
-          paintIf(map, id, "text-color", waterLabel);
-          paintIf(map, id, "text-halo-color", "rgba(255,255,255,0.8)");
-        } else if (low.indexOf("poi") !== -1) {
-          paintIf(map, id, "text-color", poi);
-          paintIf(map, id, "text-halo-color", halo);
-        } else if (low.indexOf("label") !== -1 || low.indexOf("highway-name") !== -1) {
-          paintIf(map, id, "text-color", label);
-          paintIf(map, id, "text-halo-color", halo);
-        }
-      }
-    });
+    return isWhiteTheme() ? POSITRON_STYLE : DARK_STYLE;
   }
   function paintMapStars(canvas) {
     if (!canvas) return;
@@ -18543,7 +18449,6 @@
   }
   function dressMapStyle(map) {
     if (!map || isLeaflet()) return;
-    try { applyColorfulMap(map); } catch (e) {}
     try { applyGlobeView(map); } catch (e) {}
     try { apply3DScene(map); } catch (e) {}
     try { applyGlobeView(map); } catch (e) {}
@@ -18941,12 +18846,11 @@
           if (loaded || settled) return;
           fallbackLevel += 1;
           try {
-            if (fallbackLevel === 1) { map.setStyle(BRIGHT_STYLE); armTimer(); }
-            else if (fallbackLevel === 2) { map.setStyle(rasterFallbackStyle()); armTimer(); }
-            else if (fallbackLevel === 3) { map.setStyle(OSM_RASTER); armTimer(); }
+            if (fallbackLevel === 1) { map.setStyle(rasterFallbackStyle()); armTimer(); }
+            else if (fallbackLevel === 2) { map.setStyle(OSM_RASTER); armTimer(); }
             else fail("styles-failed:" + why);
           } catch (e) {
-            if (fallbackLevel < 4) tryFallback("setStyle");
+            if (fallbackLevel < 3) tryFallback("setStyle");
             else fail("styles-failed");
           }
         }
@@ -18956,7 +18860,7 @@
           const msg = String((err && (err.message || err)) || "");
           const url = String((err && (err.url || "")) || "");
           // Only abandon the vector style if the style document itself failed — ignore tile/sprite/glyph errors.
-          if (/error loading style|failed to fetch style|styles\/(dark|positron|liberty|bright)|load style/i.test(msg + " " + url)) {
+          if (/error loading style|failed to fetch style|styles\/dark|styles\/positron|load style/i.test(msg + " " + url)) {
             tryFallback(msg || "style");
           }
         });
@@ -20022,7 +19926,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 19. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 20. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";

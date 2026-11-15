@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="16">
+<html lang="en" data-theme="white" data-build="17">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -1895,15 +1895,23 @@
     }
     .nav-dot.show { display: block; }
     #feeds-pager {
-      flex: 1; min-height: 0; width: 300%;
+      flex: 1; min-height: 0; width: 100%;
       display: flex;
-      transform: translate3d(0,0,0);
-      will-change: transform;
-      backface-visibility: hidden; -webkit-backface-visibility: hidden;
-      touch-action: none;
-      overscroll-behavior: contain;
+      overflow-x: auto; overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-snap-stop: always;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
-    .feeds-pane { flex: 0 0 33.333%; width: 33.333%; height: 100%; position: relative; overflow: hidden; contain: layout paint; transform: translateZ(0); -webkit-transform: translateZ(0); }
+    #feeds-pager::-webkit-scrollbar { display: none; }
+    .feeds-pane {
+      flex: 0 0 100%; width: 100%; height: 100%;
+      position: relative; overflow: hidden;
+      scroll-snap-align: start; scroll-snap-stop: always;
+      contain: layout paint;
+    }
     #feeds-tabs { position: relative; touch-action: manipulation; }
     #feeds-tabs button.on::after { display: none !important; }
     #feeds-ink {
@@ -8012,7 +8020,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 16. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 17. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -17745,18 +17753,18 @@
     });
     try { window.addEventListener("resize", measureFeedsHead); } catch (e) {}
   }
-  var feedsSuppressClick = false;
-  var feedsTrackX = 0;
   var feedsPaneW = 390;
   var feedsInkCache = null;
   var feedsPagerEl = null;
   var feedsInkEl = null;
-  var FEEDS_EASE = "cubic-bezier(0.22,1,0.36,1)";
-  var FEEDS_SNAP_MS = 200;
+  var feedsVisualTab = "foryou";
+  var feedsHScrolling = false;
+  var feedsInkRaf = 0;
+  var feedsScrollEndT = 0;
   var FEEDS_TAB_ORDER = ["foryou", "following", "notifications"];
   function feedsCacheW() {
-    const pg = document.getElementById("page-feeds");
-    const w = (pg && pg.clientWidth) || window.innerWidth || feedsPaneW;
+    const pager = feedsPagerEl || document.getElementById("feeds-pager");
+    const w = (pager && pager.clientWidth) || window.innerWidth || feedsPaneW;
     if (w) feedsPaneW = w;
     return feedsPaneW;
   }
@@ -17771,35 +17779,35 @@
     ];
     return feedsInkCache;
   }
-  function feedsWrite(x, animate, ms) {
+  function feedsTabFromScroll() {
+    const pager = feedsPagerEl || document.getElementById("feeds-pager");
+    const w = feedsPaneW || feedsCacheW();
+    if (!pager || !w) return "foryou";
+    const i = Math.round(pager.scrollLeft / w);
+    return FEEDS_TAB_ORDER[Math.max(0, Math.min(2, i))] || "foryou";
+  }
+  function feedsPaintInkFromScroll() {
     const pager = feedsPagerEl || document.getElementById("feeds-pager");
     const ink = feedsInkEl || document.getElementById("feeds-ink");
-    feedsPagerEl = pager;
-    feedsInkEl = ink;
-    const tr = animate ? ("transform " + (ms || FEEDS_SNAP_MS) + "ms " + FEEDS_EASE) : "none";
-    if (pager) {
-      pager.style.transition = tr;
-      pager.style.transform = "translate3d(" + x + "px,0,0)";
-    }
-    feedsTrackX = x;
     const c = feedsInkCache;
-    if (ink && c && c[0] && c[0].w) {
-      let pos = -x / feedsPaneW;
-      if (pos < 0) pos = 0;
-      else if (pos > 2) pos = 2;
-      const i = pos < 1 ? 0 : 1, f = pos - i;
-      const l = c[i].l + (c[i + 1].l - c[i].l) * f;
-      const wd = c[i].w + (c[i + 1].w - c[i].w) * f;
-      ink.style.transition = tr;
-      ink.style.transform = "translate3d(" + l + "px,0,0) scaleX(" + wd + ")";
-    }
+    const w = feedsPaneW || 1;
+    if (!pager || !ink || !c || !c[0] || !c[0].w) return;
+    let pos = pager.scrollLeft / w;
+    if (pos < 0) pos = 0;
+    else if (pos > 2) pos = 2;
+    const i = pos < 1 ? 0 : 1, f = pos - i;
+    const l = c[i].l + (c[i + 1].l - c[i].l) * f;
+    const wd = c[i].w + (c[i + 1].w - c[i].w) * f;
+    ink.style.transition = "none";
+    ink.style.transform = "translate3d(" + l + "px,0,0) scaleX(" + wd + ")";
   }
-  function feedsMoveTo(tab, animate) {
+  function feedsScrollTo(tab, instant) {
+    const pager = feedsPagerEl || document.getElementById("feeds-pager");
+    if (!pager) return;
     const idx = Math.max(0, FEEDS_TAB_ORDER.indexOf(tab));
-    const target = -idx * feedsPaneW;
-    const ms = (animate && Math.abs(feedsTrackX - target) >= 1) ? FEEDS_SNAP_MS : 0;
-    feedsWrite(target, !!ms, ms);
-    return ms;
+    const left = idx * feedsCacheW();
+    if (instant || !pager.scrollTo) pager.scrollLeft = left;
+    else pager.scrollTo({ left: left, behavior: "smooth" });
   }
   function feedsCommitTabs(tab) {
     const page = document.getElementById("page-feeds");
@@ -17820,6 +17828,7 @@
       if (on) { b.classList.add("on"); b.setAttribute("aria-selected", "true"); }
       else { b.classList.remove("on"); b.setAttribute("aria-selected", "false"); }
     }
+    feedsVisualTab = tab;
   }
   function setFeedsTab(tab, instant, opts) {
     opts = opts || {};
@@ -17832,13 +17841,58 @@
     if (tab === "foryou" || tab === "following") state.lastVideoTab = tab;
     store.feedsTab = tab;
     feedsCommitTabs(tab);
-    const animMs = feedsMoveTo(tab, !instant);
+    const pager = feedsPagerEl || document.getElementById("feeds-pager");
+    const left = Math.max(0, FEEDS_TAB_ORDER.indexOf(tab)) * (feedsPaneW || feedsCacheW());
+    const already = !pager || Math.abs(pager.scrollLeft - left) < 4;
+    if (pager && !already && !opts.noScroll) {
+      try { pauseAllFeedVideos(); } catch (e) {}
+      feedsHScrolling = true;
+      feedsScrollTo(tab, !!instant);
+    }
     clearTimeout(setFeedsTab._t);
-    if (animMs && !opts.now) {
-      setFeedsTab._t = setTimeout(function () { feedsTabSettle(tab, prev, opts); }, animMs);
+    if (!instant && !already && !opts.now) {
+      setFeedsTab._pending = { tab: tab, prev: prev, opts: opts };
+      clearTimeout(feedsScrollEndT);
+      feedsScrollEndT = setTimeout(feedsOnScrollEnd, 280);
       return;
     }
+    setFeedsTab._pending = null;
+    if (!already && instant && pager) pager.scrollLeft = left;
+    feedsPaintInkFromScroll();
     feedsTabSettle(tab, prev, opts);
+  }
+  function feedsOnScrollEnd() {
+    clearTimeout(feedsScrollEndT);
+    feedsScrollEndT = 0;
+    feedsHScrolling = false;
+    const tab = feedsTabFromScroll();
+    const pending = setFeedsTab._pending;
+    setFeedsTab._pending = null;
+    const prev = (pending && pending.prev != null) ? pending.prev : (typeof currentFeedsTab === "function" ? currentFeedsTab() : "foryou");
+    const opts = (pending && pending.opts) || {};
+    if (tab === "foryou" && !opts.keepFocus) state.feedFocusUser = null;
+    if (tab === "following") state.feedFocusUser = null;
+    if (tab === "foryou" || tab === "following") state.lastVideoTab = tab;
+    store.feedsTab = tab;
+    feedsCommitTabs(tab);
+    feedsPaintInkFromScroll();
+    feedsTabSettle(tab, prev, opts);
+  }
+  function feedsNoteHorizScroll() {
+    if (!feedsHScrolling) {
+      feedsHScrolling = true;
+      try { pauseAllFeedVideos(); } catch (e) {}
+    }
+    if (!feedsInkRaf) {
+      feedsInkRaf = requestAnimationFrame(function () {
+        feedsInkRaf = 0;
+        feedsPaintInkFromScroll();
+        const vis = feedsTabFromScroll();
+        if (vis !== feedsVisualTab) feedsCommitTabs(vis);
+      });
+    }
+    clearTimeout(feedsScrollEndT);
+    feedsScrollEndT = setTimeout(feedsOnScrollEnd, 140);
   }
   function feedsTabSettle(tab, prev, opts) {
     if (currentFeedsTab() !== tab) return;
@@ -17860,9 +17914,18 @@
     seedNotificationsOnce();
     try { paintFeedsAvatar(); } catch (e) {}
     try { measureFeedsHead(); } catch (e) {}
+    feedsPagerEl = document.getElementById("feeds-pager");
+    feedsInkEl = document.getElementById("feeds-ink");
     feedsCacheW();
     setFeedsTab(currentFeedsTab(), true);
-    requestAnimationFrame(function () { feedsCacheW(); feedsMeasureInk(); feedsMoveTo(currentFeedsTab(), false); });
+    requestAnimationFrame(function () {
+      feedsCacheW();
+      feedsMeasureInk();
+      feedsScrollTo(currentFeedsTab(), true);
+      feedsPaintInkFromScroll();
+    });
+    try { renderDiscover({ tab: "foryou" === currentFeedsTab() ? "following" : "foryou" }); } catch (e) {}
+    try { renderNotifications(); } catch (e) {}
     try { bindFeedsSearch(); } catch (e) {}
     try { bindFeedsHeadScroll(); } catch (e) {}
     requestAnimationFrame(function () { try { measureFeedsHead(); } catch (e) {} });
@@ -17906,97 +17969,17 @@
     const pager = document.getElementById("feeds-pager");
     if (!pager) return;
     feedsPagerEl = pager;
-    feedsInkEl = document.getElementById("feeds-ink");
-    let tracking = false, horiz = null, x0 = 0, y0 = 0, base = 0, moved = false, usingTouch = false, samples = [];
-    function ignoreSwipe(t) {
-      const el = eventEl(t);
-      if (!el) return true;
-      return !!el.closest(".stories-row, .trend-row, .hash-row, .creator-row, .feeds-tabs, #feeds-search, #feeds-search-player, input, textarea");
-    }
-    function startDrag(x, y, time) {
-      tracking = true; horiz = null; moved = false;
-      x0 = x; y0 = y;
-      base = feedsTrackX;
-      samples = [{ x: x, t: time || 0 }];
-    }
-    function moveDrag(x, y, time, ev) {
-      if (!tracking) return;
-      const dx = x - x0, dy = y - y0;
-      if (horiz == null) {
-        const adx = dx < 0 ? -dx : dx, ady = dy < 0 ? -dy : dy;
-        if (adx < 5 && ady < 5) return;
-        horiz = adx > ady * 0.8;
-        if (!horiz) { tracking = false; return; }
-      }
-      if (ev && ev.cancelable) ev.preventDefault();
-      moved = true;
-      const now = time || 0;
-      samples.push({ x: x, t: now });
-      if (samples.length > 5) samples.shift();
-      let nx = base + dx;
-      const min = -2 * feedsPaneW;
-      if (nx > 0) nx = nx * 0.35;
-      else if (nx < min) nx = min + (nx - min) * 0.35;
-      feedsWrite(nx, false);
-    }
-    function endDrag() {
-      if (!tracking) return;
-      tracking = false;
-      if (!horiz) { horiz = null; usingTouch = false; return; }
-      let v = 0;
-      if (samples.length > 1) {
-        const a = samples[0], b = samples[samples.length - 1];
-        v = (b.x - a.x) / Math.max(1, b.t - a.t);
-      }
-      const startIdx = Math.round(-base / feedsPaneW);
-      const pos = -feedsTrackX / feedsPaneW;
-      let next = startIdx;
-      if (v < -0.3) next = startIdx + 1;
-      else if (v > 0.3) next = startIdx - 1;
-      else next = Math.round(pos + (pos > startIdx ? 0.2 : pos < startIdx ? -0.2 : 0));
-      if (next < 0) next = 0;
-      else if (next > 2) next = 2;
-      if (moved) {
-        feedsSuppressClick = true;
-        setTimeout(function () { feedsSuppressClick = false; }, 280);
-      }
-      const tab = FEEDS_TAB_ORDER[next];
-      if (tab === currentFeedsTab()) feedsMoveTo(tab, true);
-      else setFeedsTab(tab);
-      horiz = null;
-      usingTouch = false;
-    }
-    pager.addEventListener("touchstart", function (e) {
-      if (e.touches.length !== 1) return;
-      if (ignoreSwipe(e.target)) return;
-      usingTouch = true;
-      const tch = e.touches[0];
-      startDrag(tch.clientX, tch.clientY, e.timeStamp);
-    }, { passive: false, capture: true });
-    pager.addEventListener("touchmove", function (e) {
-      if (!usingTouch || !tracking) return;
-      const tch = e.touches[0];
-      if (!tch) return;
-      moveDrag(tch.clientX, tch.clientY, e.timeStamp, e);
-    }, { passive: false, capture: true });
-    pager.addEventListener("touchend", function () { if (usingTouch) endDrag(); }, { passive: true, capture: true });
-    pager.addEventListener("touchcancel", function () { if (usingTouch) endDrag(); }, { passive: true, capture: true });
-    pager.addEventListener("pointerdown", function (e) {
-      if (usingTouch) return;
-      if (e.pointerType === "mouse" && e.button !== 0) return;
-      if (ignoreSwipe(e.target)) return;
-      startDrag(e.clientX, e.clientY, e.timeStamp);
+    pager.addEventListener("scroll", feedsNoteHorizScroll, { passive: true });
+    pager.addEventListener("scrollend", function () {
+      clearTimeout(feedsScrollEndT);
+      feedsOnScrollEnd();
     }, { passive: true });
-    window.addEventListener("pointermove", function (e) {
-      if (usingTouch || !tracking) return;
-      moveDrag(e.clientX, e.clientY, e.timeStamp, e);
-    }, { passive: true });
-    window.addEventListener("pointerup", function () { if (!usingTouch) endDrag(); }, { passive: true });
-    window.addEventListener("pointercancel", function () { if (!usingTouch) endDrag(); }, { passive: true });
-    pager.addEventListener("click", function (e) {
-      if (feedsSuppressClick) { e.stopPropagation(); e.preventDefault(); }
-    }, true);
-    window.addEventListener("resize", function () { feedsCacheW(); feedsMeasureInk(); feedsMoveTo(currentFeedsTab(), false); });
+    window.addEventListener("resize", function () {
+      feedsCacheW();
+      feedsMeasureInk();
+      feedsScrollTo(currentFeedsTab(), true);
+      feedsPaintInkFromScroll();
+    });
   }
 
   function spotlightItems() {
@@ -19726,7 +19709,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 16. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 17. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";

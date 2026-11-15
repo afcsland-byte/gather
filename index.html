@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="18">
+<html lang="en" data-theme="white" data-build="19">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="11" />
+  <meta name="gather-build" content="19" />
   <title>Gather</title>
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
@@ -915,12 +915,26 @@
     .av svg { width: 100%; height: 100%; display: block; }
 
     /* ===== MAP ===== */
+    #map-space {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      display: block;
+      background: #07071a;
+    }
     #map {
       position: absolute;
       inset: 0;
       width: auto;
       height: auto;
-      background: var(--map-bg);
+      z-index: 1;
+      background: #F4DCB8;
+    }
+    #map.is-globe {
+      background: transparent;
     }
     #map .maplibregl-map,
     #map .leaflet-container {
@@ -928,9 +942,9 @@
       inset: 0 !important;
       width: 100% !important;
       height: 100% !important;
-      background: var(--map-bg);
+      background: transparent;
     }
-    #map canvas {
+    #map canvas:not(#map-space) {
       display: block;
       width: 100% !important;
       height: 100% !important;
@@ -4519,12 +4533,12 @@
   <script>
   window.__gatherLibsReady = (function () {
     var ML_JS = [
-      "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js",
-      "https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"
+      "https://unpkg.com/maplibre-gl@5.24.1/dist/maplibre-gl.js",
+      "https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.1/dist/maplibre-gl.js"
     ];
     var ML_CSS = [
-      "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css",
-      "https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css"
+      "https://unpkg.com/maplibre-gl@5.24.1/dist/maplibre-gl.css",
+      "https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.1/dist/maplibre-gl.css"
     ];
     var LF_JS = [
       "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
@@ -4681,6 +4695,7 @@
       </button>
       </section>
 <section class="page" data-page="map" id="page-map">
+        <canvas id="map-space" aria-hidden="true"></canvas>
         <div id="map"></div>
         <div id="map-fail">Map couldn't load. Check your internet connection.</div>
         <div class="map-ui">
@@ -8027,7 +8042,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 18. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 19. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -18323,6 +18338,8 @@
   };
   const DARK_STYLE = "https://tiles.openfreemap.org/styles/dark";
   const POSITRON_STYLE = "https://tiles.openfreemap.org/styles/positron";
+  const LIBERTY_STYLE = "https://tiles.openfreemap.org/styles/liberty";
+  const BRIGHT_STYLE = "https://tiles.openfreemap.org/styles/bright";
   const SAT_STYLE = {
     version: 8,
     sources: {
@@ -18367,7 +18384,169 @@
   ];
   function styleFor(layer) {
     if (mapKind(layer) === "satellite") return SAT_STYLE;
-    return isWhiteTheme() ? POSITRON_STYLE : DARK_STYLE;
+    return LIBERTY_STYLE;
+  }
+  function paintIf(map, id, prop, val) {
+    try { if (map.getLayer(id)) map.setPaintProperty(id, prop, val); } catch (e) {}
+  }
+  function applyColorfulMap(map) {
+    if (!map || isLeaflet() || typeof map.getStyle !== "function") return;
+    if (mapKind() === "satellite") return;
+    let style;
+    try { style = map.getStyle(); } catch (e) { return; }
+    if (!style || !style.layers) return;
+    const land = "#F4DCB8";
+    const water = "#32C4E0";
+    const waterway = "#4ECDE8";
+    const park = "#8FCB6A";
+    const grass = "#A6D97A";
+    const wood = "#6FB55A";
+    const sand = "#F3E4A0";
+    const building = "#F0D4C8";
+    const buildingOut = "rgba(210,170,155,0.45)";
+    const motorway = "#FFB347";
+    const motorwayCase = "#E08A28";
+    const primary = "#FFD36A";
+    const primaryCase = "#E0A030";
+    const secondary = "#FFE38A";
+    const secondaryCase = "#E8B85A";
+    const minor = "#FFFFFF";
+    const minorCase = "#E8D5B5";
+    const label = "#2A2926";
+    const halo = "#FFF8EE";
+    const waterLabel = "#1A6A8A";
+    const poi = "#5C5954";
+    style.layers.forEach(function (ly) {
+      const id = ly.id;
+      const low = String(id || "").toLowerCase();
+      const typ = ly.type;
+      if (typ === "background") {
+        paintIf(map, id, "background-color", land);
+        return;
+      }
+      if (typ === "raster" && (low.indexOf("natural") !== -1 || low.indexOf("ne2") !== -1)) {
+        paintIf(map, id, "raster-opacity", ["interpolate", ["exponential", 1.5], ["zoom"], 0, 0.28, 4, 0.1, 6, 0]);
+        return;
+      }
+      if (typ === "fill") {
+        if (low === "water" || /^water($|_)/.test(low) || /ocean|sea/.test(low)) {
+          paintIf(map, id, "fill-color", water);
+        } else if (low.indexOf("park") !== -1) {
+          paintIf(map, id, "fill-color", park);
+          paintIf(map, id, "fill-opacity", 0.75);
+        } else if (low.indexOf("grass") !== -1) {
+          paintIf(map, id, "fill-color", grass);
+        } else if (low.indexOf("wood") !== -1) {
+          paintIf(map, id, "fill-color", wood);
+        } else if (low.indexOf("sand") !== -1) {
+          paintIf(map, id, "fill-color", sand);
+        } else if (low.indexOf("residential") !== -1) {
+          paintIf(map, id, "fill-color", ["interpolate", ["linear"], ["zoom"], 9, "hsla(28,45%,88%,0.7)", 12, "hsla(28,50%,88%,0.4)"]);
+        } else if (low === "building" || low.indexOf("building") === 0) {
+          paintIf(map, id, "fill-color", building);
+          paintIf(map, id, "fill-outline-color", buildingOut);
+        }
+        return;
+      }
+      if (typ === "fill-extrusion" && low.indexOf("building") !== -1) {
+        paintIf(map, id, "fill-extrusion-color", building);
+        return;
+      }
+      if (typ === "line") {
+        const isCase = low.indexOf("casing") !== -1;
+        if (low.indexOf("water") !== -1) {
+          paintIf(map, id, "line-color", waterway);
+        } else if (low.indexOf("motorway") !== -1) {
+          paintIf(map, id, "line-color", isCase ? motorwayCase : motorway);
+        } else if (low.indexOf("trunk") !== -1 || low.indexOf("primary") !== -1) {
+          paintIf(map, id, "line-color", isCase ? primaryCase : primary);
+        } else if (low.indexOf("secondary") !== -1 || low.indexOf("tertiary") !== -1 || (low.indexOf("link") !== -1 && low.indexOf("motorway") === -1)) {
+          paintIf(map, id, "line-color", isCase ? secondaryCase : secondary);
+        } else if (low.indexOf("minor") !== -1 || low.indexOf("street") !== -1 || low.indexOf("service") !== -1 || low.indexOf("track") !== -1 || low.indexOf("path") !== -1 || low.indexOf("pedestrian") !== -1) {
+          paintIf(map, id, "line-color", isCase ? minorCase : minor);
+        }
+        return;
+      }
+      if (typ === "symbol") {
+        if (low.indexOf("water") !== -1) {
+          paintIf(map, id, "text-color", waterLabel);
+          paintIf(map, id, "text-halo-color", "rgba(255,255,255,0.8)");
+        } else if (low.indexOf("poi") !== -1) {
+          paintIf(map, id, "text-color", poi);
+          paintIf(map, id, "text-halo-color", halo);
+        } else if (low.indexOf("label") !== -1 || low.indexOf("highway-name") !== -1) {
+          paintIf(map, id, "text-color", label);
+          paintIf(map, id, "text-halo-color", halo);
+        }
+      }
+    });
+  }
+  function paintMapStars(canvas) {
+    if (!canvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(canvas.clientWidth || 0, window.innerWidth || 390);
+    const h = Math.max(canvas.clientHeight || 0, window.innerHeight || 844);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = "#07071a";
+    ctx.fillRect(0, 0, w, h);
+    let s = 7;
+    function rnd() { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }
+    for (let i = 0; i < 140; i++) {
+      const x = rnd() * w, y = rnd() * h;
+      const r = rnd() < 0.12 ? 1.25 : 0.65;
+      const a = 0.32 + rnd() * 0.55;
+      ctx.fillStyle = rnd() < 0.18 ? ("rgba(180,210,255," + a + ")") : ("rgba(255,255,255," + a + ")");
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  function ensureMapSpace() {
+    const el = document.getElementById("map-space");
+    if (!el) return null;
+    paintMapStars(el);
+    return el;
+  }
+  function syncMapSpace(map) {
+    const mapEl = document.getElementById("map");
+    const space = document.getElementById("map-space");
+    let z = 12;
+    try { if (map && map.getZoom) z = map.getZoom(); } catch (e) {}
+    const globe = z < 6.5;
+    if (mapEl) mapEl.classList.toggle("is-globe", globe);
+    if (space) space.style.opacity = globe ? "1" : "0";
+  }
+  function applyGlobeView(map) {
+    if (!map || isLeaflet()) return;
+    try {
+      if (typeof map.setProjection === "function") map.setProjection({ type: "globe" });
+    } catch (e) {}
+    try {
+      if (typeof map.setSky === "function") {
+        map.setSky({
+          "sky-color": "#07071a",
+          "horizon-color": "#7EC8FF",
+          "horizon-fog-blend": 0.8,
+          "fog-color": "#B8E4FF",
+          "fog-ground-blend": 0.5,
+          "sky-horizon-blend": 0.7,
+          "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 0.85, 7, 0]
+        });
+      }
+    } catch (e) {}
+    try { ensureMapSpace(); } catch (e) {}
+    try { syncMapSpace(map); } catch (e) {}
+  }
+  function dressMapStyle(map) {
+    if (!map || isLeaflet()) return;
+    try { applyColorfulMap(map); } catch (e) {}
+    try { applyGlobeView(map); } catch (e) {}
+    try { apply3DScene(map); } catch (e) {}
+    try { applyGlobeView(map); } catch (e) {}
   }
   function isView3D() { return !!state.view3d; }
   function webglSupported() {
@@ -18734,12 +18913,14 @@
           zoom: on ? VIEW3D.zoom : FLAT_VIEW.zoom,
           pitch: on ? VIEW3D.pitch : FLAT_VIEW.pitch,
           bearing: on ? VIEW3D.bearing : FLAT_VIEW.bearing,
+          minZoom: 0,
           maxPitch: 85,
           dragRotate: true,
           touchPitch: true,
           pitchWithRotate: true,
           attributionControl: false,
-          failIfMajorPerformanceCaveat: false
+          failIfMajorPerformanceCaveat: false,
+          projection: { type: "globe" }
         });
         state.map = map;
         state.mapEngine = "maplibre";
@@ -18760,11 +18941,12 @@
           if (loaded || settled) return;
           fallbackLevel += 1;
           try {
-            if (fallbackLevel === 1) { map.setStyle(rasterFallbackStyle()); armTimer(); }
-            else if (fallbackLevel === 2) { map.setStyle(OSM_RASTER); armTimer(); }
+            if (fallbackLevel === 1) { map.setStyle(BRIGHT_STYLE); armTimer(); }
+            else if (fallbackLevel === 2) { map.setStyle(rasterFallbackStyle()); armTimer(); }
+            else if (fallbackLevel === 3) { map.setStyle(OSM_RASTER); armTimer(); }
             else fail("styles-failed:" + why);
           } catch (e) {
-            if (fallbackLevel < 3) tryFallback("setStyle");
+            if (fallbackLevel < 4) tryFallback("setStyle");
             else fail("styles-failed");
           }
         }
@@ -18774,12 +18956,12 @@
           const msg = String((err && (err.message || err)) || "");
           const url = String((err && (err.url || "")) || "");
           // Only abandon the vector style if the style document itself failed — ignore tile/sprite/glyph errors.
-          if (/error loading style|failed to fetch style|styles\/dark|styles\/positron|load style/i.test(msg + " " + url)) {
+          if (/error loading style|failed to fetch style|styles\/(dark|positron|liberty|bright)|load style/i.test(msg + " " + url)) {
             tryFallback(msg || "style");
           }
         });
         function afterStyleReady() {
-          try { apply3DScene(map); } catch (err) {}
+          try { dressMapStyle(map); } catch (err) {}
           try {
             if (isView3D()) map.jumpTo({
               center: [state.loc.lng, state.loc.lat],
@@ -18790,8 +18972,27 @@
             else map.jumpTo({ pitch: FLAT_VIEW.pitch, bearing: FLAT_VIEW.bearing });
           } catch (err) {}
           try { map.resize(); } catch (e) {}
+          try { syncMapSpace(map); } catch (e) {}
           renderMapMarkers();
         }
+        map.on("style.load", function () {
+          try { dressMapStyle(map); } catch (err) {}
+        });
+        map.on("zoom", function () { try { syncMapSpace(map); } catch (e) {} });
+        map.on("zoomend", function () {
+          try { syncMapSpace(map); } catch (e) {}
+          try {
+            if (map.getZoom() < 2.2 && (map.getPitch() || 0) > 8) {
+              map.easeTo({ pitch: 0, duration: 500 });
+            }
+          } catch (e) {}
+        });
+        try {
+          if (!window.__gatherStarsResize) {
+            window.__gatherStarsResize = function () { try { ensureMapSpace(); } catch (e) {} };
+            window.addEventListener("resize", window.__gatherStarsResize);
+          }
+        } catch (e) {}
         map.on("load", function () {
           loaded = true;
           clearTimeout(waitTimer);
@@ -18908,11 +19109,12 @@
     }
     try { state.map.setStyle(styleFor(kind)); } catch (e) { return; }
     state.map.once("idle", function () {
-      try { apply3DScene(state.map); } catch (err) {}
+      try { dressMapStyle(state.map); } catch (err) {}
       try {
         if (isView3D()) state.map.easeTo({ pitch: VIEW3D.pitch, bearing: VIEW3D.bearing, zoom: Math.max(state.map.getZoom(), VIEW3D.zoom), duration: 700 });
         else state.map.easeTo({ pitch: 0, bearing: 0, duration: 400 });
       } catch (err) {}
+      try { syncMapSpace(state.map); } catch (e) {}
       renderMapMarkers();
     });
   }
@@ -19820,7 +20022,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 18. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 19. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";

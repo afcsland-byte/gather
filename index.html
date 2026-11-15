@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="21">
+<html lang="en" data-theme="white" data-build="22">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -10,8 +10,11 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="21" />
+  <meta name="gather-build" content="22" />
   <title>Gather</title>
+  <link rel="preconnect" href="https://assets.mixkit.co" crossorigin>
+  <link rel="dns-prefetch" href="https://assets.mixkit.co">
+  <link rel="preload" as="video" href="https://assets.mixkit.co/videos/1230/1230-720.mp4" type="video/mp4">
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
   <style>
@@ -4345,20 +4348,35 @@
       min-height: 100%;
       scroll-snap-align: start;
       scroll-snap-stop: always;
-      background: #000;
+      background-color: #111;
+      background-size: cover;
+      background-position: center;
       overflow: hidden;
       color: #fff;
     }
     .vf-slide video,
     .vf-slide .vf-poster {
       position: absolute; inset: 0; width: 100%; height: 100%;
-      object-fit: cover; background: #000;
+      object-fit: cover;
+      background-color: transparent;
+      background-size: cover;
+      background-position: center;
       transform: translateZ(0); -webkit-transform: translateZ(0);
       backface-visibility: hidden; -webkit-backface-visibility: hidden;
     }
-    .vf-slide .vf-poster { display: none; }
+    .vf-slide .vf-poster {
+      display: block;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .vf-slide video { z-index: 1; }
+    .vf-slide.is-ready .vf-poster,
+    .vf-slide.is-playing .vf-poster {
+      opacity: 0;
+      transition: opacity 80ms linear;
+    }
     .vf-slide.is-failed video { display: none; }
-    .vf-slide.is-failed .vf-poster { display: block; }
+    .vf-slide.is-failed .vf-poster { display: block; opacity: 1; }
     .vf-pause {
       position: absolute; inset: 0; display: none; place-items: center;
       pointer-events: none; z-index: 2;
@@ -4559,7 +4577,16 @@
 
     </style>
   <script>
-  window.__gatherLibsReady = (function () {
+  window.__gatherMapLibsStarted = false;
+  var __gatherMapLibsResolve, __gatherMapLibsReject;
+  window.__gatherLibsReady = new Promise(function (resolve, reject) {
+    __gatherMapLibsResolve = resolve;
+    __gatherMapLibsReject = reject;
+  });
+  window.__gatherStartMapLibs = function () {
+    if (window.__gatherMapLibsStarted) return window.__gatherLibsReady;
+    window.__gatherMapLibsStarted = true;
+    (function () {
     var ML_JS = [
       "https://unpkg.com/maplibre-gl@5.24.1/dist/maplibre-gl.js",
       "https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.1/dist/maplibre-gl.js"
@@ -4616,15 +4643,31 @@
       return loadCss(LF_CSS).then(function () { return loadScript(LF_JS, 8000); });
     };
     loadCss(ML_CSS);
-    if (typeof maplibregl !== "undefined") return Promise.resolve("present");
-    return loadScript(ML_JS, 8000).catch(function () { return null; });
-  })();
+    var ready = (typeof maplibregl !== "undefined")
+      ? Promise.resolve("present")
+      : loadScript(ML_JS, 8000).catch(function () { return null; });
+    ready.then(function (v) { __gatherMapLibsResolve(v); }, function (err) { __gatherMapLibsResolve(null); });
+    })();
+    return window.__gatherLibsReady;
+  };
   </script>
 </head>
 
 <body>
   <div id="app">
     <div id="pager">
+      <script>
+      (function(){
+        try {
+          var s = JSON.parse(localStorage.getItem("gather.v2") || "{}");
+          if (!(s.session && s.session.signedIn && s.onboardingDone)) return;
+          var i = (typeof s.lastPage === "number") ? s.lastPage : 2;
+          if (i < 0 || i > 4) i = 2;
+          document.getElementById("pager").style.transform = "translateX(" + (-i * 100) + "%)";
+          if (i === 0) document.documentElement.setAttribute("data-boot-feeds", "1");
+        } catch (e) {}
+      })();
+      </script>
       <section class="page" data-page="feeds" id="page-feeds">
         <div class="feeds-head" id="feeds-head">
           <div class="feeds-top">
@@ -4652,7 +4695,12 @@
           <div class="feeds-pane" data-feeds-pane="foryou">
             <div class="scroll" id="feeds-scroll-foryou">
               <div class="stories-row" id="feeds-stories"></div>
-              <div class="feed" id="discover-feed"></div>
+              <div class="feed video-feed" id="discover-feed">
+                <article class="vf-slide vf-boot-slide" id="feeds-boot-slide" data-feed-id="fv-osu" data-feed-user="kwame" style="background:linear-gradient(180deg,#050510 0%,#1A1240 50%,#0A0A12 100%);background-size:cover;background-position:center">
+                  <img class="vf-poster" alt="" />
+                  <video id="feeds-boot-video" playsinline webkit-playsinline loop muted preload="auto" src="https://assets.mixkit.co/videos/1230/1230-720.mp4"></video>
+                </article>
+              </div>
             </div>
           </div>
           <div class="feeds-pane" data-feeds-pane="following">
@@ -6804,18 +6852,23 @@
     const pager = $("#pager");
     if (instant) pager.classList.add("dragging");
     pager.style.transform = "translateX(" + (-i * 100) + "%)";
-    if (instant) requestAnimationFrame(() => pager.classList.remove("dragging"));
+    if (instant) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { pager.classList.remove("dragging"); });
+      });
+    }
     try { pinAppScroll(); } catch (e) {}
     $$("#nav .nav-btn, #nav .nav-center").forEach(b => b.classList.toggle("active", Number(b.dataset.go) === i));
     try { syncNavBadges(); } catch (e) {}
     $("#nav").classList.toggle("solid", i === PAGE.feeds || i === PAGE.chat || i === PAGE.community);
+    try { store.lastPage = i; saveStore(); } catch (e) {}
     if (i === PAGE.map) { initMap(); setTimeout(() => { try { mapResize(); } catch (e) {} }, 80); try { maybeShowGatherHint(); } catch (e) {} }
     if (i === PAGE.chat) { try { renderChatPage(); } catch (e) { console.warn("renderChatPage", e); } }
     if (i !== PAGE.map) { try { closeGatherSheet(); } catch (e) {} }
     if (i === PAGE.camera) startCamera();
     else stopCameraPreview();
-    if (i === PAGE.feeds) { renderChatPage(); renderDiscover(); syncFeedsStories(); try { initFeedsTabs(); } catch (e) {} }
-    else { try { pauseAllFeedVideos(); closeFeedComments(); } catch (e) {} }
+    if (i === PAGE.feeds) { renderChatPage(); renderDiscover({ reuse: true }); syncFeedsStories(); try { initFeedsTabs(); } catch (e) {} }
+    else { try { pauseAllFeedVideos(); closeFeedComments(); } catch (e) {} try { if (typeof ensureFeedsWarmPreload === "function") ensureFeedsWarmPreload(); } catch (e) {} }
     if (i === PAGE.community) renderCommunityPage();
   }
   function syncFeedsStories() {
@@ -8070,7 +8123,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 21. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 22. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -16869,18 +16922,38 @@
     if (on) return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16 9.5a4 4 0 0 1 0 5"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg>';
     return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M19 9l-6 6M13 9l6 6"/></svg>';
   }
-  function videoSlideHtml(v) {
+  function feedPosterUrl(v) {
     const pics = photos();
-    const poster = v.posterSrc || pics[v.poster] || pics.night;
+    return (v && (v.posterSrc || (v.poster && pics[v.poster]) || pics.night)) || pics.night;
+  }
+  function applySlidePoster(slide, v) {
+    if (!slide) return "";
+    const poster = feedPosterUrl(v);
+    if (poster) {
+      slide.style.backgroundImage = 'url("' + poster + '")';
+      const img = slide.querySelector(".vf-poster");
+      if (img && img.getAttribute("src") !== poster) img.setAttribute("src", poster);
+      const vid = slide.querySelector("video");
+      if (vid) {
+        try { vid.setAttribute("poster", poster); vid.style.backgroundImage = 'url("' + poster + '")'; } catch (e) {}
+      }
+    }
+    return poster;
+  }
+  function videoSlideHtml(v, opts) {
+    opts = opts || {};
+    const poster = feedPosterUrl(v);
+    const preload = opts.preload ? "auto" : "metadata";
     const handle = feedHandleOf(v.userId);
     const liked = likedFeedSet().indexOf(v.id) !== -1;
     const saved = savedFeedSet().indexOf(v.id) !== -1;
     const following = v.userId !== "me" && typeof isFollowing === "function" && isFollowing(v.userId);
     const comments = feedCommentsFor(v.id, v.comments);
     const likeN = (v.likes || 0) + (liked ? 1 : 0);
-    return '<article class="vf-slide" data-feed-id="'+escapeHtml(v.id)+'" data-feed-user="'+escapeHtml(v.userId || "")+'">'+
+    const bg = poster ? (' style="background-image:url(\'' + poster + '\')"') : "";
+    return '<article class="vf-slide" data-feed-id="'+escapeHtml(v.id)+'" data-feed-user="'+escapeHtml(v.userId || "")+'"'+bg+'>'+
       '<img class="vf-poster" alt="" src="'+poster+'" />'+
-      '<video playsinline webkit-playsinline loop muted preload="metadata" poster="'+poster+'" src="'+escapeHtml(v.src)+'"></video>'+
+      '<video playsinline webkit-playsinline loop muted preload="'+preload+'" poster="'+poster+'" style="background-image:url(\'' + poster + '\')" src="'+escapeHtml(v.src)+'"></video>'+
       '<div class="vf-pause" aria-hidden="true"><span>&#9654;</span></div>'+
       '<div class="vf-actions">'+
         '<button type="button" class="vf-av-btn" data-profile="'+escapeHtml(v.userId)+'" aria-label="Profile">'+
@@ -17026,8 +17099,14 @@
       const poster = slide.querySelector(".vf-poster");
       if (poster) poster.style.display = "block";
     });
+    function markReady() { slide.classList.add("is-ready"); }
+    vid.addEventListener("loadeddata", markReady);
+    vid.addEventListener("canplay", markReady);
+    if (vid.readyState >= 2) markReady();
+    try { applySlidePoster(slide, v); } catch (e) {}
     vid.addEventListener("playing", function () {
       slide.classList.add("is-playing");
+      slide.classList.add("is-ready");
       slide.classList.remove("is-paused");
     });
     vid.addEventListener("pause", function () {
@@ -17219,6 +17298,146 @@
   }
   function pickFreshFeedCards() { return allFeedVideos({ refresh: true }); }
   function currentFeedCards() { return allFeedVideos(); }
+  function ensureFeedsWarmPreload() {
+    try {
+      const first = visibleFeedVideos({ tab: "foryou" })[0];
+      if (!first || !first.src) return;
+      let el = document.getElementById("feeds-warm-video");
+      if (!el) {
+        el = document.createElement("video");
+        el.id = "feeds-warm-video";
+        el.muted = true;
+        el.playsInline = true;
+        el.preload = "auto";
+        el.setAttribute("playsinline", "");
+        el.setAttribute("webkit-playsinline", "");
+        el.style.cssText = "position:fixed;left:-120px;top:-120px;width:2px;height:2px;opacity:0;pointer-events:none;";
+        document.body.appendChild(el);
+      }
+      if (el.getAttribute("src") !== first.src) {
+        el.setAttribute("preload", "auto");
+        el.src = first.src;
+        try { el.load(); } catch (e) {}
+      }
+    } catch (e) {}
+  }
+  function adoptPreparedVideo(root, prepared, first) {
+    if (!root || !prepared || !first) return;
+    const dest = root.querySelector('.vf-slide[data-feed-id="'+first.id+'"] video') || root.querySelector(".vf-slide video");
+    if (!dest || dest === prepared) return;
+    if ((prepared.currentSrc || prepared.src || prepared.getAttribute("src") || "") !== first.src) return;
+    try {
+      dest.parentNode.replaceChild(prepared, dest);
+      prepared.removeAttribute("id");
+      prepared.muted = !feedSoundOn;
+      prepared.loop = true;
+      prepared.playsInline = true;
+    } catch (e) {}
+  }
+  function paintFirstFeedNow() {
+    try { photos(); } catch (e) {}
+    const root = document.getElementById("discover-feed");
+    const bootVid = document.getElementById("feeds-boot-video");
+    const bootSlide = document.getElementById("feeds-boot-slide") || (bootVid && bootVid.closest(".vf-slide"));
+    const first = (typeof visibleFeedVideos === "function" && visibleFeedVideos({ tab: "foryou" })[0]) || (SEED_FEED_VIDEOS && SEED_FEED_VIDEOS[0]);
+    if (bootVid && first) {
+      if (bootVid.getAttribute("src") !== first.src) {
+        bootVid.setAttribute("src", first.src);
+        try { bootVid.load(); } catch (e) {}
+      }
+      bootVid.preload = "auto";
+      bootVid.muted = true;
+      bootVid.playsInline = true;
+      if (bootSlide) {
+        bootSlide.setAttribute("data-feed-id", first.id || "fv-osu");
+        try { applySlidePoster(bootSlide, first); } catch (e) {}
+      }
+    }
+    if (root && first && !root.dataset.mounted) {
+      /* Keep the boot video in place; full list is mounted by renderDiscover shortly. */
+    }
+    try { if (document.documentElement.getAttribute("data-boot-feeds") === "1" && bootVid) bootVid.play().catch(function () {}); } catch (e) {}
+  }
+  function commitFeedList(root, sc, videos, prepared, opts) {
+    opts = opts || {};
+    const first = videos[0];
+    const html = videos.map(function (v, i) { return videoSlideHtml(v, { preload: i === 0 }); }).join("");
+    const stash = prepared || document.getElementById("feeds-boot-video");
+    if (stash && stash.parentNode && root.contains(stash)) {
+      stash.parentNode.removeChild(stash);
+    } else if (stash && stash.parentNode && stash.parentNode.id === "feeds-refresh-hold") {
+      stash.parentNode.removeChild(stash);
+    }
+    root.className = "feed video-feed";
+    root.innerHTML = html;
+    if (stash && first) adoptPreparedVideo(root, stash, first);
+    const hold = document.getElementById("feeds-refresh-hold");
+    if (hold && hold.parentNode) hold.parentNode.removeChild(hold);
+    root.dataset.mounted = "1";
+    videos.forEach(function (v) {
+      const slide = root.querySelector('.vf-slide[data-feed-id="'+v.id+'"]');
+      if (slide) bindFeedVideoMedia(slide, v);
+    });
+    sizeVideoSlides();
+    bindVideoFeedClicks();
+    bindVideoFeedObserver(sc, root);
+    if (opts.refresh && sc) { try { sc.scrollTop = 0; } catch (err) {} }
+    const firstVid = root.querySelector(".vf-slide video");
+    const firstSlide = firstVid && firstVid.closest(".vf-slide");
+    if (firstVid && firstVid.readyState >= 2 && firstSlide) firstSlide.classList.add("is-ready");
+    requestAnimationFrame(function () {
+      sizeVideoSlides();
+      if (typeof currentFeedsTab === "function" && opts.tab && currentFeedsTab() !== opts.tab) return;
+      if (state.page !== PAGE.feeds) return;
+      const visible = sc && sc.scrollTop < (sc.clientHeight * 0.5);
+      if (firstVid && (visible || opts.refresh || (sc && sc.scrollTop === 0))) playFeedVideo(firstVid);
+    });
+    try { window.addEventListener("resize", sizeVideoSlides); } catch (err) {}
+  }
+  function refreshDiscoverSmooth(opts) {
+    const tab = opts.tab || (typeof isVideoFeedsTab === "function" && isVideoFeedsTab() ? currentFeedsTab() : "foryou");
+    const root = feedRootForTab(tab) || document.getElementById("discover-feed");
+    const sc = feedScrollForTab(tab);
+    if (!root) return;
+    const videos = visibleFeedVideos({ refresh: true, tab: tab, focusUser: opts.focusUser });
+    if (!videos.length && tab === "following") {
+      root.innerHTML = '<div class="vf-empty" id="following-empty"><p>Follow creators to see their videos here</p><button type="button" class="btn btn-primary" id="btn-following-to-foryou">For you</button></div>';
+      root.dataset.mounted = "1";
+      try { pauseFeedPane("following"); } catch (err) {}
+      sizeVideoSlides();
+      return;
+    }
+    if (!videos.length) return;
+    const first = videos[0];
+    let hold = document.getElementById("feeds-refresh-hold");
+    if (hold) hold.innerHTML = "";
+    else {
+      hold = document.createElement("div");
+      hold.id = "feeds-refresh-hold";
+      hold.style.cssText = "position:fixed;left:-80px;top:-80px;width:4px;height:4px;overflow:hidden;opacity:0;pointer-events:none;";
+      document.body.appendChild(hold);
+    }
+    hold.innerHTML = videoSlideHtml(first, { preload: true });
+    const prepSlide = hold.querySelector(".vf-slide");
+    const prepVid = hold.querySelector("video");
+    if (prepVid) {
+      prepVid.preload = "auto";
+      prepVid.muted = true;
+      prepVid.playsInline = true;
+      try { prepVid.load(); } catch (e) {}
+    }
+    try { applySlidePoster(prepSlide, first); } catch (e) {}
+    let done = false;
+    function commit() {
+      if (done) return;
+      done = true;
+      commitFeedList(root, sc, videos, prepVid, { refresh: true, tab: tab });
+    }
+    if (!prepVid || prepVid.readyState >= 2) { commit(); return; }
+    prepVid.addEventListener("loadeddata", commit, { once: true });
+    prepVid.addEventListener("canplay", commit, { once: true });
+    setTimeout(commit, 450);
+  }
   function renderDiscover(opts) {
     opts = opts || {};
     const tab = opts.tab || (typeof isVideoFeedsTab === "function" && isVideoFeedsTab() ? currentFeedsTab() : "foryou");
@@ -17229,15 +17448,16 @@
     if (opts.refresh) {
       const other = document.getElementById(tab === "following" ? "discover-feed" : "following-feed");
       if (other) other.dataset.mounted = "";
+      refreshDiscoverSmooth({ tab: tab, focusUser: opts.focusUser });
+      return;
     }
-    const canReuse = opts.reuse && root.dataset.mounted === "1" && !opts.refresh && !(tab === "foryou" && state.feedFocusUser);
+    const canReuse = (opts.reuse || root.dataset.mounted === "1") && root.dataset.mounted === "1" && !(tab === "foryou" && state.feedFocusUser);
     if (canReuse) {
       sizeVideoSlides();
       if (typeof currentFeedsTab === "function" && currentFeedsTab() === tab && state.page === PAGE.feeds) resumeFeedPane(tab);
       return;
     }
-    const videos = visibleFeedVideos({ refresh: !!opts.refresh, tab: tab, focusUser: opts.focusUser });
-    root.className = "feed video-feed";
+    const videos = visibleFeedVideos({ refresh: false, tab: tab, focusUser: opts.focusUser });
     if (!videos.length && tab === "following") {
       root.innerHTML = '<div class="vf-empty" id="following-empty"><p>Follow creators to see their videos here</p><button type="button" class="btn btn-primary" id="btn-following-to-foryou">For you</button></div>';
       root.dataset.mounted = "1";
@@ -17245,25 +17465,8 @@
       sizeVideoSlides();
       return;
     }
-    root.innerHTML = videos.map(videoSlideHtml).join("");
-    root.dataset.mounted = "1";
-    videos.forEach(function (v) {
-      const slide = root.querySelector('.vf-slide[data-feed-id="'+v.id+'"]');
-      if (slide) bindFeedVideoMedia(slide, v);
-    });
-    sizeVideoSlides();
-    bindVideoFeedClicks();
-    bindVideoFeedObserver(sc, root);
-    if (opts.refresh && sc) { try { sc.scrollTop = 0; } catch (err) {} }
-    requestAnimationFrame(function () {
-      sizeVideoSlides();
-      if (typeof currentFeedsTab === "function" && currentFeedsTab() !== tab) return;
-      if (state.page !== PAGE.feeds) return;
-      const first = root.querySelector(".vf-slide video");
-      const visible = sc && sc.scrollTop < (sc.clientHeight * 0.5);
-      if (first && (visible || opts.refresh || (sc && sc.scrollTop === 0))) playFeedVideo(first);
-    });
-    try { window.addEventListener("resize", sizeVideoSlides); } catch (err) {}
+    if (!videos.length) return;
+    commitFeedList(root, sc, videos, document.getElementById("feeds-boot-video"), { refresh: false, tab: tab });
   }
 
 
@@ -18800,6 +19003,7 @@
     if (state.mapInitPending) return;
     state.mapInitPending = true;
     hideMapFail();
+    try { if (typeof window.__gatherStartMapLibs === "function") window.__gatherStartMapLibs(); } catch (e) {}
     const ready = window.__gatherLibsReady;
     Promise.resolve(ready)
       .catch(function () { return null; })
@@ -19951,7 +20155,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 21. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 22. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -20360,10 +20564,7 @@
         resetTabToRoot(i);
         return;
       }
-      goPage(i);
-      if (i === PAGE.feeds) {
-        try { startFeedsIconRefresh(); } catch (err) {}
-      }
+      goPage(i, i === PAGE.feeds);
     });
   });
   // shutter press (camera page only)
@@ -21351,7 +21552,19 @@
   function startUi() {
     hideAuth();
     hideNav(false);
-    goPage(2, true);
+    var startPage = PAGE.map;
+    try {
+      if (store.onboardingDone && typeof store.lastPage === "number" && store.lastPage >= 0 && store.lastPage < PAGES.length) {
+        startPage = store.lastPage;
+      }
+    } catch (e) {}
+    goPage(startPage, true);
+    try {
+      if (startPage === PAGE.feeds) {
+        const first = document.querySelector("#feeds-scroll-foryou .vf-slide video") || document.getElementById("feeds-boot-video");
+        if (first) playFeedVideo(first);
+      }
+    } catch (e) {}
     try { syncLayerChips(); } catch (e) {}
     maybeOnboard();
     try { maybeShowGatherHint(); } catch (e) {}
@@ -22355,26 +22568,42 @@
     try { applyTheme(store.theme || "white"); syncLayerChips(); } catch (e) {}
     photos();
     if (new URLSearchParams(location.search).get("demo") === "1") store.onboardingDone = true;
-    setupSwipe();
-    renderLenses();
-    paintFallbackScene();
-    try { renderChatPage(); } catch (e) { console.warn("renderChatPage", e); }
-    try { renderDiscover(); } catch (e) { console.warn("renderDiscover", e); }
-    try { renderStoriesPage(); } catch (e) { console.warn("renderStoriesPage", e); }
-    try { seedNotificationsOnce(); syncFeedsNotifBadges(); } catch (e) {}
-    bindAuthEvents();
-    if (isSignedIn()) {
-      const ready = window.__gatherLibsReady;
-      if (ready && typeof ready.then === "function") ready.then(startUi, startUi);
-      else startUi();
-    } else {
-      hideNav(true);
-      showAuth("welcome");
+    try { paintFirstFeedNow(); } catch (e) { console.warn("paintFirstFeedNow", e); }
+    function afterFirstPaint(fn) {
+      const run = function () { try { fn(); } catch (err) { console.warn("boot:afterPaint", err); } };
+      if (typeof requestAnimationFrame === "function") {
+        requestAnimationFrame(function () {
+          if (typeof requestIdleCallback === "function") requestIdleCallback(run, { timeout: 400 });
+          else setTimeout(run, 0);
+        });
+      } else setTimeout(run, 0);
     }
-    runSplash(function () {
-      if (isSignedIn()) { hideAuth(); hideNav(false); }
-    });
-    try { registerGatherSW(); } catch (e) {}
+    function continueBoot() {
+      setupSwipe();
+      renderLenses();
+      paintFallbackScene();
+      try { renderChatPage(); } catch (e) { console.warn("renderChatPage", e); }
+      try { renderDiscover({ reuse: true }); } catch (e) { console.warn("renderDiscover", e); }
+      try { renderStoriesPage(); } catch (e) { console.warn("renderStoriesPage", e); }
+      try { seedNotificationsOnce(); syncFeedsNotifBadges(); } catch (e) {}
+      bindAuthEvents();
+      if (isSignedIn()) {
+        startUi();
+      } else {
+        hideNav(true);
+        showAuth("welcome");
+      }
+      runSplash(function () {
+        if (isSignedIn()) { hideAuth(); hideNav(false); }
+      });
+      try { registerGatherSW(); } catch (e) {}
+      afterFirstPaint(function () {
+        try { if (typeof window.__gatherStartMapLibs === "function") window.__gatherStartMapLibs(); } catch (e) {}
+        try { if (state.page !== PAGE.feeds) ensureFeedsWarmPreload(); } catch (e) {}
+      });
+    }
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(continueBoot);
+    else continueBoot();
   }
   boot();
 })();

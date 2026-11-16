@@ -2812,7 +2812,7 @@
     }
     .auth-step-help { font-size: 14px; color: var(--muted); line-height: 1.4; margin-bottom: 18px; }
     .auth-slider {
-      flex: 1; overflow: hidden; position: relative;
+      flex: 1; overflow: hidden; overflow-x: hidden; position: relative;
       width: 100%;
     }
     .auth-track {
@@ -21579,7 +21579,9 @@
     if (next) next.textContent = step.next;
     if (err) err.textContent = "";
     const slider = track && track.parentElement;
-    const paneW = (slider && slider.clientWidth) || (track && track.parentElement && track.parentElement.clientWidth) || 0;
+    const paneW = (slider && slider.clientWidth) || 0;
+    const ae = document.activeElement;
+    if (ae && ae.closest && ae.closest("#auth-signup-track") && ae.blur) ae.blur();
     $$("#auth-signup-track .auth-pane").forEach(function (pane, i) {
       const on = i === authState.step;
       pane.classList.toggle("on", on);
@@ -21592,6 +21594,14 @@
       }
     });
     if (track) track.style.transform = "translateX(" + (-authState.step * (paneW || 0)) + "px)";
+    const root = document.getElementById("auth-root");
+    const view = slider && slider.closest(".auth-view");
+    function pinAuthScroll() {
+      [slider, track, root, view].forEach(function (el) { if (el) el.scrollLeft = 0; });
+    }
+    pinAuthScroll();
+    requestAnimationFrame(pinAuthScroll);
+    setTimeout(pinAuthScroll, 340);
     const back = document.getElementById("auth-signup-back");
     if (back) back.setAttribute("aria-label", authState.step === 0 ? "Back to welcome" : "Back");
   }

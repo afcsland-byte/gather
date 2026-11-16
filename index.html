@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="26">
+<html lang="en" data-theme="white" data-build="27">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -4288,6 +4288,41 @@
     }
     .place-pin.live-stream .place-pin-ico { background: #3B1020; }
     .place-pin.live-party .place-pin-ico { background: #FF375F; color: #fff; }
+    html[data-theme="black"] .place-pin {
+      background: #161A24; color: #F4F6FA;
+      border-color: rgba(255,255,255,0.14);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 8px 22px rgba(0,0,0,.55);
+    }
+    html[data-theme="black"] .place-pin.party,
+    html[data-theme="black"] .place-pin.live-party {
+      border-color: #FF7AA8;
+      box-shadow: 0 0 16px rgba(255,55,95,0.55), 0 6px 18px rgba(0,0,0,.5);
+    }
+    html[data-theme="black"] .place-pin.is-live {
+      border-color: #FF375F;
+      box-shadow: 0 0 18px rgba(255,55,95,0.72), 0 6px 18px rgba(0,0,0,.5);
+    }
+    html[data-theme="black"] .place-pin.live-stream {
+      border-color: #FF8AA8;
+    }
+    html[data-theme="black"] .pin-av {
+      box-shadow: 0 0 10px rgba(255,255,255,0.12), 0 2px 10px rgba(0,0,0,.6);
+    }
+    html[data-theme="black"] .pin-av.friend {
+      border-color: #FFE566;
+      box-shadow: 0 0 14px rgba(255,214,60,0.75);
+    }
+    html[data-theme="black"] .pin-av.party {
+      border-color: #FF6B9A;
+      box-shadow: 0 0 14px rgba(255,55,95,0.7);
+    }
+    html[data-theme="black"] .pin-label {
+      background: rgba(8,10,16,.9); color: #F7F8FB;
+      box-shadow: 0 0 10px rgba(0,0,0,.45);
+    }
+    html[data-theme="black"] .pulse-core {
+      box-shadow: 0 0 12px 2px rgba(0,194,255,.85);
+    }
     html[data-theme="white"] .place-pin.live-stream .place-pin-ico { background: #FDECEE; }
     html[data-theme="white"] .place-pin.live-party .place-pin-ico { background: #FF375F; color: #fff; }
     #search-panel .result-row .chip.live-chip {
@@ -8117,7 +8152,7 @@ function blankStore() {
       '<label class="field"><span>Status</span><input id="set-status" maxlength="40" value="'+escapeHtml(store.profile.status)+'" /></label></div>'+
       '<div class="section-label">Appearance</div>'+
       '<div class="group">'+
-      '<button type="button" class="set-row'+(store.theme!=="white"?" on":"")+'" data-theme-pick="black"><div class="set-copy"><h4>Black</h4><p>Dark map and interface</p></div></button>'+
+      '<button type="button" class="set-row'+(store.theme!=="white"?" on":"")+'" data-theme-pick="black"><div class="set-copy"><h4>Black</h4><p>Night map and dark interface</p></div></button>'+
       '<button type="button" class="set-row'+(store.theme==="white"?" on":"")+'" data-theme-pick="white"><div class="set-copy"><h4>White</h4><p>Light greyscale map and interface</p></div></button>'+
       "</div>"+
       '<div class="section-label">Pull to refresh</div>'+
@@ -8160,7 +8195,7 @@ function blankStore() {
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 26. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 27. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -18650,6 +18685,7 @@ function blankStore() {
   };
   const DARK_STYLE = "https://tiles.openfreemap.org/styles/dark";
   const POSITRON_STYLE = "https://tiles.openfreemap.org/styles/positron";
+  const NIGHT_EARTH_TILES = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_Black_Marble/default/2016-01-01/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png";
   const SAT_STYLE = {
     version: 8,
     sources: {
@@ -18742,24 +18778,149 @@ function blankStore() {
     } catch (e) {}
     try {
       if (typeof map.setSky === "function") {
-        map.setSky({
-          "sky-color": "#07071a",
-          "horizon-color": "#7EC8FF",
-          "horizon-fog-blend": 0.8,
-          "fog-color": "#B8E4FF",
-          "fog-ground-blend": 0.5,
-          "sky-horizon-blend": 0.7,
-          "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 0.85, 7, 0]
-        });
+        if (isWhiteTheme()) {
+          map.setSky({
+            "sky-color": "#07071a",
+            "horizon-color": "#7EC8FF",
+            "horizon-fog-blend": 0.8,
+            "fog-color": "#B8E4FF",
+            "fog-ground-blend": 0.5,
+            "sky-horizon-blend": 0.7,
+            "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 0.85, 7, 0]
+          });
+        } else {
+          map.setSky({
+            "sky-color": "#050512",
+            "horizon-color": "#1A2748",
+            "horizon-fog-blend": 0.55,
+            "fog-color": "#0B1228",
+            "fog-ground-blend": 0.62,
+            "sky-horizon-blend": 0.85,
+            "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.32, 5, 0.12, 7, 0]
+          });
+        }
       }
     } catch (e) {}
     try { ensureMapSpace(); } catch (e) {}
     try { syncMapSpace(map); } catch (e) {}
   }
+
+  function setLayerPaint(map, id, props) {
+    if (!map || !map.getLayer || !map.getLayer(id)) return;
+    Object.keys(props).forEach(function (k) {
+      try { map.setPaintProperty(id, k, props[k]); } catch (e) {}
+    });
+  }
+  function ensureNightRoadGlow(map) {
+    if (!map || isWhiteTheme() || !map.getSource || !map.getSource("openmaptiles")) return;
+    function glow(id, before, filter, color, width) {
+      if (map.getLayer(id)) return;
+      try {
+        map.addLayer({
+          id: id,
+          type: "line",
+          source: "openmaptiles",
+          "source-layer": "transportation",
+          filter: filter,
+          layout: { "line-cap": "round", "line-join": "round" },
+          paint: {
+            "line-color": color,
+            "line-opacity": 0.38,
+            "line-blur": 8,
+            "line-width": width
+          }
+        }, before && map.getLayer(before) ? before : undefined);
+      } catch (e) {}
+    }
+    glow("night-glow-major", "highway_major_inner",
+      ["all", ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false], ["match", ["get", "class"], ["primary", "secondary", "tertiary", "trunk"], true, false]],
+      "#F3D27A",
+      ["interpolate", ["exponential", 1.3], ["zoom"], 10, 4, 20, 28]
+    );
+    glow("night-glow-motorway", "highway_motorway_inner",
+      ["all", ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false], ["==", ["get", "class"], "motorway"]],
+      "#FFC56A",
+      ["interpolate", ["exponential", 1.4], ["zoom"], 6, 4, 20, 40]
+    );
+  }
+  function ensureNightEarth(map) {
+    if (!map || isWhiteTheme()) return;
+    try {
+      if (!map.getSource("night-earth")) {
+        map.addSource("night-earth", {
+          type: "raster",
+          tiles: [NIGHT_EARTH_TILES],
+          tileSize: 256,
+          minzoom: 0,
+          maxzoom: 8,
+          attribution: "NASA Black Marble"
+        });
+      }
+      if (!map.getLayer("night-earth")) {
+        const before = map.getLayer("water_name") ? "water_name" : (map.getLayer("place_other") ? "place_other" : undefined);
+        map.addLayer({
+          id: "night-earth",
+          type: "raster",
+          source: "night-earth",
+          minzoom: 0,
+          maxzoom: 7,
+          paint: {
+            "raster-opacity": ["interpolate", ["linear"], ["zoom"], 5.4, 1, 6.5, 0],
+            "raster-fade-duration": 0
+          }
+        }, before);
+      }
+    } catch (e) {}
+  }
+  function paintNightMap(map) {
+    if (!map || isLeaflet() || isWhiteTheme()) return;
+    setLayerPaint(map, "background", { "background-color": "#1B1F2A" });
+    setLayerPaint(map, "water", { "fill-color": "#0A1C3D" });
+    setLayerPaint(map, "waterway", { "line-color": "#0A1C3D" });
+    setLayerPaint(map, "landcover_wood", { "fill-color": "#154428", "fill-opacity": 0.85 });
+    setLayerPaint(map, "landuse_park", { "fill-color": "#1A4A2E" });
+    setLayerPaint(map, "landuse_residential", { "fill-color": "#222636", "fill-opacity": 0.55 });
+    setLayerPaint(map, "landcover_ice_shelf", { "fill-color": "#2A3344" });
+    setLayerPaint(map, "landcover_glacier", { "fill-color": "#2C3A4E" });
+    setLayerPaint(map, "building", { "fill-color": "#2C3040", "fill-outline-color": "#3E4558" });
+    setLayerPaint(map, "highway_path", { "line-color": "#3E4658", "line-opacity": 0.8 });
+    setLayerPaint(map, "highway_minor", { "line-color": "#8B93A6", "line-opacity": 0.75, "line-blur": 0.2 });
+    setLayerPaint(map, "highway_major_casing", { "line-color": "rgba(12,14,20,0.9)" });
+    setLayerPaint(map, "highway_major_inner", { "line-color": "#E8C56A" });
+    setLayerPaint(map, "highway_major_subtle", { "line-color": "#D4B15C" });
+    setLayerPaint(map, "highway_motorway_casing", { "line-color": "rgba(20,14,8,0.9)" });
+    setLayerPaint(map, "highway_motorway_inner", { "line-color": "#FFB24A" });
+    setLayerPaint(map, "highway_motorway_subtle", { "line-color": "#F0A83C" });
+    setLayerPaint(map, "aeroway-taxiway", { "line-color": "#4A5160" });
+    setLayerPaint(map, "aeroway-runway", { "line-color": "#5A6170" });
+    setLayerPaint(map, "aeroway-runway-casing", { "line-color": "rgba(20,22,30,0.85)" });
+    setLayerPaint(map, "aeroway-area", { "fill-color": "#1A1E28" });
+    setLayerPaint(map, "road_area_pier", { "fill-color": "#2A2E38" });
+    setLayerPaint(map, "road_pier", { "line-color": "#2A2E38" });
+    ["railway", "railway_minor", "railway_transit"].forEach(function (id) {
+      setLayerPaint(map, id, { "line-color": "#5A6578" });
+    });
+    ["railway_dashline", "railway_minor_dashline", "railway_transit_dashline"].forEach(function (id) {
+      setLayerPaint(map, id, { "line-color": "#1B1F2A" });
+    });
+    setLayerPaint(map, "water_name", { "text-color": "#9EC0EC", "text-halo-color": "#0A1528" });
+    setLayerPaint(map, "highway_name_other", { "text-color": "#F0E6C8", "text-halo-color": "#12141A" });
+    setLayerPaint(map, "highway_name_motorway", { "text-color": "#FFE7A8", "text-halo-color": "#12141A" });
+    const placeColor = { "text-color": "#F4F6FA", "text-halo-color": "rgba(10,12,18,0.9)" };
+    ["place_other", "place_suburb", "place_village", "place_town", "place_city", "place_city_large", "place_state", "place_country_other", "place_country_minor", "place_country_major"].forEach(function (id) {
+      setLayerPaint(map, id, placeColor);
+    });
+    setLayerPaint(map, "boundary_state", { "line-color": "#4A5580" });
+    setLayerPaint(map, "boundary_country_z0-4", { "line-color": "#5A6A98" });
+    setLayerPaint(map, "boundary_country_z5-", { "line-color": "#5A6A98" });
+    ensureNightRoadGlow(map);
+    ensureNightEarth(map);
+  }
   function dressMapStyle(map) {
     if (!map || isLeaflet()) return;
     try { applyGlobeView(map); } catch (e) {}
     try { apply3DScene(map); } catch (e) {}
+    try { if (!isWhiteTheme()) paintNightMap(map); } catch (e) {}
     try { applyGlobeView(map); } catch (e) {}
   }
   function isView3D() { return !!state.view3d; }
@@ -20374,7 +20535,7 @@ function blankStore() {
       '<label class="field"><span>Status</span><input id="set-status" maxlength="40" value="'+escapeHtml(store.profile.status)+'" /></label></div>'+
       '<div class="section-label">Appearance</div>'+
       '<div class="group">'+
-      '<button type="button" class="set-row'+(store.theme!=="white"?" on":"")+'" data-theme-pick="black"><div class="set-copy"><h4>Black</h4><p>Dark map and interface</p></div></button>'+
+      '<button type="button" class="set-row'+(store.theme!=="white"?" on":"")+'" data-theme-pick="black"><div class="set-copy"><h4>Black</h4><p>Night map and dark interface</p></div></button>'+
       '<button type="button" class="set-row'+(store.theme==="white"?" on":"")+'" data-theme-pick="white"><div class="set-copy"><h4>White</h4><p>Light greyscale map and interface</p></div></button>'+
       "</div>"+
       '<div class="section-label">Pull to refresh</div>'+
@@ -20417,7 +20578,7 @@ function blankStore() {
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 26. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 27. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";

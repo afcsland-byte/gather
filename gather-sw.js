@@ -1,8 +1,8 @@
-/* Gather service worker — Version 26
+/* Gather service worker — Version 27
    Network-first for the app document so a new deploy is seen on the next load.
    App-shell + images are cached for instant reload paint.
    Media Range requests are left to the network (caching ranged MP4 is risky). */
-const CACHE = "gather-v26";
+const CACHE = "gather-v27";
 
 self.addEventListener("install", function (event) {
   self.skipWaiting();

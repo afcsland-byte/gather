@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="23">
+<html lang="en" data-theme="white" data-build="24">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -10,11 +10,10 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="gather-build" content="23" />
+  <meta name="gather-build" content="24" />
   <title>Gather</title>
-  <link rel="preconnect" href="https://assets.mixkit.co" crossorigin>
-  <link rel="dns-prefetch" href="https://assets.mixkit.co">
-  <link rel="preload" as="video" href="https://assets.mixkit.co/videos/1230/1230-720.mp4" type="video/mp4">
+  <link rel="preload" as="image" href="media/fv-osu.jpg">
+  <link rel="preload" as="video" href="media/fv-osu.mp4" type="video/mp4">
   <link rel="icon" type="image/svg+xml" href="logos/gather-black.svg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23111111'/%3E%3Cpath d='M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z' fill='%23FFFFFF'/%3E%3C/svg%3E" />
   <style>
@@ -939,6 +938,9 @@
     #map.is-globe {
       background: transparent;
     }
+    #map.is-globe .maplibregl-marker,
+    #map.is-globe .leaflet-marker-icon,
+    #map.is-globe .gather-pin { display: none !important; }
     #map .maplibregl-map,
     #map .leaflet-container {
       position: absolute !important;
@@ -1255,9 +1257,11 @@
     }
     .cam-brand { font-weight: 600; letter-spacing: -0.015em; font-size: 18px; text-shadow: 0 2px 8px #000; }
     .cam-bottom {
-      position: absolute; left: 0; right: 0; bottom: calc(var(--nav-h) + var(--safe-bot) + 6px);
-      z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 10px;
+      position: absolute; left: 0; right: 0; bottom: calc(var(--nav-h) + var(--safe-bot) + 8px);
+      z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 8px;
+      pointer-events: none;
     }
+    .cam-bottom > * { pointer-events: auto; }
     .lens-name { font-weight: 600; font-size: 14px; text-shadow: 0 2px 8px #000; }
     .lenses {
       display: flex; gap: 10px; overflow-x: auto; width: 100%;
@@ -1272,7 +1276,11 @@
     .lens.on { border-color: var(--yellow); box-shadow: 0 0 0 2px #000, 0 0 0 4px var(--yellow); }
     .lens span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; font-weight: 600; }
     #file-fallback { display: none; }
-    .cam-hint { font-size: 11px; color: #ddd; text-shadow: 0 1px 4px #000; }
+    .cam-hint {
+      font-size: 11px; color: #ddd; text-shadow: 0 1px 4px #000;
+      text-align: center; padding: 0 16px; max-width: 100%;
+      white-space: normal; line-height: 1.3;
+    }
     .rec-timer {
       display: none; position: absolute; top: calc(58px + var(--safe-top)); left: 50%;
       transform: translateX(-50%); z-index: 4;
@@ -2139,9 +2147,7 @@
       font-size: 40px; font-weight: 600; letter-spacing: -0.02em;
       display: flex; flex-direction: column; align-items: center; gap: 14px;
     }
-    .ob-mark .brand-logo { width: 72px; height: 72px; display: none; }
-    html:not([data-theme="white"]) .ob-mark .logo-on-black { display: block; }
-    html[data-theme="white"] .ob-mark .logo-on-white { display: block; }
+    .ob-mark .brand-logo { width: 72px; height: 72px; display: block; color: currentColor; }
     .ob-mark span { color: var(--yellow); }
     .ob-sub { color: var(--muted); margin: 8px 0 28px; line-height: 1.45; }
     .avatar-opts { display: flex; flex-direction: column; gap: 12px; flex: 1; overflow-y: auto; }
@@ -2450,8 +2456,9 @@
       border-bottom-width: 0;
     }
     #cam-shutter {
-      position: absolute; left: 50%; bottom: calc(var(--nav-h) + var(--safe-bot) + 8px);
-      transform: translateX(-50%); z-index: 6; border: 0; cursor: pointer;
+      position: relative; left: auto; bottom: auto;
+      transform: none; z-index: 6; border: 0; cursor: pointer;
+      flex: none; margin: 2px 0;
     }
 
     #pin-sheet {
@@ -2598,7 +2605,7 @@
       position: absolute; top: calc(10px + var(--safe-top)); right: 12px; z-index: 4;
     }
     .live-top {
-      position: absolute; top: calc(10px + var(--safe-top)); left: 12px; right: 56px;
+      position: absolute; top: calc(10px + var(--safe-top)); left: 12px; right: 124px;
       display: flex; align-items: center; gap: 10px; z-index: 3; color: #fff;
     }
     #live-who { font-weight: 600; font-size: 15px; }
@@ -2806,9 +2813,10 @@
     .auth-step-help { font-size: 14px; color: var(--muted); line-height: 1.4; margin-bottom: 18px; }
     .auth-slider {
       flex: 1; overflow: hidden; position: relative;
+      width: 100%;
     }
     .auth-track {
-      display: flex; height: 100%;
+      display: flex; height: 100%; width: 100%;
       transition: transform .32s cubic-bezier(.2,.8,.2,1);
       will-change: transform;
     }
@@ -2818,8 +2826,15 @@
     .auth-pane {
       flex: 0 0 100%;
       width: 100%;
+      min-width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       padding-right: 2px;
-      overflow-y: auto;
+      overflow: hidden;
+    }
+    .auth-pane[aria-hidden="true"] {
+      visibility: hidden;
+      pointer-events: none;
     }
     .auth-field { display: block; margin: 0 0 14px; }
     .auth-field span {
@@ -4211,6 +4226,8 @@
       width: auto; padding: 6px 12px; height: 34px; font-size: 12px;
       background: rgba(255,59,48,.9); color: #fff;
     }
+    #live-end-btn[hidden] { display: none !important; }
+    #live-end-btn.is-leave { background: rgba(0,0,0,.55); }
 
     #live-party {
       display: none; position: absolute; inset: 0; z-index: 85;
@@ -4698,7 +4715,7 @@
               <div class="feed video-feed" id="discover-feed">
                 <article class="vf-slide vf-boot-slide" id="feeds-boot-slide" data-feed-id="fv-osu" data-feed-user="kwame" style="background:linear-gradient(180deg,#050510 0%,#1A1240 50%,#0A0A12 100%);background-size:cover;background-position:center">
                   <img class="vf-poster" alt="" />
-                  <video id="feeds-boot-video" playsinline webkit-playsinline loop muted preload="auto" src="https://assets.mixkit.co/videos/1230/1230-720.mp4"></video>
+                  <video id="feeds-boot-video" playsinline webkit-playsinline loop muted preload="auto" src="media/fv-osu.mp4" poster="media/fv-osu.jpg"></video>
                 </article>
               </div>
             </div>
@@ -4783,8 +4800,8 @@
               </div>
             </div>
             <div class="layer-switch" id="layer-switch">
-              <button type="button" data-layer="black" class="on">Black</button>
-              <button type="button" data-layer="white">White</button>
+              <button type="button" data-layer="black">Black</button>
+              <button type="button" data-layer="white" class="on">White</button>
               <button type="button" data-layer="satellite">Satellite</button>
             </div>
             <div class="map-chips">
@@ -4829,9 +4846,9 @@
         <div class="cam-bottom">
           <div class="lens-name" id="lens-name">Classic</div>
           <div class="lenses" id="lenses"></div>
+          <button type="button" class="shutter ready" id="cam-shutter" aria-label="Capture"></button>
           <p class="cam-hint">Tap to capture a Moment · hold for a short clip</p>
         </div>
-        <button type="button" class="shutter ready" id="cam-shutter" aria-label="Capture"></button>
         <div id="snap-preview">
           <div id="editor-stage">
             <img id="preview-img" alt="" />
@@ -5462,7 +5479,7 @@
     <div id="stories-page" hidden></div>
 
     <div id="onboarding">
-      <div class="ob-mark"><img class="brand-logo logo-on-black" src="logos/gather-white.svg" width="72" height="72" alt="Gather" /><img class="brand-logo logo-on-white" src="logos/gather-black.svg" width="72" height="72" alt="Gather" />Gather</div>
+      <div class="ob-mark"><svg class="brand-logo" viewBox="0 0 32 32" width="72" height="72" aria-hidden="true"><path d="M16 7s7 6 7 11a7 7 0 1 1-14 0c0-5 7-11 7-11z" fill="currentColor"/></svg><span>Gather</span></div>
       <p class="ob-sub">Communities, friends and stories around you. Let’s set up your look.</p>
       <label class="field" style="padding:0 0 16px;">
         <span>Your name</span>
@@ -5492,7 +5509,7 @@
         <h2 id="call-name">Calling</h2>
         <p id="call-status">Calling…</p>
         <p id="call-timer" hidden>0:00</p>
-        <p class="call-e2e">🔒 End-to-end encrypted</p>
+        <p class="call-e2e">🔒 Demo call</p>
       </div>
       <div id="call-self">
         <video id="call-self-video" playsinline autoplay muted></video>
@@ -6466,7 +6483,7 @@
     }
     el.classList.add("show");
     clearTimeout(toast._t);
-    toast._t = setTimeout(function () { el.classList.remove("show"); }, action ? 4200 : 2200);
+    toast._t = setTimeout(function () { try { el.classList.remove("show"); } catch (e) {} }, action ? 3800 : 1800);
   }
   let audioCtx = null;
   const soundLog = [];
@@ -6855,6 +6872,7 @@
     if (instant == null) instant = true;
     if (i === PAGE.camera && state.page !== PAGE.camera) state.pageBeforeCamera = state.page;
     state.page = i;
+    try { hideToast(); } catch (e) {}
     const pager = $("#pager");
     if (instant) pager.classList.add("dragging");
     pager.style.transform = "translateX(" + (-i * 100) + "%)";
@@ -7814,7 +7832,9 @@
     try { renderMapMarkers(); } catch (err) {}
     closeLive();
     closePartyLive();
-    toast("You're offline");
+    try { hideToast(); } catch (e) {}
+    if (typeof navigator !== "undefined" && navigator.onLine === false) toast("You're offline");
+    else toast("You're no longer live");
   }
   function startGoLive() {
     const me = store.profile || {};
@@ -8046,7 +8066,8 @@
       if (e.target.closest("#live-react-btn")) { reactLive(); return; }
       if (e.target.closest("#live-end-btn")) {
         const t = state.liveTarget || {};
-        endUserLive(t.itemId || t.id);
+        if (t.isMine) endUserLive(t.itemId || t.id);
+        else { try { closeLive(); } catch (err) {} }
         return;
       }
       if (e.target.closest("#party-close") || e.target.closest("#party-close-2")) { closePartyLive(); return; }
@@ -8129,7 +8150,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 23. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 24. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -16813,23 +16834,25 @@
   let feedSoundOn = false;
   let feedTapTimer = 0;
   let feedLastTap = 0;
+  const LOCAL_FEED_CLIPS = ["media/fv-osu.mp4","media/fv-labadi.mp4","media/fv-roof.mp4","media/fv-jamestown.mp4","media/fv-market.mp4","media/fv-square.mp4","media/fv-nightwalk.mp4","media/fv-cup.mp4","media/fv-ronaldo-1.mp4","media/fv-ronaldo-2.mp4","media/fv-kwame-foot.mp4","media/fv-yaw-ronaldo.mp4","media/fv-kofi-music.mp4","media/fv-akosua-dance.mp4","media/fv-nana-ideas.mp4","media/fv-lydia-food.mp4"];
+  try { window.__gatherLocalClips = LOCAL_FEED_CLIPS.slice(); } catch (e) {}
   const SEED_FEED_VIDEOS = [
-    { id: "fv-osu", src: "https://assets.mixkit.co/videos/1230/1230-720.mp4", poster: "night", userId: "kwame", caption: "Osu after hours. The lights never really go off. #music #Accra", sound: "Night Drive \u2014 Accra Mix", tags: ["music", "Accra"], likes: 2140, comments: [["Ama", "The energy though."], ["Fiifi", "I need to be there."], ["Nii", "Save me a spot."]] },
-    { id: "fv-labadi", src: "https://assets.mixkit.co/videos/3456/3456-720.mp4", poster: "beach", userId: "efua", caption: "Labadi at golden hour. Barefoot, always.", sound: "Golden Hour \u2014 Shoreline", tags: ["Accra"], likes: 1862, comments: [["Lydia", "This light is perfect."], ["Ama", "Which side of the beach?"]] },
-    { id: "fv-roof", src: "https://assets.mixkit.co/videos/30000/30000-720.mp4", poster: "fun", userId: "kojo", caption: "East Legon rooftop, late set, no rush. #music", sound: "Rooftop Session", tags: ["music", "Accra"], likes: 974, comments: [["Abena", "What time does it start?"], ["Yaw", "Send it."]] },
-    { id: "fv-jamestown", src: "https://assets.mixkit.co/videos/1250/1250-720.mp4", poster: "sunset", userId: "ama", caption: "Jamestown walking, just before the light goes.", sound: "Harbour Walk", tags: ["Accra"], likes: 1320, comments: [["Kwame", "Classic Ama."], ["Efua", "Take me next time."]] },
-    { id: "fv-market", src: "https://assets.mixkit.co/videos/1192/1192-720.mp4", poster: "green", userId: "lydia", caption: "Saturday in the city. New spots, honest notes. #food #Accra", sound: "City Notes", tags: ["food", "Accra"], likes: 808, comments: [["Abena", "Where is this?"]] },
-    { id: "fv-square", src: "https://assets.mixkit.co/videos/43000/43000-720.mp4", poster: "green", userId: "yaw", caption: "A quick loop around the arch this afternoon.", sound: "Original sound \u2014 Yaw", tags: ["Accra"], likes: 2410, comments: [["Sena", "The streak continues."], ["Kojo", "I'm coming through."]] },
-    { id: "fv-nightwalk", src: "https://assets.mixkit.co/videos/1600/1600-720.mp4", poster: "night", userId: "abena", caption: "Airport City after work. Soft lights, slow walk.", sound: "After Work", tags: ["Accra"], likes: 690, comments: [["Lydia", "Saving this."]] },
-    { id: "fv-cup", src: "https://videos.pexels.com/video-files/10871054/10871054-hd_1080_1920_30fps.mp4", poster: "beach", userId: "fiifi", caption: "Friday cup energy. Winner stays on. Channeling Ronaldo tonight. #football", sound: "Match Night", tags: ["football", "Accra"], likes: 1544, comments: [["Kwame", "Who won?"], ["Nii", "Next fixture soon."]] },
-    { id: "fv-ronaldo-1", src: "https://assets.mixkit.co/videos/1200/1200-720.mp4", poster: "fun", userId: "ronaldo", caption: "Training at the park. Stay sharp. #football", sound: "Match Day", tags: ["football", "Accra"], likes: 3200, comments: [["Kwame", "Clean finish."], ["Fiifi", "Respect."]] },
-    { id: "fv-ronaldo-2", src: "https://assets.mixkit.co/videos/1220/1220-720.mp4", poster: "sunset", userId: "ronaldo", caption: "Footwork before Sunday's kickabout. #football #Accra", sound: "Stadium Drums", tags: ["football"], likes: 2875, comments: [["Yaw", "That's the one."]] },
-    { id: "fv-kwame-foot", src: "https://assets.mixkit.co/videos/1232/1232-720.mp4", poster: "night", userId: "kwame", caption: "Ronaldo-level footwork on the Osu pitch today. #football", sound: "Crowd Pulse", tags: ["football", "Accra"], likes: 1104, comments: [["Ronaldo Mensah", "Nice touch."]] },
-    { id: "fv-yaw-ronaldo", src: "https://assets.mixkit.co/videos/1252/1252-720.mp4", poster: "green", userId: "yaw", caption: "The #Ronaldo challenge after the match. I tried. #comedy #football", sound: "Original sound \u2014 Yaw", tags: ["football", "comedy"], likes: 980, comments: [["Fiifi", "The attempt though."]] },
-    { id: "fv-kofi-music", src: "https://assets.mixkit.co/videos/1164/1164-720.mp4", poster: "night", userId: "kofi", caption: "A new music loop from the studio. Headphones on. #music", sound: "Kofi Beats \u2014 Night Bus", tags: ["music"], likes: 1640, comments: [["Kojo", "Send the file."]] },
-    { id: "fv-akosua-dance", src: "https://assets.mixkit.co/videos/3448/3448-720.mp4", poster: "sunset", userId: "akosua", caption: "Dance rehearsal, no cuts. #dance #music", sound: "Practice Mix", tags: ["dance", "music"], likes: 1422, comments: [["Ama", "The footwork!"]] },
-    { id: "fv-nana-ideas", src: "https://assets.mixkit.co/videos/1180/1180-720.mp4", poster: "green", userId: "nana", caption: "A few ideas for a better Sunday in Accra. #ideas", sound: "Quiet Notes", tags: ["ideas", "Accra"], likes: 760, comments: [["Lydia", "Saving these ideas."]] },
-    { id: "fv-lydia-food", src: "https://assets.mixkit.co/videos/42940/42940-720.mp4", poster: "fun", userId: "lydia", caption: "Street food in Accra, hot and fast. #food", sound: "Market Morning", tags: ["food", "Accra"], likes: 990, comments: [["Abena", "Where is this stall?"]] }
+    { id: "fv-osu", src: "media/fv-osu.mp4", posterSrc: "media/fv-osu.jpg", poster: "night", userId: "kwame", caption: "Osu after hours. The lights never really go off. #music #Accra", sound: "Night Drive \u2014 Accra Mix", tags: ["music", "Accra"], likes: 2140, comments: [["Ama", "The energy though."], ["Fiifi", "I need to be there."], ["Nii", "Save me a spot."]] },
+    { id: "fv-labadi", src: "media/fv-labadi.mp4", posterSrc: "media/fv-labadi.jpg", poster: "beach", userId: "efua", caption: "Labadi at golden hour. Barefoot, always.", sound: "Golden Hour \u2014 Shoreline", tags: ["Accra"], likes: 1862, comments: [["Lydia", "This light is perfect."], ["Ama", "Which side of the beach?"]] },
+    { id: "fv-roof", src: "media/fv-roof.mp4", posterSrc: "media/fv-roof.jpg", poster: "fun", userId: "kojo", caption: "East Legon rooftop, late set, no rush. #music", sound: "Rooftop Session", tags: ["music", "Accra"], likes: 974, comments: [["Abena", "What time does it start?"], ["Yaw", "Send it."]] },
+    { id: "fv-jamestown", src: "media/fv-jamestown.mp4", posterSrc: "media/fv-jamestown.jpg", poster: "sunset", userId: "ama", caption: "Jamestown walking, just before the light goes.", sound: "Harbour Walk", tags: ["Accra"], likes: 1320, comments: [["Kwame", "Classic Ama."], ["Efua", "Take me next time."]] },
+    { id: "fv-market", src: "media/fv-market.mp4", posterSrc: "media/fv-market.jpg", poster: "green", userId: "lydia", caption: "Saturday in the city. New spots, honest notes. #food #Accra", sound: "City Notes", tags: ["food", "Accra"], likes: 808, comments: [["Abena", "Where is this?"]] },
+    { id: "fv-square", src: "media/fv-square.mp4", posterSrc: "media/fv-square.jpg", poster: "green", userId: "yaw", caption: "A quick loop around the arch this afternoon.", sound: "Original sound \u2014 Yaw", tags: ["Accra"], likes: 2410, comments: [["Sena", "The streak continues."], ["Kojo", "I'm coming through."]] },
+    { id: "fv-nightwalk", src: "media/fv-nightwalk.mp4", posterSrc: "media/fv-nightwalk.jpg", poster: "night", userId: "abena", caption: "Airport City after work. Soft lights, slow walk.", sound: "After Work", tags: ["Accra"], likes: 690, comments: [["Lydia", "Saving this."]] },
+    { id: "fv-cup", src: "media/fv-cup.mp4", posterSrc: "media/fv-cup.jpg", poster: "beach", userId: "fiifi", caption: "Friday cup energy. Winner stays on. Channeling Ronaldo tonight. #football", sound: "Match Night", tags: ["football", "Accra"], likes: 1544, comments: [["Kwame", "Who won?"], ["Nii", "Next fixture soon."]] },
+    { id: "fv-ronaldo-1", src: "media/fv-ronaldo-1.mp4", posterSrc: "media/fv-ronaldo-1.jpg", poster: "fun", userId: "ronaldo", caption: "Training at the park. Stay sharp. #football", sound: "Match Day", tags: ["football", "Accra"], likes: 3200, comments: [["Kwame", "Clean finish."], ["Fiifi", "Respect."]] },
+    { id: "fv-ronaldo-2", src: "media/fv-ronaldo-2.mp4", posterSrc: "media/fv-ronaldo-2.jpg", poster: "sunset", userId: "ronaldo", caption: "Footwork before Sunday's kickabout. #football #Accra", sound: "Stadium Drums", tags: ["football"], likes: 2875, comments: [["Yaw", "That's the one."]] },
+    { id: "fv-kwame-foot", src: "media/fv-kwame-foot.mp4", posterSrc: "media/fv-kwame-foot.jpg", poster: "night", userId: "kwame", caption: "Ronaldo-level footwork on the Osu pitch today. #football", sound: "Crowd Pulse", tags: ["football", "Accra"], likes: 1104, comments: [["Ronaldo Mensah", "Nice touch."]] },
+    { id: "fv-yaw-ronaldo", src: "media/fv-yaw-ronaldo.mp4", posterSrc: "media/fv-yaw-ronaldo.jpg", poster: "green", userId: "yaw", caption: "The #Ronaldo challenge after the match. I tried. #comedy #football", sound: "Original sound \u2014 Yaw", tags: ["football", "comedy"], likes: 980, comments: [["Fiifi", "The attempt though."]] },
+    { id: "fv-kofi-music", src: "media/fv-kofi-music.mp4", posterSrc: "media/fv-kofi-music.jpg", poster: "night", userId: "kofi", caption: "A new music loop from the studio. Headphones on. #music", sound: "Kofi Beats \u2014 Night Bus", tags: ["music"], likes: 1640, comments: [["Kojo", "Send the file."]] },
+    { id: "fv-akosua-dance", src: "media/fv-akosua-dance.mp4", posterSrc: "media/fv-akosua-dance.jpg", poster: "sunset", userId: "akosua", caption: "Dance rehearsal, no cuts. #dance #music", sound: "Practice Mix", tags: ["dance", "music"], likes: 1422, comments: [["Ama", "The footwork!"]] },
+    { id: "fv-nana-ideas", src: "media/fv-nana-ideas.mp4", posterSrc: "media/fv-nana-ideas.jpg", poster: "green", userId: "nana", caption: "A few ideas for a better Sunday in Accra. #ideas", sound: "Quiet Notes", tags: ["ideas", "Accra"], likes: 760, comments: [["Lydia", "Saving these ideas."]] },
+    { id: "fv-lydia-food", src: "media/fv-lydia-food.mp4", posterSrc: "media/fv-lydia-food.jpg", poster: "fun", userId: "lydia", caption: "Street food in Accra, hot and fast. #food", sound: "Market Morning", tags: ["food", "Accra"], likes: 990, comments: [["Abena", "Where is this stall?"]] }
   ];
   function feedHandleOf(userId) {
     if (userId === "me") return (store.session && store.session.username) || (store.profile && store.profile.name) || "you";
@@ -17102,9 +17125,37 @@
       bar.style.width = Math.max(0, Math.min(100, (vid.currentTime / vid.duration) * 100)) + "%";
     });
     vid.addEventListener("error", function () {
+      const tries = Number(vid.getAttribute("data-fallback-tries") || "0");
+      const local = (window.__gatherLocalClips || []).slice();
+      if (!local.length) {
+        document.querySelectorAll("#discover-feed video[src], #following-feed video[src]").forEach(function (v) {
+          const s = v.getAttribute("src");
+          if (s && local.indexOf(s) === -1) local.push(s);
+        });
+        window.__gatherLocalClips = local;
+      }
+      if (tries < 2 && local.length) {
+        const cur = vid.getAttribute("src") || "";
+        const idx = Math.max(0, local.indexOf(cur));
+        const nextSrc = local[(idx + 1 + tries) % local.length];
+        if (nextSrc && nextSrc !== cur) {
+          vid.setAttribute("data-fallback-tries", String(tries + 1));
+          vid.src = nextSrc;
+          try { vid.load(); } catch (e) {}
+          return;
+        }
+      }
       slide.classList.add("is-failed");
       const poster = slide.querySelector(".vf-poster");
       if (poster) poster.style.display = "block";
+      if (typeof currentFeedsTab === "function" && (currentFeedsTab() === "foryou" || currentFeedsTab() === "following")) {
+        const nextSlide = slide.nextElementSibling;
+        const nv = nextSlide && nextSlide.querySelector("video");
+        if (nv && state.page === PAGE.feeds) {
+          try { nv.closest(".scroll") && (slide.parentElement.parentElement.scrollTop += (nextSlide.offsetHeight || 0)); } catch (e) {}
+          try { if (typeof playFeedVideo === "function") playFeedVideo(nv); } catch (e) {}
+        }
+      }
     });
     function markReady() { slide.classList.add("is-ready"); }
     vid.addEventListener("loadeddata", markReady);
@@ -18486,7 +18537,11 @@
       }
     }
     const endBtn = document.getElementById("live-end-btn");
-    if (endBtn) endBtn.hidden = !isMine;
+    if (endBtn) {
+      endBtn.hidden = false;
+      endBtn.textContent = isMine ? "End live" : "Leave";
+      endBtn.classList.toggle("is-leave", !isMine);
+    }
     const chatIn = document.getElementById("live-chat-input");
     if (chatIn) chatIn.value = "";
     $("#live-viewer").classList.add("open");
@@ -19135,6 +19190,10 @@
               map.easeTo({ pitch: 0, duration: 500 });
             }
           } catch (e) {}
+          clearTimeout(renderMapMarkers._spreadT);
+          renderMapMarkers._spreadT = setTimeout(function () {
+            try { renderMapMarkers(); } catch (e) {}
+          }, 80);
         });
         try {
           if (!window.__gatherStarsResize) {
@@ -19342,9 +19401,63 @@
   function findMeetup(id) {
     return allMeetups().find(function (m) { return m && m.id === id; });
   }
+  function currentMapZoom() {
+    try { if (state.map && state.map.getZoom) return state.map.getZoom(); } catch (e) {}
+    return 12;
+  }
+  function spreadPinCoords(items) {
+    if (!items || items.length < 2) return items;
+    const z = currentMapZoom();
+    if (z < 6.5) return items;
+    const lat0 = items[0].lat || 5.56;
+    const metersPerPx = 156543.03392 * Math.cos(lat0 * Math.PI / 180) / Math.pow(2, z);
+    const minDeg = Math.max((150 * metersPerPx) / 111320, 0.0008);
+    const n = items.length;
+    const parent = [];
+    for (let i = 0; i < n; i++) parent[i] = i;
+    function find(i) { return parent[i] === i ? i : (parent[i] = find(parent[i])); }
+    function uni(a, b) { a = find(a); b = find(b); if (a !== b) parent[b] = a; }
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const dlat = items[i].lat - items[j].lat;
+        const dlng = (items[i].lng - items[j].lng) * Math.cos(lat0 * Math.PI / 180);
+        if ((dlat * dlat + dlng * dlng) < (minDeg * minDeg)) uni(i, j);
+      }
+    }
+    const groups = {};
+    for (let i = 0; i < n; i++) {
+      const r = find(i);
+      (groups[r] || (groups[r] = [])).push(i);
+    }
+    Object.keys(groups).forEach(function (k) {
+      const g = groups[k];
+      if (g.length < 2) return;
+      let cy = 0, cx = 0;
+      g.forEach(function (i) { cy += items[i].lat; cx += items[i].lng; });
+      cy /= g.length; cx /= g.length;
+      const radius = minDeg * (0.7 + 0.18 * Math.min(g.length, 10));
+      const cos = Math.max(0.2, Math.cos(cy * Math.PI / 180));
+      g.forEach(function (i, idx) {
+        const ang = (-Math.PI / 2) + (2 * Math.PI * idx / g.length);
+        items[i].lat = cy + radius * Math.cos(ang);
+        items[i].lng = cx + (radius * Math.sin(ang)) / cos;
+      });
+    });
+    return items;
+  }
+  function queueMapPin(el, lng, lat, anchor) {
+    (state._pinQueue || (state._pinQueue = [])).push({ el: el, lng: lng, lat: lat, anchor: anchor || "bottom" });
+  }
+  function flushMapPins() {
+    const q = state._pinQueue || [];
+    state._pinQueue = [];
+    spreadPinCoords(q);
+    q.forEach(function (p) { state.markers.push(addMapMarker(p.el, p.lng, p.lat, p.anchor)); });
+  }
   function renderMapMarkers() {
     if (!state.map) return;
     clearMarkers();
+    state._pinQueue = [];
     const pulse = document.createElement("div");
     pulse.className = "pulse-wrap";
     pulse.innerHTML = '<div class="pulse-ring"></div><div class="pulse-ring d2"></div><div class="pulse-core"></div>';
@@ -19362,7 +19475,7 @@
         live: !!c.live
       });
       el.addEventListener("click", (ev) => { ev.stopPropagation(); if (c.live) openLive("comm", c.id); else openSheet(c.id); });
-      state.markers.push(addMapMarker(el, c.lng, c.lat, "bottom"));
+      queueMapPin(el, c.lng, c.lat, "bottom");
     });
     allMeetups().forEach(function (m) {
       if (!m || !isFinite(m.lat) || !isFinite(m.lng)) return;
@@ -19373,7 +19486,7 @@
         sub: meetupCountLabel(m)
       });
       el.addEventListener("click", function (ev) { ev.stopPropagation(); openMeetupSheet(m.id); });
-      state.markers.push(addMapMarker(el, m.lng, m.lat, "bottom"));
+      queueMapPin(el, m.lng, m.lat, "bottom");
     });
     const markedLive = {};
     if (state.showFriends) {
@@ -19385,7 +19498,7 @@
           if (isLivePerson(p.id)) openLive("person", p.id);
           else openSheetFriend(p);
         });
-        state.markers.push(addMapMarker(el, p.lng, p.lat, "bottom"));
+        queueMapPin(el, p.lng, p.lat, "bottom");
       });
     }
     (typeof visibleMapCommunities === "function" ? visibleMapCommunities() : allCommunities()).forEach(function (c) {
@@ -19408,9 +19521,10 @@
           live: true
         });
         el.addEventListener("click", function (ev) { ev.stopPropagation(); openLiveItem(it); });
-        state.markers.push(addMapMarker(el, it.lng, it.lat, "bottom"));
+        queueMapPin(el, it.lng, it.lat, "bottom");
       });
     }
+    flushMapPins();
   }
   function fmtMeetupWhen(ts) {
     const d = new Date(Number(ts) || Date.now());
@@ -20207,7 +20321,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 23. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 24. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -20671,6 +20785,15 @@
     applyMapLayer(b.dataset.layer);
   });
   function syncLayerChips() {
+    const sat = (typeof mapKind === "function") ? mapKind() === "satellite" : false;
+    const white = (typeof isWhiteTheme === "function") ? isWhiteTheme() : true;
+    $$("#layer-switch button").forEach(function (b) {
+      const l = b.dataset.layer;
+      if (l === "satellite") b.classList.toggle("on", sat);
+      else if (l === "black") b.classList.toggle("on", !sat && !white);
+      else if (l === "white") b.classList.toggle("on", !sat && white);
+      else b.classList.remove("on");
+    });
     const c = document.getElementById("tog-comms");
     const p = document.getElementById("tog-parties");
     const f = document.getElementById("tog-friends");
@@ -21455,6 +21578,11 @@
     if (next) next.textContent = step.next;
     if (err) err.textContent = "";
     if (track) track.style.transform = "translateX(-" + authState.step * 100 + "%)";
+    $$("#auth-signup-track .auth-pane").forEach(function (pane, i) {
+      const on = i === authState.step;
+      pane.classList.toggle("on", on);
+      pane.setAttribute("aria-hidden", on ? "false" : "true");
+    });
     const back = document.getElementById("auth-signup-back");
     if (back) back.setAttribute("aria-label", authState.step === 0 ? "Back to welcome" : "Back");
   }
@@ -21604,6 +21732,7 @@
   function startUi() {
     hideAuth();
     hideNav(false);
+    try { hideToast(); } catch (e) {}
     var startPage = PAGE.map;
     try {
       if (store.onboardingDone && typeof store.lastPage === "number" && store.lastPage >= 0 && store.lastPage < PAGES.length) {

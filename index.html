@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="24">
+<html lang="en" data-theme="white" data-build="25">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -1020,6 +1020,7 @@
     .layer-switch button.on { background: var(--yellow); color: var(--yellow-ink); }
     .map-chips {
       display: flex; gap: 6px;
+      flex-wrap: wrap;
     }
     .map-chips button {
       height: 32px; padding: 0 12px; border-radius: 999px;
@@ -4800,15 +4801,11 @@
                 <input id="search-input" type="text" enterkeyhint="search" placeholder="Search communities or parties" />
               </div>
             </div>
-            <div class="layer-switch" id="layer-switch">
-              <button type="button" data-layer="black">Black</button>
-              <button type="button" data-layer="white" class="on">White</button>
-              <button type="button" data-layer="satellite">Satellite</button>
-            </div>
-            <div class="map-chips">
-              <button type="button" class="on" id="tog-comms">Communities</button>
-              <button type="button" class="on" id="tog-parties">Parties</button>
-              <button type="button" id="tog-friends">Friends</button>
+            <div class="map-chips" id="map-filter-chips">
+              <button type="button" class="on" data-map-filter="all" aria-pressed="true">All</button>
+              <button type="button" data-map-filter="friends" aria-pressed="false">Friends</button>
+              <button type="button" data-map-filter="parties" aria-pressed="false">Parties</button>
+              <button type="button" data-map-filter="live" aria-pressed="false">Live</button>
             </div>
             <div id="search-panel"></div>
           </div>
@@ -6224,6 +6221,7 @@
       theme: "white",
       themeChosen: false,
       mapLayer: "streets",
+      mapFilter: "all",
       view3d: false,
       following: ["kwame","efua","kojo","ama","lydia","yaw"],
       followingSeeded: true,
@@ -6276,6 +6274,8 @@
       s.layers.friends = false;
       s.placeFirstMap = true;
     }
+    if (s.mapFilter !== "friends" && s.mapFilter !== "parties" && s.mapFilter !== "live") s.mapFilter = "all";
+    s.mapLayer = "streets";
     if (!Array.isArray(s.meetups)) s.meetups = [];
     s.gatherHoldHintSeen = s.gatherHoldHintSeen === true;
     s.messages = (s.messages && typeof s.messages === "object" && !Array.isArray(s.messages)) ? s.messages : {};
@@ -6413,12 +6413,10 @@
     draft: { name: "", category: "football", description: "", lat: ACCRA.lat, lng: ACCRA.lng, place: "Accra" },
     avatarDraft: null,
     avatarFrom: null,
-    showComms: true, showParties: true, showFriends: false,
+    mapFilter: "all",
     view3d: false
   };
-  state.showComms = store.layers.comms;
-  state.showParties = store.layers.parties;
-  state.showFriends = store.layers.friends;
+  state.mapFilter = (store.mapFilter === "friends" || store.mapFilter === "parties" || store.mapFilter === "live") ? store.mapFilter : "all";
   state.view3d = !!store.view3d;
 
   const $ = (sel, el) => (el || document).querySelector(sel);
@@ -8151,7 +8149,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 24. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 25. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -18850,8 +18848,6 @@
   }
   function isWhiteTheme() { return (store.theme || "white") === "white"; }
   function mapKind(layer) {
-    const l = layer == null ? store.mapLayer : layer;
-    if (l === "satellite" || l === "terrain") return "satellite";
     return "streets";
   }
   function rasterFallbackStyle() { return isWhiteTheme() ? ESRI_LIGHT : ESRI_DARK; }
@@ -19357,6 +19353,8 @@
       ring.className = "pin-status-ring " + statusRing;
       wrap.appendChild(ring);
     }
+    wrap.setAttribute("data-pin-kind", cls || "friend");
+    if (live) wrap.setAttribute("data-pin-live", "1");
     const el = document.createElement("div");
     el.className = "pin-av " + (cls || "");
     if (padded) { el.style.margin = "4px"; el.style.position = "relative"; el.style.zIndex = "1"; }
@@ -19389,6 +19387,8 @@
     const wrap = document.createElement("button");
     wrap.type = "button";
     wrap.className = "place-pin " + (opts.kind || "comm") + (opts.live ? " is-live" : "");
+    wrap.setAttribute("data-pin-kind", opts.kind || "comm");
+    if (opts.live) wrap.setAttribute("data-pin-live", "1");
     wrap.innerHTML =
       '<span class="place-pin-ico" aria-hidden="true">' + (opts.emoji || "\uD83D\uDCCD") + "</span>" +
       '<span class="place-pin-copy"><span class="place-pin-name">' + escapeHtml(opts.name || "") + "</span>" +
@@ -19412,7 +19412,8 @@
     if (z < 6.5) return items;
     const lat0 = items[0].lat || 5.56;
     const metersPerPx = 156543.03392 * Math.cos(lat0 * Math.PI / 180) / Math.pow(2, z);
-    const minDeg = Math.max((150 * metersPerPx) / 111320, 0.0008);
+    const minDeg = Math.max((48 * metersPerPx) / 111320, 0.0008);
+    const maxDeg = Math.max((80 * metersPerPx) / 111320, minDeg);
     const n = items.length;
     const parent = [];
     for (let i = 0; i < n; i++) parent[i] = i;
@@ -19436,7 +19437,7 @@
       let cy = 0, cx = 0;
       g.forEach(function (i) { cy += items[i].lat; cx += items[i].lng; });
       cy /= g.length; cx /= g.length;
-      const radius = minDeg * (0.7 + 0.18 * Math.min(g.length, 10));
+      const radius = Math.min(maxDeg, minDeg * (0.7 + 0.16 * Math.min(g.length, 8)));
       const cos = Math.max(0.2, Math.cos(cy * Math.PI / 180));
       g.forEach(function (i, idx) {
         const ang = (-Math.PI / 2) + (2 * Math.PI * idx / g.length);
@@ -19455,46 +19456,78 @@
     spreadPinCoords(q);
     q.forEach(function (p) { state.markers.push(addMapMarker(p.el, p.lng, p.lat, p.anchor)); });
   }
+  function mapFilter() {
+    const f = state.mapFilter || (store && store.mapFilter) || "all";
+    if (f === "friends" || f === "parties" || f === "live") return f;
+    return "all";
+  }
+  function isNearYou(pt) {
+    try { return haversine(state.loc, pt) <= NEARBY_KM; } catch (e) { return true; }
+  }
+  function syncMapFilterChips() {
+    const f = mapFilter();
+    $$("#map-filter-chips [data-map-filter]").forEach(function (b) {
+      const on = b.getAttribute("data-map-filter") === f;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+  function setMapFilter(f) {
+    if (f !== "friends" && f !== "parties" && f !== "live") f = "all";
+    state.mapFilter = f;
+    store.mapFilter = f;
+    saveStore();
+    syncMapFilterChips();
+    renderMapMarkers();
+  }
   function renderMapMarkers() {
     if (!state.map) return;
     clearMarkers();
     state._pinQueue = [];
+    const filter = mapFilter();
     const pulse = document.createElement("div");
     pulse.className = "pulse-wrap";
+    pulse.setAttribute("data-pin-kind", "you");
     pulse.innerHTML = '<div class="pulse-ring"></div><div class="pulse-ring d2"></div><div class="pulse-core"></div>';
     state.userMarker = addMapMarker(pulse, state.loc.lng, state.loc.lat, "center");
-    (typeof visibleMapCommunities === "function" ? visibleMapCommunities() : allCommunities()).forEach(c => {
-      const isParty = c.category === "party";
-      if (isParty && !state.showParties) return;
-      if (!isParty && !state.showComms) return;
-      const cat = catById[c.category] || catById.other;
-      const el = makePlacePinEl({
-        kind: isParty ? "party" : "comm",
-        emoji: isParty ? (cat.emoji || "\uD83C\uDF89") : "\uD83D\uDC65",
-        name: c.name,
-        sub: isParty ? placeCountLabel(c) : ("Community \u00b7 " + placeCountLabel(c)),
-        live: !!c.live
-      });
-      el.addEventListener("click", (ev) => { ev.stopPropagation(); if (c.live) openLive("comm", c.id); else openSheet(c.id); });
-      queueMapPin(el, c.lng, c.lat, "bottom");
-    });
-    allMeetups().forEach(function (m) {
-      if (!m || !isFinite(m.lat) || !isFinite(m.lng)) return;
-      const el = makePlacePinEl({
-        kind: "meetup",
-        emoji: "\uD83D\uDCCD",
-        name: m.title,
-        sub: meetupCountLabel(m)
-      });
-      el.addEventListener("click", function (ev) { ev.stopPropagation(); openMeetupSheet(m.id); });
-      queueMapPin(el, m.lng, m.lat, "bottom");
-    });
     const markedLive = {};
-    if (state.showFriends) {
-      store.friends.map(id => personById[id]).filter(Boolean).forEach(p => {
+    if (filter === "all" || filter === "parties") {
+      (typeof visibleMapCommunities === "function" ? visibleMapCommunities() : allCommunities()).forEach(function (c) {
+        const isParty = c.category === "party";
+        if (filter === "parties") {
+          if (!isParty || !isNearYou(c)) return;
+        }
+        const cat = catById[c.category] || catById.other;
+        const el = makePlacePinEl({
+          kind: isParty ? "party" : "comm",
+          emoji: isParty ? (cat.emoji || "🎉") : "👥",
+          name: c.name,
+          sub: isParty ? placeCountLabel(c) : ("Community · " + placeCountLabel(c)),
+          live: !!c.live
+        });
+        el.addEventListener("click", function (ev) { ev.stopPropagation(); if (c.live) openLive("comm", c.id); else openSheet(c.id); });
+        queueMapPin(el, c.lng, c.lat, "bottom");
+        if (c.live) markedLive["comm:" + c.id] = true;
+      });
+    }
+    if (filter === "all") {
+      allMeetups().forEach(function (m) {
+        if (!m || !isFinite(m.lat) || !isFinite(m.lng)) return;
+        const el = makePlacePinEl({
+          kind: "meetup",
+          emoji: "📍",
+          name: m.title,
+          sub: meetupCountLabel(m)
+        });
+        el.addEventListener("click", function (ev) { ev.stopPropagation(); openMeetupSheet(m.id); });
+        queueMapPin(el, m.lng, m.lat, "bottom");
+      });
+    }
+    if (filter === "all" || filter === "friends") {
+      store.friends.map(function (id) { return personById[id]; }).filter(Boolean).forEach(function (p) {
         const el = makePinEl(avatarSVG(p.avatar, 44), "friend", p.name.split(" ")[0], isLivePerson(p.id), hasActiveStatus(p.id) ? (hasUnseenStatus(p.id) ? "unseen" : "seen") : "");
         if (isLivePerson(p.id)) { el.classList.add("is-live"); markedLive["person:" + p.id] = true; }
-        el.addEventListener("click", (ev) => {
+        el.addEventListener("click", function (ev) {
           ev.stopPropagation();
           if (isLivePerson(p.id)) openLive("person", p.id);
           else openSheetFriend(p);
@@ -19502,13 +19535,34 @@
         queueMapPin(el, p.lng, p.lat, "bottom");
       });
     }
-    (typeof visibleMapCommunities === "function" ? visibleMapCommunities() : allCommunities()).forEach(function (c) {
-      const isParty = c.category === "party";
-      if (isParty && !state.showParties) return;
-      if (!isParty && !state.showComms) return;
-      if (c.live) markedLive["comm:" + c.id] = true;
-    });
-    if (typeof allLiveItems === "function") {
+    if (filter === "live") {
+      store.friends.map(function (id) { return personById[id]; }).filter(Boolean).forEach(function (p) {
+        if (!isLivePerson(p.id)) return;
+        const el = makePinEl(avatarSVG(p.avatar, 44), "friend", p.name.split(" ")[0], true, hasActiveStatus(p.id) ? (hasUnseenStatus(p.id) ? "unseen" : "seen") : "");
+        el.classList.add("is-live");
+        el.setAttribute("data-pin-kind", "live");
+        markedLive["person:" + p.id] = true;
+        el.addEventListener("click", function (ev) { ev.stopPropagation(); openLive("person", p.id); });
+        queueMapPin(el, p.lng, p.lat, "bottom");
+      });
+      (typeof visibleMapCommunities === "function" ? visibleMapCommunities() : allCommunities()).forEach(function (c) {
+        if (!c || !c.live) return;
+        markedLive["comm:" + c.id] = true;
+        const isParty = c.category === "party";
+        const cat = catById[c.category] || catById.other;
+        const el = makePlacePinEl({
+          kind: isParty ? "live-party" : "live-stream",
+          emoji: isParty ? (cat.emoji || "🎉") : "📹",
+          name: c.name,
+          sub: isParty ? "Live party" : "LIVE",
+          live: true
+        });
+        el.setAttribute("data-pin-kind", "live");
+        el.addEventListener("click", function (ev) { ev.stopPropagation(); openLive("comm", c.id); });
+        queueMapPin(el, c.lng, c.lat, "bottom");
+      });
+    }
+    if ((filter === "all" || filter === "live") && typeof allLiveItems === "function") {
       allLiveItems().forEach(function (it) {
         if (!it || !isFinite(it.lat) || !isFinite(it.lng)) return;
         const key = (it.kind && it.targetId) ? (it.kind + ":" + it.targetId) : it.id;
@@ -19516,11 +19570,12 @@
         markedLive[key] = true;
         const el = makePlacePinEl({
           kind: it.type === "party" ? "live-party" : "live-stream",
-          emoji: it.type === "party" ? "\uD83C\uDF89" : "\uD83D\uDCF9",
+          emoji: it.type === "party" ? "🎉" : "📹",
           name: it.title,
-          sub: (it.type === "party" ? "Live party \u00b7 " : "LIVE \u00b7 ") + fmtCount(it.viewers || 0),
+          sub: (it.type === "party" ? "Live party · " : "LIVE · ") + fmtCount(it.viewers || 0),
           live: true
         });
+        el.setAttribute("data-pin-kind", "live");
         el.addEventListener("click", function (ev) { ev.stopPropagation(); openLiveItem(it); });
         queueMapPin(el, it.lng, it.lat, "bottom");
       });
@@ -20322,7 +20377,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 24. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 25. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
@@ -20781,30 +20836,17 @@
     if (c && state.map) mapEaseTo({ center: [c.lng, c.lat], zoom: 15, duration: 800 });
     openSheet(id);
   });
-  $("#layer-switch").addEventListener("click", (e) => {
-    const b = e.target.closest("[data-layer]"); if (!b) return;
-    applyMapLayer(b.dataset.layer);
-  });
-  function syncLayerChips() {
-    const sat = (typeof mapKind === "function") ? mapKind() === "satellite" : false;
-    const white = (typeof isWhiteTheme === "function") ? isWhiteTheme() : true;
-    $$("#layer-switch button").forEach(function (b) {
-      const l = b.dataset.layer;
-      if (l === "satellite") b.classList.toggle("on", sat);
-      else if (l === "black") b.classList.toggle("on", !sat && !white);
-      else if (l === "white") b.classList.toggle("on", !sat && white);
-      else b.classList.remove("on");
+  const mapFilterChips = document.getElementById("map-filter-chips");
+  if (mapFilterChips) {
+    mapFilterChips.addEventListener("click", function (e) {
+      const b = e.target.closest("[data-map-filter]");
+      if (!b) return;
+      setMapFilter(b.getAttribute("data-map-filter"));
     });
-    const c = document.getElementById("tog-comms");
-    const p = document.getElementById("tog-parties");
-    const f = document.getElementById("tog-friends");
-    if (c) c.classList.toggle("on", !!state.showComms);
-    if (p) p.classList.toggle("on", !!state.showParties);
-    if (f) f.classList.toggle("on", !!state.showFriends);
   }
-  $("#tog-comms").addEventListener("click", () => { state.showComms = !state.showComms; store.layers.comms = state.showComms; saveStore(); $("#tog-comms").classList.toggle("on", state.showComms); renderMapMarkers(); });
-  $("#tog-parties").addEventListener("click", () => { state.showParties = !state.showParties; store.layers.parties = state.showParties; saveStore(); $("#tog-parties").classList.toggle("on", state.showParties); renderMapMarkers(); });
-  $("#tog-friends").addEventListener("click", () => { state.showFriends = !state.showFriends; store.layers.friends = state.showFriends; saveStore(); $("#tog-friends").classList.toggle("on", state.showFriends); renderMapMarkers(); });
+  function syncLayerChips() {
+    if (typeof syncMapFilterChips === "function") syncMapFilterChips();
+  }
   const gatherBtn = document.getElementById("nav-map-btn");
   const gatherHold = { timer: null, pressed: false, fired: false, cancelled: false, suppressClick: false, x: 0, y: 0 };
   function cancelGatherHold(el) {

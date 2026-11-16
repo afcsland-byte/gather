@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="white" data-build="25">
+<html lang="en" data-theme="white" data-build="26">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -6139,7 +6139,18 @@
   function defaultAvatar() {
     return { skin: SKINS[2], hair: "fade", hairColor: HAIR_COLORS[0], outfit: "hoodie", outfitColor: "#FFFFFF", acc: "none", bg: "#1A1A00" };
   }
-  function blankStore() {
+    function canonicalizeMapFilter(raw) {
+    const keys = ["friends", "parties", "live"];
+    if (raw === "all" || raw == null || raw === "") return "all";
+    let list;
+    if (Array.isArray(raw)) list = raw;
+    else if (typeof raw === "string") list = raw.split(/[,\s]+/);
+    else return "all";
+    const set = keys.filter(function (k) { return list.indexOf(k) !== -1; });
+    if (set.length === 0 || set.length === 3) return "all";
+    return set;
+  }
+function blankStore() {
     const pics = photos();
     return {
       onboardingDone: false,
@@ -6274,7 +6285,7 @@
       s.layers.friends = false;
       s.placeFirstMap = true;
     }
-    if (s.mapFilter !== "friends" && s.mapFilter !== "parties" && s.mapFilter !== "live") s.mapFilter = "all";
+    s.mapFilter = canonicalizeMapFilter(s.mapFilter);
     s.mapLayer = "streets";
     if (!Array.isArray(s.meetups)) s.meetups = [];
     s.gatherHoldHintSeen = s.gatherHoldHintSeen === true;
@@ -6416,7 +6427,7 @@
     mapFilter: "all",
     view3d: false
   };
-  state.mapFilter = (store.mapFilter === "friends" || store.mapFilter === "parties" || store.mapFilter === "live") ? store.mapFilter : "all";
+  state.mapFilter = canonicalizeMapFilter(store.mapFilter);
   state.view3d = !!store.view3d;
 
   const $ = (sel, el) => (el || document).querySelector(sel);
@@ -8149,7 +8160,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 25. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
+      '<div class="hint">About Gather \u00b7 Version 26. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'.replace("\\u00b7","\u00b7")+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>';
   }
@@ -19457,25 +19468,51 @@
     q.forEach(function (p) { state.markers.push(addMapMarker(p.el, p.lng, p.lat, p.anchor)); });
   }
   function mapFilter() {
-    const f = state.mapFilter || (store && store.mapFilter) || "all";
-    if (f === "friends" || f === "parties" || f === "live") return f;
-    return "all";
+    return canonicalizeMapFilter(state.mapFilter != null ? state.mapFilter : (store && store.mapFilter));
+  }
+  function mapHasFilter(kind) {
+    const f = mapFilter();
+    if (f === "all") return true;
+    return Array.isArray(f) && f.indexOf(kind) !== -1;
+  }
+  function isAllMapFilter() {
+    return mapFilter() === "all";
   }
   function isNearYou(pt) {
     try { return haversine(state.loc, pt) <= NEARBY_KM; } catch (e) { return true; }
   }
   function syncMapFilterChips() {
     const f = mapFilter();
+    const allOn = f === "all";
     $$("#map-filter-chips [data-map-filter]").forEach(function (b) {
-      const on = b.getAttribute("data-map-filter") === f;
+      const id = b.getAttribute("data-map-filter");
+      const on = allOn ? (id === "all") : (id !== "all" && Array.isArray(f) && f.indexOf(id) !== -1);
       b.classList.toggle("on", on);
       b.setAttribute("aria-pressed", on ? "true" : "false");
     });
   }
-  function setMapFilter(f) {
-    if (f !== "friends" && f !== "parties" && f !== "live") f = "all";
-    state.mapFilter = f;
-    store.mapFilter = f;
+  function setMapFilter(clicked) {
+    const keys = ["friends", "parties", "live"];
+    let next;
+    if (clicked === "all" || keys.indexOf(clicked) === -1) {
+      next = "all";
+    } else {
+      const cur = mapFilter();
+      if (cur === "all") {
+        next = [clicked];
+      } else {
+        const has = cur.indexOf(clicked) !== -1;
+        if (has) {
+          const left = cur.filter(function (k) { return k !== clicked; });
+          next = left.length ? left : "all";
+        } else {
+          const add = cur.concat([clicked]);
+          next = add.length === 3 ? "all" : add;
+        }
+      }
+    }
+    state.mapFilter = next;
+    store.mapFilter = next;
     saveStore();
     syncMapFilterChips();
     renderMapMarkers();
@@ -19484,19 +19521,22 @@
     if (!state.map) return;
     clearMarkers();
     state._pinQueue = [];
-    const filter = mapFilter();
+    const allOn = isAllMapFilter();
+    const showFriends = allOn || mapHasFilter("friends");
+    const showParties = allOn || mapHasFilter("parties");
+    const showLive = allOn || mapHasFilter("live");
+    const partiesNearOnly = !allOn && showParties;
     const pulse = document.createElement("div");
     pulse.className = "pulse-wrap";
     pulse.setAttribute("data-pin-kind", "you");
     pulse.innerHTML = '<div class="pulse-ring"></div><div class="pulse-ring d2"></div><div class="pulse-core"></div>';
     state.userMarker = addMapMarker(pulse, state.loc.lng, state.loc.lat, "center");
     const markedLive = {};
-    if (filter === "all" || filter === "parties") {
+    if (allOn || showParties) {
       (typeof visibleMapCommunities === "function" ? visibleMapCommunities() : allCommunities()).forEach(function (c) {
         const isParty = c.category === "party";
-        if (filter === "parties") {
-          if (!isParty || !isNearYou(c)) return;
-        }
+        if (!isParty && !allOn) return;
+        if (isParty && partiesNearOnly && !isNearYou(c)) return;
         const cat = catById[c.category] || catById.other;
         const el = makePlacePinEl({
           kind: isParty ? "party" : "comm",
@@ -19510,7 +19550,7 @@
         if (c.live) markedLive["comm:" + c.id] = true;
       });
     }
-    if (filter === "all") {
+    if (allOn) {
       allMeetups().forEach(function (m) {
         if (!m || !isFinite(m.lat) || !isFinite(m.lng)) return;
         const el = makePlacePinEl({
@@ -19523,7 +19563,7 @@
         queueMapPin(el, m.lng, m.lat, "bottom");
       });
     }
-    if (filter === "all" || filter === "friends") {
+    if (showFriends) {
       store.friends.map(function (id) { return personById[id]; }).filter(Boolean).forEach(function (p) {
         const el = makePinEl(avatarSVG(p.avatar, 44), "friend", p.name.split(" ")[0], isLivePerson(p.id), hasActiveStatus(p.id) ? (hasUnseenStatus(p.id) ? "unseen" : "seen") : "");
         if (isLivePerson(p.id)) { el.classList.add("is-live"); markedLive["person:" + p.id] = true; }
@@ -19535,9 +19575,9 @@
         queueMapPin(el, p.lng, p.lat, "bottom");
       });
     }
-    if (filter === "live") {
+    if (showLive && !allOn) {
       store.friends.map(function (id) { return personById[id]; }).filter(Boolean).forEach(function (p) {
-        if (!isLivePerson(p.id)) return;
+        if (!isLivePerson(p.id) || markedLive["person:" + p.id]) return;
         const el = makePinEl(avatarSVG(p.avatar, 44), "friend", p.name.split(" ")[0], true, hasActiveStatus(p.id) ? (hasUnseenStatus(p.id) ? "unseen" : "seen") : "");
         el.classList.add("is-live");
         el.setAttribute("data-pin-kind", "live");
@@ -19546,7 +19586,7 @@
         queueMapPin(el, p.lng, p.lat, "bottom");
       });
       (typeof visibleMapCommunities === "function" ? visibleMapCommunities() : allCommunities()).forEach(function (c) {
-        if (!c || !c.live) return;
+        if (!c || !c.live || markedLive["comm:" + c.id]) return;
         markedLive["comm:" + c.id] = true;
         const isParty = c.category === "party";
         const cat = catById[c.category] || catById.other;
@@ -19562,7 +19602,7 @@
         queueMapPin(el, c.lng, c.lat, "bottom");
       });
     }
-    if ((filter === "all" || filter === "live") && typeof allLiveItems === "function") {
+    if (showLive && typeof allLiveItems === "function") {
       allLiveItems().forEach(function (it) {
         if (!it || !isFinite(it.lat) || !isFinite(it.lng)) return;
         const key = (it.kind && it.targetId) ? (it.kind + ":" + it.targetId) : it.id;
@@ -20377,7 +20417,7 @@
       "</div>"+
       '<p class="privacy-note">Screenshot detection and blocking need the native app; this demo simulates them.</p>'+
       (typeof settingsDemoToolsHtml === "function" ? settingsDemoToolsHtml() : "")+
-      '<div class="hint">About Gather \u00b7 Version 25. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
+      '<div class="hint">About Gather \u00b7 Version 26. This demo runs in your browser. Moments, stories and chats stay on this device. There are no live accounts or servers yet.</div>'+
       '<div style="padding:12px 16px 8px"><button type="button" class="btn btn-ghost" id="btn-logout">Log out</button></div>'+
       '<div style="padding:0 16px 32px"><button type="button" class="btn btn-danger" id="btn-reset">Clear local data</button></div>'+
       "</div>";
